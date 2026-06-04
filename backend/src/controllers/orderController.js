@@ -4,10 +4,15 @@ import Product from '../models/Product.js';
 import Razorpay from 'razorpay';
 import { createShipment } from '../services/shippingPartner.js';
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+function getRazorpay() {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    return null;
+  }
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
+}
 
 export async function createOrder(req, res, next) {
   try {
@@ -33,7 +38,11 @@ export async function createOrder(req, res, next) {
 
     let razorpayOrder = null;
     if (paymentMethod === 'razorpay') {
-      razorpayOrder = await razorpay.orders.create({
+      const rzp = getRazorpay();
+      if (!rzp) {
+        return res.status(400).json({ message: 'Razorpay not configured. Use COD or configure RAZORPAY_KEY_ID/RAZORPAY_KEY_SECRET' });
+      }
+      razorpayOrder = await rzp.orders.create({
         amount: Math.round(total * 100),
         currency: 'INR',
         receipt: `receipt_${Date.now()}`,
