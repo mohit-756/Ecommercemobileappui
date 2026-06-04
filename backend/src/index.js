@@ -11,6 +11,7 @@ import addressRoutes from './routes/addresses.js';
 import shippingRoutes from './routes/shipping.js';
 import adminRoutes from './routes/admin.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import seedRoutes from './routes/seed.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,6 +34,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/shipping', shippingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', seedRoutes);
 
 app.use(errorHandler);
 
