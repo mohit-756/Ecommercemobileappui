@@ -55,18 +55,21 @@ export function Home() {
     <div className="min-h-full pb-6">
       <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 md:pt-4 md:rounded-t-[32px]">
         <div className="flex justify-between items-center mb-4">
-          <div>
+          <div onClick={() => navigate('/addresses')} className="cursor-pointer active:opacity-70 transition-opacity">
             <p className="text-gray-500 text-sm">Location</p>
             <h2 className="text-gray-900 font-bold flex items-center gap-1">
               New York, USA <span className="text-blue-600">▾</span>
             </h2>
           </div>
           <div className="flex gap-3">
-            <button className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center relative">
+            <button className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center relative active:scale-95 transition-transform">
               <Bell size={20} className="text-gray-700" />
               <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+            <div
+              onClick={() => navigate('/profile')}
+              className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden cursor-pointer active:scale-95 transition-transform border border-gray-100"
+            >
               <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User" />
             </div>
           </div>

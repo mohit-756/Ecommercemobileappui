@@ -3,6 +3,7 @@ import { Home, Search, ShoppingCart, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../contexts/CartContext';
+import { Capacitor } from '@capacitor/core';
 
 const BOTTOM_NAV_ROUTES = ['/home', '/search', '/cart', '/profile'];
 
@@ -38,7 +39,7 @@ export function MobileShell() {
         {/* Content Area */}
         <div className={cn(
           "flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth bg-gray-50",
-          showBottomNav ? "pb-20" : "pb-0",
+          showBottomNav ? "pb-24" : "pb-0", // Increased padding to avoid overlap
           "md:pt-8" // Padding for fake status bar on desktop
         )}>
           <AnimatePresence mode="popLayout" initial={false}>
@@ -57,8 +58,8 @@ export function MobileShell() {
 
         {/* Bottom Navigation */}
         {showBottomNav && (
-          <div className="absolute bottom-0 w-full bg-white border-t border-gray-100 pb-8 pt-2 px-6 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] md:rounded-b-[32px] z-50">
-            <div className="flex justify-between items-center mb-2">
+          <div className="absolute bottom-0 w-full bg-white border-t border-gray-100 pb-safe pt-2 px-6 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] md:rounded-b-[32px] z-50">
+            <div className="flex justify-between items-center mb-1">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
@@ -98,8 +99,10 @@ export function MobileShell() {
                 );
               })}
             </div>
-            {/* Home indicator for iOS style */}
-            <div className="w-1/3 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-1" />
+            {/* Only show manual home indicator on non-native (web) desktop preview */}
+            {!Capacitor.isNativePlatform() && (
+              <div className="w-1/3 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-1" />
+            )}
           </div>
         )}
       </div>

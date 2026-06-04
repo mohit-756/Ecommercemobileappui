@@ -8,7 +8,18 @@
   "plugins": {
     "SplashScreen": {
       "launchAutoHide": true,
+      "backgroundColor": "#ffffff",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false,
+      "launchShowDuration": 2000
+    },
+    "StatusBar": {
+      "style": "DARK",
       "backgroundColor": "#ffffff"
+    },
+    "Keyboard": {
+      "resize": "body",
+      "style": "DARK"
     }
   }
 }
