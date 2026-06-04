@@ -1,27 +1,11 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-async function getGuestUser() {
-  let guest = await User.findOne({ email: 'guest@luminar.app' });
-  if (!guest) {
-    guest = await User.create({
-      name: 'Guest User',
-      email: 'guest@luminar.app',
-      password: 'guest0000',
-      role: 'user',
-      phone: '0000000000',
-    });
-  }
-  return guest;
-}
-
 export async function protect(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-
     if (!authHeader?.startsWith('Bearer ')) {
-      req.user = await getGuestUser();
-      return next();
+      return res.status(401).json({ message: 'Not authorized, no token' });
     }
 
     const token = authHeader.split(' ')[1];
@@ -29,15 +13,13 @@ export async function protect(req, res, next) {
     const user = await User.findById(decoded.id).select('-password');
 
     if (!user) {
-      req.user = await getGuestUser();
-      return next();
+      return res.status(401).json({ message: 'User not found' });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    req.user = await getGuestUser();
-    next();
+    return res.status(401).json({ message: 'Not authorized, token failed' });
   }
 }
 

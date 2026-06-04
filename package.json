@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "cap:build": "vite build && npx cap sync android"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^10.0.0",
@@ -71,6 +74,7 @@
     "vaul": "1.1.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.4.0",
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
     "tailwindcss": "4.1.12",

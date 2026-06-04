@@ -95,6 +95,28 @@ async function seed() {
   await Category.deleteMany({});
   await Product.deleteMany({});
 
+  const existingGuest = await User.findOne({ email: 'guest@luminar.app' });
+  if (!existingGuest) {
+    await User.create({
+      name: 'Guest User',
+      email: 'guest@luminar.app',
+      password: 'guest0000',
+      role: 'user',
+    });
+    console.log('Created guest user');
+  }
+
+  const existingAdmin = await User.findOne({ email: 'admin@luminar.app' });
+  if (!existingAdmin) {
+    await User.create({
+      name: 'Admin',
+      email: 'admin@luminar.app',
+      password: 'admin0000',
+      role: 'admin',
+    });
+    console.log('Created admin user');
+  }
+
   const createdCategories = await Category.insertMany(categories);
   console.log(`Seeded ${createdCategories.length} categories`);
 

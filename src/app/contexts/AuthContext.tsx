@@ -41,6 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(null);
       })
       .finally(() => setIsLoading(false));
+
+    const handleLogout = () => {
+      setToken(null);
+      setUser(null);
+    };
+    window.addEventListener('auth:logout', handleLogout);
+    return () => window.removeEventListener('auth:logout', handleLogout);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
