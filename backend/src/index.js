@@ -36,11 +36,29 @@ app.use('/api/admin', adminRoutes);
 
 app.use(errorHandler);
 
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled rejection:', err);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+  process.exit(1);
+});
+
 async function start() {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  console.log('Starting server...');
+  console.log('MONGODB_URI set:', !!process.env.MONGODB_URI);
+  console.log('JWT_SECRET set:', !!process.env.JWT_SECRET);
+  console.log('PORT:', process.env.PORT || PORT);
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 }
 
 start();
