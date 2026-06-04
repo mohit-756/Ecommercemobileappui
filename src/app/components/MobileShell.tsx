@@ -2,19 +2,21 @@ import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Home, Search, ShoppingCart, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
+import { useCart } from '../contexts/CartContext';
 
 const BOTTOM_NAV_ROUTES = ['/home', '/search', '/cart', '/profile'];
 
 export function MobileShell() {
   const location = useLocation();
   const navigate = useNavigate();
-  
+  const { itemCount } = useCart();
+
   const showBottomNav = BOTTOM_NAV_ROUTES.includes(location.pathname);
 
   const navItems = [
     { icon: Home, label: 'Home', path: '/home' },
     { icon: Search, label: 'Search', path: '/search' },
-    { icon: ShoppingCart, label: 'Cart', path: '/cart', badge: 3 },
+    { icon: ShoppingCart, label: 'Cart', path: '/cart', badge: itemCount },
     { icon: User, label: 'Profile', path: '/profile' },
   ];
 
@@ -74,7 +76,7 @@ export function MobileShell() {
                         )}
                         strokeWidth={isActive ? 2.5 : 2}
                       />
-                      {item.badge && (
+                      {(item.badge ?? 0) > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center ring-2 ring-white">
                           {item.badge}
                         </span>

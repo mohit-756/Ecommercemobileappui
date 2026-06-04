@@ -2,16 +2,27 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import { ShoppingBag } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useMobileFeatures } from '../hooks/useMobileFeatures';
 
 export function Splash() {
+  useMobileFeatures();
   const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
+    if (isLoading) return;
+
     const timer = setTimeout(() => {
-      navigate('/onboarding');
+      if (user) {
+        navigate('/home', { replace: true });
+      } else {
+        navigate('/onboarding', { replace: true });
+      }
     }, 2000);
+
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, user, isLoading]);
 
   return (
     <div className="flex flex-col items-center justify-center h-full min-h-screen bg-blue-600">

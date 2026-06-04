@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Search, Bell, Menu, LayoutGrid, Smartphone, Shirt, Home as HomeIcon, Sparkles } from 'lucide-react';
+import { Search, Bell, LayoutGrid, Smartphone, Shirt, Home as HomeIcon, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { products, categories } from '../data/mock';
+import { productService } from '../services/productService';
+import { categoryService } from '../services/categoryService';
 import { ProductCard } from '../components/ProductCard';
 import { cn } from '../lib/utils';
+
+const bannerIcons: Record<string, any> = {
+  LayoutGrid, Smartphone, Shirt, Home: HomeIcon, Sparkles,
+};
 
 const banners = [
   { id: 1, title: 'Summer Sale', subtitle: 'Up to 50% Off', bg: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
@@ -13,18 +18,41 @@ const banners = [
   { id: 3, title: 'Exclusive', subtitle: 'Members Only Deals', bg: 'bg-gradient-to-r from-amber-500 to-orange-600' },
 ];
 
-const categoryIcons: Record<string, any> = {
-  LayoutGrid, Smartphone, Shirt, Home: HomeIcon, Sparkles
-};
-
 export function Home() {
   const navigate = useNavigate();
   const [emblaRef] = useEmblaCarousel({ loop: true });
-  const [activeCategory, setActiveCategory] = useState('1');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [categories, setCategories] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          categoryService.getCategories(),
+          productService.getProducts({ limit: 10 }),
+        ]);
+        setCategories([{ _id: 'all', name: 'All', icon: 'LayoutGrid' }, ...catRes.data]);
+        setProducts(prodRes.data.products);
+      } catch (err) {
+        console.error('Failed to load home data', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const filteredProducts = activeCategory === 'all'
+    ? products
+    : products.filter((p: any) => {
+        const catId = typeof p.category === 'object' ? p.category?._id : p.category;
+        return catId === activeCategory;
+      });
 
   return (
     <div className="min-h-full pb-6">
-      {/* Header */}
       <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 md:pt-4 md:rounded-t-[32px]">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -44,8 +72,7 @@ export function Home() {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div 
+        <div
           onClick={() => navigate('/search')}
           className="bg-gray-50 flex items-center px-4 py-3 rounded-2xl border border-gray-100 cursor-text"
         >
@@ -54,78 +81,76 @@ export function Home() {
         </div>
       </div>
 
-      {/* Main Scrollable Content */}
-      <div className="px-6 pt-4 space-y-8">
-        
-        {/* Banner Carousel */}
-        <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
-          <div className="flex">
-            {banners.map((banner) => (
-              <div key={banner.id} className="flex-[0_0_100%] min-w-0 pr-4">
-                <div className={cn("h-40 rounded-2xl p-6 flex flex-col justify-center relative overflow-hidden", banner.bg)}>
-                  <div className="relative z-10">
-                    <p className="text-white/80 text-sm font-medium mb-1">{banner.subtitle}</p>
-                    <h3 className="text-white text-2xl font-bold mb-3">{banner.title}</h3>
-                    <button className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/30 transition-colors w-fit">
-                      Shop Now
-                    </button>
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="px-6 pt-4 space-y-8">
+          <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
+            <div className="flex">
+              {banners.map((banner) => (
+                <div key={banner.id} className="flex-[0_0_100%] min-w-0 pr-4">
+                  <div className={cn("h-40 rounded-2xl p-6 flex flex-col justify-center relative overflow-hidden", banner.bg)}>
+                    <div className="relative z-10">
+                      <p className="text-white/80 text-sm font-medium mb-1">{banner.subtitle}</p>
+                      <h3 className="text-white text-2xl font-bold mb-3">{banner.title}</h3>
+                      <button className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/30 transition-colors w-fit">
+                        Shop Now
+                      </button>
+                    </div>
+                    <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <div className="absolute right-12 -top-12 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
                   </div>
-                  {/* Decorative circles */}
-                  <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                  <div className="absolute right-12 -top-12 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Categories */}
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-gray-900 text-lg">Categories</h3>
-            <button className="text-blue-600 text-sm font-medium">See All</button>
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-gray-900 text-lg">Categories</h3>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar -mx-6 px-6">
+              {categories.map((cat: any) => {
+                const Icon = bannerIcons[cat.icon] || LayoutGrid;
+                const isActive = activeCategory === cat._id;
+                return (
+                  <button
+                    key={cat._id}
+                    onClick={() => setActiveCategory(cat._id)}
+                    className="flex flex-col items-center gap-2 min-w-[72px]"
+                  >
+                    <div className={cn(
+                      "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300",
+                      isActive ? "bg-blue-600 text-white shadow-lg shadow-blue-200 scale-105" : "bg-white border border-gray-100 text-gray-600"
+                    )}>
+                      <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                    </div>
+                    <span className={cn(
+                      "text-xs font-medium transition-colors",
+                      isActive ? "text-blue-600" : "text-gray-500"
+                    )}>
+                      {cat.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar -mx-6 px-6">
-            {categories.map((cat) => {
-              const Icon = categoryIcons[cat.icon];
-              const isActive = activeCategory === cat.id;
-              return (
-                <button 
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className="flex flex-col items-center gap-2 min-w-[72px]"
-                >
-                  <div className={cn(
-                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300",
-                    isActive ? "bg-blue-600 text-white shadow-lg shadow-blue-200 scale-105" : "bg-white border border-gray-100 text-gray-600"
-                  )}>
-                    <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                  </div>
-                  <span className={cn(
-                    "text-xs font-medium transition-colors",
-                    isActive ? "text-blue-600" : "text-gray-500"
-                  )}>
-                    {cat.name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* Featured Products */}
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-gray-900 text-lg">Featured Products</h3>
-            <button className="text-blue-600 text-sm font-medium">See All</button>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {products.slice(0, 4).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-gray-900 text-lg">Featured Products</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {filteredProducts.slice(0, 4).map((product: any) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

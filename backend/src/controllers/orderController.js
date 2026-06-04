@@ -1,0 +1,237 @@
+import Order from '../models/Order.js';
+import Cart from '../models/Cart.js';
+import Product from '../models/Product.js';
+import Razorpay from 'razorpay';
+import { createShipment } from '../services/shippingPartner.js';
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
+export async function createOrder(req, res, next) {
+  try {
+    const { shippingAddress, paymentMethod, notes } = req.body;
+
+    const cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ message: 'Cart is empty' });
+    }
+
+    const items = cart.items.map(item => ({
+      product: item.product._id,
+      name: item.product.name,
+      price: item.product.price,
+      quantity: item.quantity,
+      image: item.product.images?.[0] || '',
+    }));
+
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const tax = Math.round(subtotal * 0.08 * 100) / 100;
+    const shippingCost = subtotal > 500 ? 0 : 40;
+    const total = Math.round((subtotal + tax + shippingCost) * 100) / 100;
+
+    let razorpayOrder = null;
+    if (paymentMethod === 'razorpay') {
+      razorpayOrder = await razorpay.orders.create({
+        amount: Math.round(total * 100),
+        currency: 'INR',
+        receipt: `receipt_${Date.now()}`,
+      });
+    }
+
+    const order = await Order.create({
+      user: req.user._id,
+      items,
+      shippingAddress,
+      paymentMethod,
+      paymentDetails: {
+        status: paymentMethod === 'cod' ? 'pending' : 'pending',
+        razorpayOrderId: razorpayOrder?.id,
+      },
+      subtotal,
+      tax,
+      shippingCost,
+      total,
+      status: paymentMethod === 'cod' ? 'confirmed' : 'pending',
+      tracking: [{
+        status: 'placed',
+        label: 'Order Placed',
+        description: 'Your order has been placed successfully',
+        timestamp: new Date(),
+      }],
+      notes,
+    });
+
+    await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+
+    for (const item of cart.items) {
+      await Product.findByIdAndUpdate(item.product._id, {
+        $inc: { stock: -item.quantity },
+      });
+    }
+
+    if (order.status !== 'cancelled') {
+      try {
+        const shipment = await createShipment(order, shippingAddress);
+        if (shipment) {
+          order.courierDetails = {
+            name: shipment.courierName,
+            trackingId: shipment.trackingId,
+            estimatedDelivery: shipment.estimatedDelivery,
+          };
+          await order.save();
+        }
+      } catch (err) {
+        console.error('Shipping partner error:', err.message);
+      }
+    }
+
+    res.status(201).json({
+      order,
+      razorpayOrder,
+      razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function verifyPayment(req, res, next) {
+  try {
+    const { orderId, razorpayPaymentId, razorpaySignature } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const body = order.paymentDetails.razorpayOrderId + '|' + razorpayPaymentId;
+    const expectedSignature = require('crypto')
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(body)
+      .digest('hex');
+
+    if (expectedSignature !== razorpaySignature) {
+      order.paymentDetails.status = 'failed';
+      await order.save();
+      return res.status(400).json({ message: 'Payment verification failed' });
+    }
+
+    order.paymentDetails.razorpayPaymentId = razorpayPaymentId;
+    order.paymentDetails.razorpaySignature = razorpaySignature;
+    order.paymentDetails.status = 'paid';
+    order.status = 'confirmed';
+    order.tracking.push({
+      status: 'confirmed',
+      label: 'Order Confirmed',
+      description: 'Payment received, order confirmed',
+      timestamp: new Date(),
+    });
+
+    await order.save();
+
+    res.json({ message: 'Payment verified', order });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getUserOrders(req, res, next) {
+  try {
+    const { page = 1, limit = 10, status } = req.query;
+    const filter = { user: req.user._id };
+    if (status) filter.status = status;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [orders, total] = await Promise.all([
+      Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+      Order.countDocuments(filter),
+    ]);
+
+    res.json({
+      orders,
+      pagination: { page: Number(page), limit: Number(limit), total, pages: Math.ceil(total / Number(limit)) },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getOrderById(req, res, next) {
+  try {
+    const order = await Order.findById(req.params.id).populate('items.product');
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAllOrders(req, res, next) {
+  try {
+    const { page = 1, limit = 20, status } = req.query;
+    const filter = {};
+    if (status) filter.status = status;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [orders, total] = await Promise.all([
+      Order.find(filter).populate('user', 'name email').sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+      Order.countDocuments(filter),
+    ]);
+
+    res.json({
+      orders,
+      pagination: { page: Number(page), limit: Number(limit), total, pages: Math.ceil(total / Number(limit)) },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateOrderStatus(req, res, next) {
+  try {
+    const { status, description } = req.body;
+
+    const statusLabels = {
+      confirmed: 'Order Confirmed',
+      processing: 'Processing',
+      packed: 'Packed',
+      shipped: 'Shipped',
+      out_for_delivery: 'Out for Delivery',
+      delivered: 'Delivered',
+      cancelled: 'Cancelled',
+    };
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      {
+        status,
+        $push: {
+          tracking: {
+            status,
+            label: statusLabels[status] || status,
+            description: description || `Order status updated to ${statusLabels[status] || status}`,
+            timestamp: new Date(),
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+}

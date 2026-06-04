@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import { MobileShell } from "./components/MobileShell";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Splash } from "./pages/Splash";
 import { Onboarding } from "./pages/Onboarding";
 import { Login } from "./pages/Login";
@@ -11,7 +12,11 @@ import { ProductDetails } from "./pages/ProductDetails";
 import { Checkout } from "./pages/Checkout";
 import { OrderSuccess } from "./pages/OrderSuccess";
 import { OrderTracking } from "./pages/OrderTracking";
+import { Addresses } from "./pages/Addresses";
 import { Orders } from "./pages/Orders";
+import { AdminDashboard } from "./pages/AdminDashboard";
+import { AdminProducts } from "./pages/AdminProducts";
+import { AdminOrders } from "./pages/AdminOrders";
 
 export const router = createBrowserRouter([
   {
@@ -21,15 +26,19 @@ export const router = createBrowserRouter([
       { index: true, element: <Splash /> },
       { path: "onboarding", element: <Onboarding /> },
       { path: "login", element: <Login /> },
-      { path: "home", element: <Home /> },
-      { path: "search", element: <Search /> },
-      { path: "cart", element: <Cart /> },
-      { path: "profile", element: <Profile /> },
-      { path: "product/:id", element: <ProductDetails /> },
-      { path: "checkout", element: <Checkout /> },
-      { path: "success", element: <OrderSuccess /> },
-      { path: "tracking", element: <OrderTracking /> },
-      { path: "orders", element: <Orders /> },
+      { path: "home", element: <ProtectedRoute><Home /></ProtectedRoute> },
+      { path: "search", element: <ProtectedRoute><Search /></ProtectedRoute> },
+      { path: "cart", element: <ProtectedRoute><Cart /></ProtectedRoute> },
+      { path: "profile", element: <ProtectedRoute><Profile /></ProtectedRoute> },
+      { path: "product/:id", element: <ProtectedRoute><ProductDetails /></ProtectedRoute> },
+      { path: "checkout", element: <ProtectedRoute><Checkout /></ProtectedRoute> },
+      { path: "success", element: <ProtectedRoute><OrderSuccess /></ProtectedRoute> },
+      { path: "tracking", element: <ProtectedRoute><OrderTracking /></ProtectedRoute> },
+      { path: "orders", element: <ProtectedRoute><Orders /></ProtectedRoute> },
+      { path: "addresses", element: <ProtectedRoute><Addresses /></ProtectedRoute> },
+      { path: "admin", element: <ProtectedRoute><AdminDashboard /></ProtectedRoute> },
+      { path: "admin/products", element: <ProtectedRoute><AdminProducts /></ProtectedRoute> },
+      { path: "admin/orders", element: <ProtectedRoute><AdminOrders /></ProtectedRoute> },
       { path: "*", element: <Navigate to="/home" replace /> },
     ],
   },

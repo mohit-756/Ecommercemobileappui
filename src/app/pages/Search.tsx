@@ -1,22 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { ChevronLeft, Search as SearchIcon, X, SlidersHorizontal } from 'lucide-react';
-import { products } from '../data/mock';
+import { productService } from '../services/productService';
 import { ProductCard } from '../components/ProductCard';
 
 export function Search() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const recentSearches = ['Wireless headphones', 'Smart watch', 'Sneakers', 'Backpack'];
 
-  const searchResults = query ? products.filter(p => p.name.toLowerCase().includes(query.toLowerCase())) : [];
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const res = await productService.getProducts({ search: query, limit: 20 });
+        setResults(res.data.products);
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <div className="min-h-full flex flex-col bg-white">
-      {/* Header */}
       <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white md:pt-6 md:rounded-t-[32px] border-b border-gray-100 flex items-center gap-3">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 flex-shrink-0"
         >
@@ -24,8 +44,8 @@ export function Search() {
         </button>
         <div className="flex-1 relative">
           <SearchIcon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -33,7 +53,7 @@ export function Search() {
             className="w-full bg-gray-100 border-transparent text-gray-900 rounded-xl py-2.5 pl-10 pr-10 focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none transition-all"
           />
           {query && (
-            <button 
+            <button
               onClick={() => setQuery('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
@@ -55,7 +75,7 @@ export function Search() {
             </div>
             <div className="flex flex-wrap gap-2">
               {recentSearches.map((search, idx) => (
-                <button 
+                <button
                   key={idx}
                   onClick={() => setQuery(search)}
                   className="bg-white border border-gray-200 text-gray-600 text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
@@ -68,12 +88,16 @@ export function Search() {
         ) : (
           <div>
             <h3 className="font-bold text-gray-900 mb-4">
-              {searchResults.length} Results for "{query}"
+              {loading ? 'Searching...' : `${results.length} Results for "${query}"`}
             </h3>
-            {searchResults.length > 0 ? (
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : results.length > 0 ? (
               <div className="grid grid-cols-2 gap-4">
-                {searchResults.map(product => (
-                  <ProductCard key={product.id} product={product} />
+                {results.map((product: any) => (
+                  <ProductCard key={product._id} product={product} />
                 ))}
               </div>
             ) : (

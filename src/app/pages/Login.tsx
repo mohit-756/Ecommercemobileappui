@@ -1,15 +1,84 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { Mail, Lock, Eye, EyeOff, Apple, Facebook } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router';
+import { Mail, Lock, Eye, EyeOff, Apple, Fingerprint } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { biometricService } from '../services/biometricService';
+import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, register, user } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    biometricService.checkAvailability().then(res => {
+      setBiometricAvailable(res.available);
+    });
+  }, []);
+
+  const handleBiometricLogin = async () => {
+    setBiometricLoading(true);
+    try {
+      const savedEmail = localStorage.getItem('bio_email');
+      const savedPassword = localStorage.getItem('bio_password');
+      if (!savedEmail || !savedPassword) {
+        toast.error('Please log in manually first to enable biometric login');
+        return;
+      }
+      const auth = await biometricService.authenticate('Log in to Luminar');
+      if (auth.success) {
+        await login(savedEmail, savedPassword);
+        toast.success('Welcome back!');
+        navigate('/home', { replace: true });
+      }
+    } catch {
+      toast.error('Biometric login failed');
+    } finally {
+      setBiometricLoading(false);
+    }
+  };
+
+  const from = (location.state as any)?.from?.pathname || '/home';
+
+  if (user) {
+    navigate(from, { replace: true });
+    return null;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/home');
+    setLoading(true);
+
+    const form = e.target as HTMLFormElement;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+
+    try {
+      if (isLogin) {
+        await login(email, password);
+        if (biometricAvailable) {
+          localStorage.setItem('bio_email', email);
+          localStorage.setItem('bio_password', password);
+        }
+        toast.success('Welcome back!');
+      } else {
+        const name = (form.elements.namedItem('name') as HTMLInputElement).value;
+        await register(name, email, password);
+        toast.success('Account created successfully!');
+      }
+      navigate(from, { replace: true });
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,8 +97,9 @@ export function Login() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
             <div className="relative">
-              <input 
-                type="text" 
+              <input
+                name="name"
+                type="text"
                 placeholder="John Doe"
                 className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3.5 px-4 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
                 required
@@ -44,8 +114,9 @@ export function Login() {
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
               <Mail size={20} />
             </div>
-            <input 
-              type="email" 
+            <input
+              name="email"
+              type="email"
               placeholder="you@example.com"
               className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3.5 pl-11 pr-4 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
               required
@@ -59,13 +130,15 @@ export function Login() {
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
               <Lock size={20} />
             </div>
-            <input 
-              type={showPassword ? 'text' : 'password'} 
+            <input
+              name="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3.5 pl-11 pr-12 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
               required
+              minLength={6}
             />
-            <button 
+            <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
@@ -83,11 +156,19 @@ export function Login() {
           </div>
         )}
 
-        <button 
+        <button
           type="submit"
-          className="w-full bg-blue-600 text-white font-semibold rounded-xl py-4 mt-4 shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white font-semibold rounded-xl py-4 mt-4 shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {isLogin ? 'Sign In' : 'Sign Up'}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              {isLogin ? 'Signing in...' : 'Creating account...'}
+            </span>
+          ) : (
+            isLogin ? 'Sign In' : 'Sign Up'
+          )}
         </button>
 
         <div className="relative my-6">
@@ -114,12 +195,24 @@ export function Login() {
             <span className="font-medium text-gray-700">Apple</span>
           </button>
         </div>
+
+        {biometricAvailable && isLogin && (
+          <button
+            type="button"
+            disabled={biometricLoading}
+            onClick={handleBiometricLogin}
+            className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white font-semibold rounded-xl py-3.5 mt-2 hover:bg-gray-800 active:scale-[0.98] transition-all disabled:opacity-60"
+          >
+            <Fingerprint size={20} />
+            {biometricLoading ? 'Authenticating...' : 'Login with Fingerprint'}
+          </button>
+        )}
       </form>
 
       <div className="text-center mt-6">
         <p className="text-gray-500 text-sm">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <button 
+          <button
             onClick={() => setIsLogin(!isLogin)}
             className="text-blue-600 font-semibold hover:underline"
           >
