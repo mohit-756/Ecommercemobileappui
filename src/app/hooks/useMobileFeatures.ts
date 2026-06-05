@@ -23,11 +23,14 @@ export function useMobileFeatures() {
 
     deepLinkService.init();
 
+    let wasOffline = false;
     const networkListener = networkService.addListener((status) => {
       if (!status.connected) {
         toast.error('You are offline. Some features may be unavailable.');
-      } else {
+        wasOffline = true;
+      } else if (wasOffline) {
         toast.success('Back online!');
+        wasOffline = false;
       }
     });
 
