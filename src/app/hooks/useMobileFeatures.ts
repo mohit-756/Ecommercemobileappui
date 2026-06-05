@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { pushService } from '../services/pushService';
@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 export function useMobileFeatures() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
@@ -34,11 +35,28 @@ export function useMobileFeatures() {
       }
     });
 
+    let lastTimeBackPress = 0;
+    const timePeriodToExit = 2000;
+
     const backButtonListener = App.addListener('backButton', ({ canGoBack }) => {
+      // Priority 1: If user is on Home or Login, standard exit logic
+      if (location.pathname === '/home' || location.pathname === '/login') {
+        if (Date.now() - lastTimeBackPress < timePeriodToExit) {
+          App.exitApp();
+        } else {
+          lastTimeBackPress = Date.now();
+          toast('Press back again to exit', { duration: 2000 });
+        }
+        return;
+      }
+
+      // Priority 2: If we can go back in history, do it
       if (canGoBack) {
         window.history.back();
-      } else {
-        App.exitApp();
+      }
+      // Priority 3: Safety net - if stuck, always go to Home instead of exiting
+      else {
+        navigate('/home', { replace: true });
       }
     });
 
@@ -46,5 +64,5 @@ export function useMobileFeatures() {
       networkListener.remove();
       backButtonListener.remove();
     };
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 }

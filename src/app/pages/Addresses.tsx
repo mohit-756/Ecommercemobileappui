@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ChevronLeft, Plus, MapPin, Home, Briefcase, MoreHorizontal, Pencil, Trash2, Star } from 'lucide-react';
+import { ChevronLeft, Plus, MapPin, Home, Briefcase, MoreHorizontal, Pencil, Trash2, Star, Zap } from 'lucide-react';
 import { addressService } from '../services/addressService';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';

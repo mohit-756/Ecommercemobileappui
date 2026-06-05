@@ -12,13 +12,6 @@ export function MobileShell() {
   const navigate = useNavigate();
   const { itemCount } = useCart();
 
-  const handleDragEnd = (event: any, info: any) => {
-    // If user drags more than 100px from left to right, go back
-    if (info.offset.x > 100 && info.velocity.x > 200) {
-      window.history.back();
-    }
-  };
-
   const showBottomNav = BOTTOM_NAV_ROUTES.includes(location.pathname);
 
   const navItems = [
