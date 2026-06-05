@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { cn, normalizeProduct } from '../lib/utils';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
+import { hapticService } from '../services/hapticService';
 
 interface ProductCardProps {
   product: any;
@@ -18,6 +19,7 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
+      await hapticService.impact();
       await addToCart(product.id, product);
       toast.success('Added to cart');
     } catch {
@@ -27,7 +29,23 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
-    toast('Added to wishlist', { icon: <Heart size={16} fill="currentColor" className="text-red-500" /> });
+    hapticService.impact();
+
+    const saved = localStorage.getItem('user_wishlist');
+    let wishlist = saved ? JSON.parse(saved) : [];
+
+    const exists = wishlist.find((p: any) => (p.id || p._id) === (product.id || product._id));
+
+    if (exists) {
+      wishlist = wishlist.filter((p: any) => (p.id || p._id) !== (product.id || product._id));
+      toast.success('Removed from wishlist');
+    } else {
+      wishlist.push(raw);
+      toast.success('Added to wishlist');
+    }
+
+    localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
+    window.dispatchEvent(new Event('wishlist-updated'));
   };
 
   if (layout === 'list') {
@@ -75,7 +93,12 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
       className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col relative group"
     >
       <div className="relative aspect-square bg-gray-100 overflow-hidden">
-        <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
         {product.discount && (
           <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
             {product.discount} OFF

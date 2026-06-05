@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ChevronLeft, MapPin, CreditCard, Wallet, ShieldCheck, Banknote, Star, ExternalLink, Loader2 } from 'lucide-react';
+import { ChevronLeft, MapPin, CreditCard, Wallet, ShieldCheck, Banknote, Star, ExternalLink, Loader2, Zap } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { addressService } from '../services/addressService';
 import { shippingService } from '../services/shippingService';
@@ -9,6 +9,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { loadRazorpayScript, openRazorpayCheckout } from '../lib/razorpay';
 import { toast } from 'sonner';
+import { hapticService } from '../services/hapticService';
 
 interface Address {
   _id: string;
@@ -98,6 +99,7 @@ export function Checkout() {
       const { order, razorpayOrder, razorpayKeyId } = res.data;
 
       if (paymentMethod === 'cod') {
+        await hapticService.notificationSuccess();
         await clearCart();
         navigate(`/success?orderId=${order._id}`);
         return;
@@ -148,8 +150,8 @@ export function Checkout() {
   }
 
   const paymentMethods = [
+    { id: 'upi', name: 'UPI (GPay / PhonePe / Paytm)', icon: ShieldCheck, popular: true },
     { id: 'razorpay', name: 'Credit / Debit Card', icon: CreditCard },
-    { id: 'razorpay', name: 'UPI / GPay / PhonePe', icon: ShieldCheck },
     { id: 'razorpay', name: 'Wallet / Net Banking', icon: Wallet },
     { id: 'cod', name: 'Cash on Delivery', icon: Banknote },
   ];
@@ -185,7 +187,7 @@ export function Checkout() {
                   {addresses.map((addr) => (
                     <label key={addr._id} className={cn(
                       "flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all bg-white",
-                      selectedAddress?._id === addr._id ? 'border-blue-600 ring-1 ring-blue-600' : 'border-gray-100'
+                      selectedAddress?._id === addr._id ? 'border-blue-600 ring-1 ring-blue-600 shadow-sm' : 'border-gray-100'
                     )}>
                       <div className="mt-0.5">
                         <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", selectedAddress?._id === addr._id ? 'border-blue-600' : 'border-gray-300')}>
@@ -197,7 +199,7 @@ export function Checkout() {
                           <span className="font-semibold text-gray-900 capitalize text-sm">{addr.label}</span>
                           {addr.isDefault && <Star size={12} className="text-amber-500 fill-amber-500" />}
                         </div>
-                        <p className="text-sm text-gray-500">{addr.fullName}, {addr.addressLine1}, {addr.city}, {addr.state} - {addr.pincode}</p>
+                        <p className="text-sm text-gray-500 line-clamp-1">{addr.fullName}, {addr.addressLine1}, {addr.city}</p>
                         <p className="text-xs text-gray-400 mt-0.5">{addr.phone}</p>
                       </div>
                       <input type="radio" name="address" className="hidden" checked={selectedAddress?._id === addr._id} onChange={() => setSelectedAddress(addr)} />
@@ -212,9 +214,9 @@ export function Checkout() {
                     <div className="flex items-center gap-2 text-sm text-gray-500"><div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /> Checking delivery...</div>
                   ) : pincodeStatus ? (
                     pincodeStatus.serviceable ? (
-                      <span className="text-sm text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-medium">
-                        ✓ Delivery available{pincodeStatus.estimatedDays ? ` (${pincodeStatus.estimatedDays} days)` : ''}
-                      </span>
+                      <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full font-bold">
+                        <Zap size={12} className="fill-emerald-600" /> FREE DELIVERY IN 12 MINS
+                      </div>
                     ) : (
                       <span className="text-sm text-red-600 bg-red-50 px-3 py-1 rounded-full font-medium">✕ Delivery not available</span>
                     )
@@ -231,28 +233,36 @@ export function Checkout() {
                   <span className="text-gray-900 font-medium">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500">
-                  <span>Shipping</span>
-                  <span className="text-gray-900 font-medium">{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                  <span>Delivery Fee</span>
+                  <span className="text-emerald-600 font-bold uppercase text-[10px]">Free</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500">
-                  <span>Tax (8%)</span>
-                  <span className="text-gray-900 font-medium">${tax.toFixed(2)}</span>
+                  <span>Handling Charge</span>
+                  <span className="text-gray-900 font-medium">$2.00</span>
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="font-bold text-gray-900 mb-3">Payment Method</h3>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-bold text-gray-900">Payment Method</h3>
+                <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase">
+                  <ShieldCheck size={12} /> Secure
+                </div>
+              </div>
               <div className="space-y-2">
                 {paymentMethods.map((method, idx) => {
-                  const methodId = idx === 3 ? 'cod' : 'razorpay';
+                  const methodId = method.id === 'cod' ? 'cod' : 'razorpay';
                   return (
                     <label key={idx} className={cn(
-                      "flex items-center p-4 rounded-2xl border cursor-pointer transition-all bg-white",
-                      paymentMethod === methodId ? "border-blue-600 ring-1 ring-blue-600" : "border-gray-100"
+                      "flex items-center p-4 rounded-2xl border cursor-pointer transition-all bg-white relative",
+                      paymentMethod === methodId ? "border-blue-600 ring-1 ring-blue-600 shadow-sm" : "border-gray-100"
                     )}>
                       <method.icon size={24} className={cn("mr-4", paymentMethod === methodId ? "text-blue-600" : "text-gray-400")} />
-                      <span className={cn("font-medium flex-1 text-sm", paymentMethod === methodId ? "text-blue-900" : "text-gray-700")}>{method.name}</span>
+                      <div className="flex-1">
+                        <span className={cn("font-bold block text-sm", paymentMethod === methodId ? "text-blue-900" : "text-gray-700")}>{method.name}</span>
+                        {(method as any).popular && <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">Popular</span>}
+                      </div>
                       <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === methodId ? "border-blue-600" : "border-gray-300")}>
                         {paymentMethod === methodId && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
                       </div>

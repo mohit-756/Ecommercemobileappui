@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { Trash2, Minus, Plus, ArrowRight, Tag, ShoppingCart } from 'lucide-react';
+import { Trash2, Minus, Plus, ArrowRight, Tag, ShoppingCart, BellOff, DoorOpen, UserCheck, PhoneOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../contexts/CartContext';
 
@@ -96,7 +96,7 @@ export function Cart() {
 
         {items.length > 0 && (
           <>
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 mb-6">
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <Tag size={20} />
               </div>
@@ -106,6 +106,25 @@ export function Cart() {
                 className="flex-1 bg-transparent outline-none text-sm placeholder-gray-400"
               />
               <button className="text-blue-600 font-semibold text-sm">Apply</button>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="font-bold text-gray-900 mb-3 px-1">Delivery Instructions</h3>
+              <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+                {[
+                  { id: '1', label: 'Don\'t ring bell', icon: 'BellOff' },
+                  { id: '2', label: 'Leave at gate', icon: 'DoorOpen' },
+                  { id: '3', label: 'Leave with guard', icon: 'UserCheck' },
+                  { id: '4', label: 'Avoid calling', icon: 'PhoneOff' },
+                ].map((inst) => (
+                  <button
+                    key={inst.id}
+                    className="flex flex-col items-center justify-center min-w-[100px] bg-white border border-gray-100 p-3 rounded-2xl active:border-blue-600 active:text-blue-600 transition-colors"
+                  >
+                    <span className="text-xs font-medium text-gray-600 text-center">{inst.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-3">

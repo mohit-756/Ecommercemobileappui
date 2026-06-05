@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Settings, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, Shield, Camera } from 'lucide-react';
+import { Settings, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, Shield, Camera, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { cameraService } from '../services/cameraService';
@@ -13,6 +13,7 @@ export function Profile() {
   const [avatarLoading, setAvatarLoading] = useState(false);
 
   const menuItems = [
+    { icon: Heart, label: 'My Wishlist', path: '/wishlist' },
     { icon: Package, label: 'My Orders', path: '/orders' },
     { icon: MapPin, label: 'Shipping Addresses', path: '/addresses' },
     { icon: CreditCard, label: 'Payment Methods', path: '/payments' },
@@ -74,7 +75,7 @@ export function Profile() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-8">
-          <div className="bg-gray-50 rounded-2xl p-3 text-center">
+          <div onClick={() => navigate('/orders')} className="bg-gray-50 rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 transition-colors">
             <span className="block text-xl font-bold text-gray-900">0</span>
             <span className="text-xs text-gray-500 font-medium">Orders</span>
           </div>
@@ -82,7 +83,7 @@ export function Profile() {
             <span className="block text-xl font-bold text-gray-900">0</span>
             <span className="text-xs text-gray-500 font-medium">Reviews</span>
           </div>
-          <div className="bg-gray-50 rounded-2xl p-3 text-center">
+          <div onClick={() => navigate('/wishlist')} className="bg-gray-50 rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 transition-colors">
             <span className="block text-xl font-bold text-gray-900">{user?.wishlist?.length || 0}</span>
             <span className="text-xs text-gray-500 font-medium">Saved</span>
           </div>

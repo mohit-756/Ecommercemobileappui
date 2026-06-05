@@ -10,7 +10,8 @@ export function Search() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const recentSearches = ['Wireless headphones', 'Smart watch', 'Sneakers', 'Backpack'];
+  const recentSearches = ['Milk', 'Bread', 'Amul Butter', 'Lays', 'Coke'];
+  const trendingCategories = ['Dairy', 'Snacks', 'Groceries', 'Beverages', 'Fresh Fruits'];
 
   useEffect(() => {
     if (!query.trim()) {
@@ -68,21 +69,41 @@ export function Search() {
 
       <div className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50">
         {!query ? (
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-900">Recent Searches</h3>
-              <button className="text-gray-400 text-sm">Clear All</button>
+          <div className="space-y-8">
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-gray-900">Recent Searches</h3>
+                <button className="text-gray-400 text-sm">Clear All</button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {recentSearches.map((search, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setQuery(search)}
+                    className="bg-white border border-gray-200 text-gray-600 text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
+                  >
+                    {search}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {recentSearches.map((search, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setQuery(search)}
-                  className="bg-white border border-gray-200 text-gray-600 text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
-                >
-                  {search}
-                </button>
-              ))}
+
+            <div>
+              <h3 className="font-bold text-gray-900 mb-4">Trending Categories</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {trendingCategories.map((cat, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setQuery(cat)}
+                    className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-gray-100 hover:border-blue-200 transition-all text-left"
+                  >
+                    <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                      <SlidersHorizontal size={18} />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700">{cat}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         ) : (

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router';
 import { ChevronLeft, Package, ChevronRight } from 'lucide-react';
 import { orderService } from '../services/orderService';
 import { cn } from '../lib/utils';
+import { motion } from 'motion/react';
+import { hapticService } from '../services/hapticService';
 
 const statusStyles: Record<string, string> = {
   pending: 'bg-yellow-50 text-yellow-600',
@@ -28,13 +30,42 @@ export function Orders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function fetchOrders(isRefresh = false) {
+    if (isRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    try {
+      const res = await orderService.getUserOrders({ limit: 50 });
+      setOrders(res.data.orders);
+      if (isRefresh) hapticService.impact();
+    } catch (err) {
+      console.error('Failed to load orders', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }
 
   useEffect(() => {
-    orderService.getUserOrders({ limit: 50 })
-      .then(res => setOrders(res.data.orders))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    fetchOrders();
   }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    (window as any)._startYOrders = touch.screenY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touch = e.changedTouches[0];
+    const startY = (window as any)._startYOrders || 0;
+    const diff = touch.screenY - startY;
+
+    if (diff > 150 && window.scrollY === 0) {
+      fetchOrders(true);
+    }
+  };
 
   function formatDate(dateStr: string) {
     const d = new Date(dateStr);
@@ -42,7 +73,22 @@ export function Orders() {
   }
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50">
+    <div
+      className="min-h-full flex flex-col bg-gray-50"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {refreshing && (
+        <div className="absolute top-20 left-0 w-full flex justify-center z-50 pointer-events-none">
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="bg-white shadow-md rounded-full p-2"
+          >
+            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          </motion.div>
+        </div>
+      )}
       <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 md:pt-6 md:rounded-t-[32px] border-b border-gray-100 flex items-center">
         <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
           <ChevronLeft size={24} />

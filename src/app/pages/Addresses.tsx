@@ -49,10 +49,31 @@ export function Addresses() {
     }
   }
 
+  const [showMap, setShowMap] = useState(false);
+
   function openAddForm() {
     setForm(emptyForm);
     setEditingId(null);
     setShowForm(true);
+  }
+
+  function handleUseLocation() {
+    setShowMap(true);
+  }
+
+  function handleConfirmMap() {
+    // Simulate auto-filling from map
+    setForm({
+      ...emptyForm,
+      addressLine1: 'Luminar Tech Park, Building 4',
+      city: 'New York',
+      state: 'NY',
+      pincode: '10001',
+      label: 'work',
+    });
+    setShowMap(false);
+    setShowForm(true);
+    toast.success('Location detected from pin!');
   }
 
   function openEditForm(addr: Address) {
@@ -135,6 +156,13 @@ export function Addresses() {
       </div>
 
       <div className="flex-1 px-6 py-6 space-y-4 overflow-y-auto">
+        <button
+          onClick={handleUseLocation}
+          className="w-full bg-white p-4 rounded-2xl border border-dashed border-blue-300 flex items-center justify-center gap-2 text-blue-600 font-bold hover:bg-blue-50 transition-colors shadow-sm"
+        >
+          <Zap size={18} className="fill-blue-600" /> Use Current Location
+        </button>
+
         {loading ? (
           <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
         ) : addresses.length === 0 ? (
@@ -206,6 +234,48 @@ export function Addresses() {
           </AnimatePresence>
         )}
       </div>
+
+      {showMap && (
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white">
+          <div className="absolute top-12 left-6 z-10">
+            <button onClick={() => setShowMap(false)} className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-900">
+              <ChevronLeft size={24} />
+            </button>
+          </div>
+
+          <div className="flex-1 bg-gray-200 relative overflow-hidden flex items-center justify-center">
+            {/* Simulated Map View */}
+            <div className="absolute inset-0 opacity-40">
+              <div className="w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]" />
+            </div>
+            <div className="relative">
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="relative z-10"
+              >
+                <MapPin size={48} className="text-red-600 fill-red-600" />
+              </motion.div>
+              <div className="w-4 h-2 bg-black/20 rounded-full blur-sm mx-auto mt-[-4px]" />
+            </div>
+
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-blue-600/30 rounded-full animate-ping" />
+          </div>
+
+          <div className="bg-white p-6 pb-12 shadow-[0_-8px_30px_rgba(0,0,0,0.1)] rounded-t-3xl">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Adjust Pin Location</h3>
+            <p className="text-sm text-gray-500 mb-6 flex items-center gap-2">
+              <MapPin size={14} className="text-blue-600" /> Luminar Tech Park, Building 4...
+            </p>
+            <button
+              onClick={handleConfirmMap}
+              className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200"
+            >
+              Confirm Location
+            </button>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center">

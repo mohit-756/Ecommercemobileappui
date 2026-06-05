@@ -16,6 +16,7 @@ import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { OrderTracking } from './pages/OrderTracking';
 import { Orders } from './pages/Orders';
+import { Wishlist } from './pages/Wishlist';
 import { Addresses } from './pages/Addresses';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminProducts } from './pages/AdminProducts';
@@ -40,6 +41,7 @@ export default function App() {
               <Route path="success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
               <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
               <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+              <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
               <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
               <Route path="admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />

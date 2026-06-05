@@ -12,6 +12,13 @@ export function MobileShell() {
   const navigate = useNavigate();
   const { itemCount } = useCart();
 
+  const handleDragEnd = (event: any, info: any) => {
+    // If user drags more than 100px from left to right, go back
+    if (info.offset.x > 100 && info.velocity.x > 200) {
+      window.history.back();
+    }
+  };
+
   const showBottomNav = BOTTOM_NAV_ROUTES.includes(location.pathname);
 
   const navItems = [
@@ -22,7 +29,7 @@ export function MobileShell() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-0 md:p-4 font-sans text-gray-900">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-0 md:p-4 font-sans text-gray-900 overflow-hidden">
       <div className="w-full h-screen md:h-[850px] md:max-w-[393px] md:rounded-[40px] md:shadow-2xl bg-white overflow-hidden relative flex flex-col md:border-[8px] md:border-gray-900 ring-1 ring-black/5">
         
         {/* Status Bar Mock for Desktop Preview */}
@@ -42,13 +49,13 @@ export function MobileShell() {
           showBottomNav ? "pb-24" : "pb-0", // Increased padding to avoid overlap
           "md:pt-8" // Padding for fake status bar on desktop
         )}>
-          <AnimatePresence mode="popLayout" initial={false}>
+          <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={location.pathname}
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.15 } }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               className="min-h-full"
             >
               <Outlet />

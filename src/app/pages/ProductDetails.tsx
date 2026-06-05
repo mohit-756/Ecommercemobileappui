@@ -7,6 +7,10 @@ import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 import { cn, normalizeProduct } from '../lib/utils';
 import { motion } from 'motion/react';
+import { hapticService } from '../services/hapticService';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
+import { Skeleton } from '../components/ui/skeleton';
 
 export function ProductDetails() {
   const { id } = useParams();
@@ -21,15 +25,45 @@ export function ProductDetails() {
   useEffect(() => {
     if (!id) return;
     productService.getProductById(id)
-      .then(res => setProduct(normalizeProduct(res.data)))
+      .then(res => {
+        const prod = normalizeProduct(res.data);
+        setProduct(prod);
+
+        // Check if in wishlist
+        const saved = localStorage.getItem('user_wishlist');
+        if (saved) {
+          const wishlist = JSON.parse(saved);
+          setIsWishlist(wishlist.some((p: any) => (p.id || p._id) === (prod.id || prod._id)));
+        }
+      })
       .catch(() => navigate(-1))
       .finally(() => setLoading(false));
   }, [id, navigate]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full min-h-screen">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-full bg-white flex flex-col pb-24 relative">
+        <div className="h-[400px] bg-gray-100">
+          <Skeleton className="w-full h-full rounded-none" />
+        </div>
+        <div className="px-6 pt-6 flex-1 bg-white -mt-4 rounded-t-3xl relative z-20 space-y-6">
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-8 w-64" />
+            </div>
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
+          <Skeleton className="h-6 w-32" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+          <div className="flex gap-3">
+            {[1, 2, 3].map(i => <Skeleton key={i} className="w-10 h-10 rounded-full" />)}
+          </div>
+        </div>
       </div>
     );
   }
@@ -38,11 +72,43 @@ export function ProductDetails() {
 
   const handleAddToCart = async () => {
     try {
+      await hapticService.impact();
       await addToCart(product.id, product, quantity);
       toast.success(`Added ${quantity} to cart`);
     } catch {
       toast.error('Failed to add to cart');
     }
+  };
+
+  const handleShare = async () => {
+    if (Capacitor.isNativePlatform()) {
+      await Share.share({
+        title: product.name,
+        text: `Check out this ${product.name} on Luminar!`,
+        url: window.location.href,
+        dialogTitle: 'Share with friends',
+      });
+    } else {
+      toast.info('Sharing is only available on mobile devices');
+    }
+  };
+
+  const handleToggleWishlist = () => {
+    hapticService.impact();
+    const saved = localStorage.getItem('user_wishlist');
+    let wishlist = saved ? JSON.parse(saved) : [];
+
+    if (isWishlist) {
+      wishlist = wishlist.filter((p: any) => (p.id || p._id) !== (product.id || product._id));
+      toast.success('Removed from wishlist');
+    } else {
+      wishlist.push(product);
+      toast.success('Added to wishlist');
+    }
+
+    localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
+    setIsWishlist(!isWishlist);
+    window.dispatchEvent(new Event('wishlist-updated'));
   };
 
   return (
@@ -55,7 +121,10 @@ export function ProductDetails() {
           <ChevronLeft size={24} />
         </button>
         <div className="flex gap-3">
-          <button className="w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-900 shadow-sm">
+          <button
+            onClick={handleShare}
+            className="w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-900 shadow-sm"
+          >
             <Share2 size={20} />
           </button>
         </div>
@@ -66,7 +135,12 @@ export function ProductDetails() {
           {product.images.length > 0 ? (
             product.images.map((img: string, idx: number) => (
               <div key={idx} className="flex-[0_0_100%] h-full relative">
-                <img src={img} alt={`${product.name} - View ${idx + 1}`} className="w-full h-full object-cover" />
+                <img
+                  src={img}
+                  alt={`${product.name} - View ${idx + 1}`}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
               </div>
             ))
           ) : (
@@ -89,7 +163,7 @@ export function ProductDetails() {
             <h1 className="text-2xl font-bold text-gray-900 leading-tight">{product.name}</h1>
           </div>
           <button
-            onClick={() => { setIsWishlist(!isWishlist); toast(isWishlist ? 'Removed from wishlist' : 'Added to wishlist'); }}
+            onClick={handleToggleWishlist}
             className="mt-1 flex-shrink-0"
           >
             <Heart size={24} className={cn("transition-colors", isWishlist ? "text-red-500 fill-red-500" : "text-gray-400")} />
