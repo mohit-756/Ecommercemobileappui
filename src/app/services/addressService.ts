@@ -13,6 +13,8 @@ export const addressService = {
     landmark?: string;
     isDefault?: boolean;
     label?: 'home' | 'work' | 'other';
+    latitude?: number;
+    longitude?: number;
   }) => api.post('/addresses', data),
 
   updateAddress: (id: string, data: any) =>

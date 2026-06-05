@@ -12,6 +12,20 @@ const addressSchema = new mongoose.Schema({
   landmark: { type: String, trim: true, default: '' },
   isDefault: { type: Boolean, default: false },
   label: { type: String, enum: ['home', 'work', 'other'], default: 'home' },
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number],
+      default: [0, 0],
+    },
+  },
+  placeId: { type: String, default: '' },
 }, { timestamps: true });
+
+addressSchema.index({ location: '2dsphere' });
 
 export default mongoose.model('Address', addressSchema);

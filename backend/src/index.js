@@ -10,6 +10,7 @@ import orderRoutes from './routes/orders.js';
 import addressRoutes from './routes/addresses.js';
 import shippingRoutes from './routes/shipping.js';
 import adminRoutes from './routes/admin.js';
+import geocodingRoutes from './routes/geocoding.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -33,6 +34,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/shipping', shippingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/geocode', geocodingRoutes);
 
 app.use(errorHandler);
 

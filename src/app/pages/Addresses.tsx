@@ -4,6 +4,7 @@ import { ChevronLeft, Plus, MapPin, Home, Briefcase, MoreHorizontal, Pencil, Tra
 import { addressService } from '../services/addressService';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
+import { LocationPicker } from '../components/LocationPicker';
 
 interface Address {
   _id: string;
@@ -17,11 +18,17 @@ interface Address {
   landmark?: string;
   isDefault: boolean;
   label: 'home' | 'work' | 'other';
+  location?: {
+    type: string;
+    coordinates: [number, number];
+  };
 }
 
 const emptyForm = {
   fullName: '', phone: '', addressLine1: '', addressLine2: '',
   city: '', state: '', pincode: '', landmark: '', isDefault: false, label: 'home' as const,
+  latitude: undefined as number | undefined,
+  longitude: undefined as number | undefined,
 };
 
 export function Addresses() {
@@ -61,19 +68,29 @@ export function Addresses() {
     setShowMap(true);
   }
 
-  function handleConfirmMap() {
-    // Simulate auto-filling from map
+  function handleConfirmMap(location: {
+    latitude: number;
+    longitude: number;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    state: string;
+    pincode: string;
+  }) {
     setForm({
       ...emptyForm,
-      addressLine1: 'Luminar Tech Park, Building 4',
-      city: 'New York',
-      state: 'NY',
-      pincode: '10001',
-      label: 'work',
+      addressLine1: location.addressLine1,
+      addressLine2: location.addressLine2,
+      city: location.city,
+      state: location.state,
+      pincode: location.pincode,
+      label: 'other',
+      latitude: location.latitude,
+      longitude: location.longitude,
     });
     setShowMap(false);
     setShowForm(true);
-    toast.success('Location detected from pin!');
+    toast.success('Location detected from map!');
   }
 
   function openEditForm(addr: Address) {
@@ -88,6 +105,8 @@ export function Addresses() {
       landmark: addr.landmark || '',
       isDefault: addr.isDefault,
       label: addr.label,
+      latitude: addr.location?.coordinates?.[1],
+      longitude: addr.location?.coordinates?.[0],
     });
     setEditingId(addr._id);
     setShowForm(true);
@@ -236,45 +255,7 @@ export function Addresses() {
       </div>
 
       {showMap && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-white">
-          <div className="absolute top-12 left-6 z-10">
-            <button onClick={() => setShowMap(false)} className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-900">
-              <ChevronLeft size={24} />
-            </button>
-          </div>
-
-          <div className="flex-1 bg-gray-200 relative overflow-hidden flex items-center justify-center">
-            {/* Simulated Map View */}
-            <div className="absolute inset-0 opacity-40">
-              <div className="w-full h-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]" />
-            </div>
-            <div className="relative">
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="relative z-10"
-              >
-                <MapPin size={48} className="text-red-600 fill-red-600" />
-              </motion.div>
-              <div className="w-4 h-2 bg-black/20 rounded-full blur-sm mx-auto mt-[-4px]" />
-            </div>
-
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-blue-600/30 rounded-full animate-ping" />
-          </div>
-
-          <div className="bg-white p-6 pb-12 shadow-[0_-8px_30px_rgba(0,0,0,0.1)] rounded-t-3xl">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Adjust Pin Location</h3>
-            <p className="text-sm text-gray-500 mb-6 flex items-center gap-2">
-              <MapPin size={14} className="text-blue-600" /> Luminar Tech Park, Building 4...
-            </p>
-            <button
-              onClick={handleConfirmMap}
-              className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200"
-            >
-              Confirm Location
-            </button>
-          </div>
-        </div>
+        <LocationPicker onConfirm={handleConfirmMap} onClose={() => setShowMap(false)} />
       )}
 
       {showForm && (

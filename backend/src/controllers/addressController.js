@@ -13,6 +13,15 @@ export async function createAddress(req, res, next) {
   try {
     const data = { ...req.body, user: req.user._id };
 
+    if (data.latitude != null && data.longitude != null) {
+      data.location = {
+        type: 'Point',
+        coordinates: [parseFloat(data.longitude), parseFloat(data.latitude)],
+      };
+    }
+    delete data.latitude;
+    delete data.longitude;
+
     if (data.isDefault) {
       await Address.updateMany({ user: req.user._id }, { isDefault: false });
     }
@@ -27,6 +36,15 @@ export async function createAddress(req, res, next) {
 export async function updateAddress(req, res, next) {
   try {
     const data = { ...req.body };
+
+    if (data.latitude != null && data.longitude != null) {
+      data.location = {
+        type: 'Point',
+        coordinates: [parseFloat(data.longitude), parseFloat(data.latitude)],
+      };
+    }
+    delete data.latitude;
+    delete data.longitude;
 
     if (data.isDefault) {
       await Address.updateMany({ user: req.user._id, _id: { $ne: req.params.id } }, { isDefault: false });
