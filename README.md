@@ -1,6 +1,6 @@
-# Retail Shop — E-Commerce Mobile App
+# DryFruit Hub — Premium Dry Fruits E-Commerce Mobile App
 
-A full-stack e-commerce mobile application built with React (web) + Capacitor (Android), powered by a Node.js + Express + MongoDB backend.
+A full-stack e-commerce mobile application for selling premium dry fruits, nuts, and healthy snacks. Built with React (web) + Capacitor (Android), powered by a Node.js + Express + MongoDB backend.
 
 ## Current Status
 
