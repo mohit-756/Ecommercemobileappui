@@ -100,7 +100,7 @@ export function Login() {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-screen bg-white px-6 pt-16 pb-8">
+    <div className="flex flex-col h-full min-h-screen bg-white px-6 pt-16 lg:pt-8 pb-8">
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           {isLogin ? 'Welcome Back!' : 'Create Account'}

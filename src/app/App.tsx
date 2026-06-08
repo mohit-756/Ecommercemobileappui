@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
-import { MobileShell } from './components/MobileShell';
+import { PlatformShell } from './components/PlatformShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Splash } from './pages/Splash';
 import { Onboarding } from './pages/Onboarding';
@@ -31,7 +31,7 @@ export default function App() {
       <AuthProvider>
         <CartProvider>
           <Routes>
-            <Route element={<MobileShell />}>
+            <Route element={<PlatformShell />}>
               <Route index element={<Splash />} />
               <Route path="onboarding" element={<Onboarding />} />
               <Route path="login" element={<Login />} />

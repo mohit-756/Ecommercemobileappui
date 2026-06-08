@@ -39,7 +39,7 @@ export function Settings() {
 
   return (
     <div className="min-h-full flex flex-col bg-gray-50">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 md:pt-6 md:rounded-t-[32px] border-b border-gray-100 flex items-center">
+      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 flex items-center">
         <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
           <ChevronLeft size={24} />
         </button>

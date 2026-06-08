@@ -6,7 +6,7 @@ export async function checkPincode(req, res, next) {
       return res.status(400).json({ message: 'Invalid pincode format' });
     }
 
-    const serviceablePincodes = ['110001', '110002', '400001', '400002', '700001', '600001'];
+    const serviceablePincodes = ['110001', '110002', '400001', '400002', '700001', '600001', '756922'];
     const isServiceable = serviceablePincodes.includes(pincode);
 
     res.json({

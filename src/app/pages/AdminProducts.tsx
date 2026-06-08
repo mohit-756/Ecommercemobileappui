@@ -86,7 +86,7 @@ export function AdminProducts() {
 
   return (
     <div className="min-h-full bg-gray-50">
-      <div className="bg-white px-6 pt-12 pb-4 md:pt-6 border-b border-gray-100">
+      <div className="bg-white px-6 pt-12 pb-4 lg:pt-0 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/admin')} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">

@@ -112,8 +112,8 @@ export function ProductDetails() {
   };
 
   return (
-    <div className="min-h-full bg-white flex flex-col pb-24 md:pb-6 relative">
-      <div className="absolute top-0 w-full z-10 flex justify-between items-center px-6 pt-12 md:pt-4">
+    <div className="min-h-full bg-white flex flex-col pb-24 lg:pb-0 relative">
+      <div className="absolute top-0 w-full z-10 flex justify-between items-center px-6 pt-12 lg:pt-4">
         <button
           onClick={() => navigate(-1)}
           className="w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-900 shadow-sm"
@@ -156,7 +156,7 @@ export function ProductDetails() {
         </div>
       </div>
 
-      <div className="px-6 pt-6 pb-32 flex-1 flex flex-col bg-white -mt-4 rounded-t-3xl relative z-20 overflow-y-auto">
+      <div className="px-6 pt-6 pb-32 lg:pb-6 flex-1 flex flex-col bg-white -mt-4 rounded-t-3xl relative z-20 overflow-y-auto">
         <div className="flex justify-between items-start mb-2">
           <div>
             <p className="text-blue-600 font-medium text-sm mb-1">{product.category}</p>
@@ -210,7 +210,7 @@ export function ProductDetails() {
         )}
       </div>
 
-      <div className="fixed md:absolute bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-8 flex items-center gap-4 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] z-50 md:rounded-b-[32px]">
+      <div className="sticky bottom-0 w-full bg-white border-t border-gray-100 p-4 pb-8 flex items-center gap-4 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] z-50">
         <div className="flex flex-col">
           <p className="text-xs text-gray-500 font-medium">Total Price</p>
           <div className="flex items-baseline gap-2">

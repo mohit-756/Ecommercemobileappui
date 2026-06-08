@@ -33,7 +33,7 @@ export function Profile() {
 
   return (
     <div className="min-h-full bg-gray-50 pb-6">
-      <div className="bg-white px-6 pt-16 pb-8 md:pt-10 rounded-b-3xl shadow-sm mb-6 relative">
+      <div className="bg-white px-6 pt-16 pb-8 lg:pt-6 rounded-b-3xl shadow-sm mb-6 relative">
         <div className="absolute top-12 right-6 md:top-6">
           <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
             <Settings size={20} />

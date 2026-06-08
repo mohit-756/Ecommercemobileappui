@@ -158,14 +158,14 @@ export function Checkout() {
 
   return (
     <div className="min-h-full flex flex-col bg-gray-50">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 md:pt-6 md:rounded-t-[32px] border-b border-gray-100 flex items-center">
+      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 flex items-center">
         <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
           <ChevronLeft size={24} />
         </button>
         <h1 className="text-xl font-bold text-gray-900 ml-2">Checkout</h1>
       </div>
 
-      <div className="flex-1 px-6 py-6 pb-32 space-y-6 overflow-y-auto">
+      <div className="flex-1 px-6 py-6 pb-32 lg:pb-6 space-y-6 overflow-y-auto">
         {loading ? (
           <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
         ) : (
@@ -279,7 +279,7 @@ export function Checkout() {
         )}
       </div>
 
-      <div className="bg-white border-t border-gray-100 p-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] relative z-10 md:rounded-b-[32px]">
+      <div className="bg-white border-t border-gray-100 p-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] relative z-10">
         <div className="flex justify-between items-end mb-4">
           <span className="text-gray-500">Total Payment</span>
           <span className="text-2xl font-bold text-gray-900">${total.toFixed(2)}</span>

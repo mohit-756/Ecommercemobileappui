@@ -31,14 +31,47 @@ See [PLAN.md](./PLAN.md) for the detailed build phases.
 
 ## Quick Start
 
-```bash
-# Frontend
-npm install
-npm run dev               # Browser at localhost:5173
-npm run build             # Production build
-npx cap sync android      # Sync to Android Studio
+### Web (Laptop / Desktop / Mobile Browser)
 
-# Backend
+```bash
+# Install dependencies
+npm install
+
+# Start dev server — opens at http://localhost:5173
+npm run dev
+
+# Production build
+npm run build
+```
+
+The web version uses **full desktop layout** (top nav, no phone frame). Works on any browser.
+
+### Android (Phone / Tablet)
+
+```bash
+# 1. Build the frontend
+npm run build
+
+# 2. Sync the build to the Android project
+npx cap sync android
+
+# 3. Open in Android Studio
+npx cap open android
+
+# 4. In Android Studio, click Run (▶) to install on connected device
+```
+
+Or combine build + sync into one step:
+
+```bash
+npm run cap:build       # vite build + npx cap sync android
+```
+
+The Android app uses the **mobile layout** with bottom navigation.
+
+### Backend
+
+```bash
 cd backend
 npm install
 npm run dev               # Backend server (default: port 5000)
@@ -65,10 +98,7 @@ npm run dev               # Backend server (default: port 5000)
 └── vite.config.ts
 ```
 
-## Testing on Phone
+## Notes
 
-1. Connect Android phone with USB debugging enabled
-2. `npm run build`
-3. `npx cap sync android`
-4. Open `android/` in Android Studio
-5. Click **Run** (play button) → app installs on phone
+- **Same codebase, two layouts** — `Capacitor.isNativePlatform()` detects the platform and switches layouts automatically.
+- Changing the desktop (web) layout **does not affect** the Android app and vice versa.

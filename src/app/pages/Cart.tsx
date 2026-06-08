@@ -19,14 +19,14 @@ export function Cart() {
 
   return (
     <div className="min-h-full flex flex-col bg-gray-50">
-      <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 md:pt-6 md:rounded-t-[32px] border-b border-gray-100 flex items-center justify-between">
+      <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">My Cart</h1>
         <span className="bg-blue-100 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">
           {itemCount} items
         </span>
       </div>
 
-      <div className="flex-1 px-6 py-6 pb-32 overflow-y-auto">
+      <div className="flex-1 px-6 py-6 pb-32 lg:pb-6 overflow-y-auto">
         <AnimatePresence>
           {items.map((item) => (
             <motion.div
@@ -150,8 +150,8 @@ export function Cart() {
         )}
       </div>
 
-      {items.length > 0 && (
-        <div className="bg-white border-t border-gray-100 p-6 md:pb-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] relative z-10 md:rounded-b-[32px]">
+        {items.length > 0 && (
+        <div className="bg-white border-t border-gray-100 p-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] relative z-10">
           <button
             onClick={() => navigate('/checkout')}
             className="w-full bg-blue-600 text-white font-semibold rounded-xl py-4 flex items-center justify-center gap-2 shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all"

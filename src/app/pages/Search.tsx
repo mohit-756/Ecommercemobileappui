@@ -36,7 +36,7 @@ export function Search() {
 
   return (
     <div className="min-h-full flex flex-col bg-white">
-      <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white md:pt-6 md:rounded-t-[32px] border-b border-gray-100 flex items-center gap-3">
+      <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white lg:pt-0 border-b border-gray-100 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
           className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 flex-shrink-0"
@@ -116,7 +116,7 @@ export function Search() {
                 <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : results.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {results.map((product: any) => (
                   <ProductCard key={product._id} product={product} />
                 ))}

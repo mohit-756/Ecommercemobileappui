@@ -97,7 +97,7 @@ export function Home() {
           </motion.div>
         </div>
       )}
-      <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 md:pt-4 md:rounded-t-[32px] border-b border-gray-50">
+      <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-50">
         <div className="flex justify-between items-center mb-4">
           <div onClick={() => navigate('/addresses')} className="cursor-pointer active:opacity-70 transition-opacity">
             <div className="flex items-center gap-1.5 mb-0.5">
@@ -234,8 +234,8 @@ export function Home() {
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-gray-900 text-lg">Featured Products</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {filteredProducts.slice(0, 4).map((product: any) => (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {filteredProducts.slice(0, 8).map((product: any) => (
                 <ProductCard key={product._id} product={product} />
               ))}
             </div>
