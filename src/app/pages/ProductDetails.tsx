@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { ChevronLeft, Heart, Share2, Star, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, Heart, Share2, Star, Minus, Plus, ShoppingBag, Check } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { productService } from '../services/productService';
+import { reviewService } from '../services/reviewService';
+import { recentlyViewedService } from '../services/recentlyViewedService';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { cn, normalizeProduct } from '../lib/utils';
 import { motion } from 'motion/react';
@@ -11,16 +14,46 @@ import { hapticService } from '../services/hapticService';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 import { Skeleton } from '../components/ui/skeleton';
+import { ProductCard } from '../components/ProductCard';
+import { wishlistService } from '../services/wishlistService';
 
 export function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const [emblaRef] = useEmblaCarousel();
   const [quantity, setQuantity] = useState(1);
   const [isWishlist, setIsWishlist] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewStats, setReviewStats] = useState<any>(null);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
+
+  const [copied, setCopied] = useState(false);
+
+  function checkWishlistStatus(prod: any) {
+    const saved = localStorage.getItem('user_wishlist');
+    if (saved) {
+      const wl = JSON.parse(saved);
+      setIsWishlist(wl.some((p: any) => (p.id || p._id) === (prod.id || prod._id)));
+    }
+    if (user) {
+      wishlistService.getWishlist().then((res) => {
+        const serverIds = (res.data || []).map((p: any) => p._id || p.id);
+        setIsWishlist(serverIds.includes(prod.id || prod._id));
+      }).catch(() => {});
+    }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -28,17 +61,34 @@ export function ProductDetails() {
       .then(res => {
         const prod = normalizeProduct(res.data);
         setProduct(prod);
+        checkWishlistStatus(prod);
+        recentlyViewedService.add(res.data);
 
-        // Check if in wishlist
-        const saved = localStorage.getItem('user_wishlist');
-        if (saved) {
-          const wishlist = JSON.parse(saved);
-          setIsWishlist(wishlist.some((p: any) => (p.id || p._id) === (prod.id || prod._id)));
+        if (res.data.category) {
+          const catId = typeof res.data.category === 'object' ? res.data.category._id : res.data.category;
+          productService.getProducts({ category: catId, limit: 5 }).then(r => {
+            setRelatedProducts((r.data.products || []).filter((p: any) => (p._id || p.id) !== id).slice(0, 4));
+          }).catch(() => {});
         }
       })
       .catch(() => navigate(-1))
       .finally(() => setLoading(false));
   }, [id, navigate]);
+
+  useEffect(() => {
+    if (!id) return;
+    setReviewsLoading(true);
+    reviewService.getProductReviews(id).then(res => {
+      setReviews(res.data.reviews || []);
+      setReviewStats(res.data);
+    }).catch(() => {}).finally(() => setReviewsLoading(false));
+
+    if (user) {
+      reviewService.checkUserReview(id).then(res => {
+        setHasReviewed(res.data.hasReviewed);
+      }).catch(() => {});
+    }
+  }, [id, user]);
 
   if (loading) {
     return (
@@ -60,9 +110,6 @@ export function ProductDetails() {
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-3/4" />
           </div>
-          <div className="flex gap-3">
-            {[1, 2, 3].map(i => <Skeleton key={i} className="w-10 h-10 rounded-full" />)}
-          </div>
         </div>
       </div>
     );
@@ -81,19 +128,23 @@ export function ProductDetails() {
   };
 
   const handleShare = async () => {
+    const url = window.location.href;
     if (Capacitor.isNativePlatform()) {
       await Share.share({
         title: product.name,
         text: `Check out this ${product.name} on Luminar!`,
-        url: window.location.href,
+        url,
         dialogTitle: 'Share with friends',
       });
     } else {
-      toast.info('Sharing is only available on mobile devices');
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success('Link copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  const handleToggleWishlist = () => {
+  const handleToggleWishlist = async () => {
     hapticService.impact();
     const saved = localStorage.getItem('user_wishlist');
     let wishlist = saved ? JSON.parse(saved) : [];
@@ -101,14 +152,50 @@ export function ProductDetails() {
     if (isWishlist) {
       wishlist = wishlist.filter((p: any) => (p.id || p._id) !== (product.id || product._id));
       toast.success('Removed from wishlist');
+      if (user) {
+        wishlistService.removeFromWishlist(product.id || product._id).catch(() => {});
+      }
     } else {
       wishlist.push(product);
       toast.success('Added to wishlist');
+      if (user) {
+        wishlistService.addToWishlist(product.id || product._id).catch(() => {});
+      }
     }
 
     localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
     setIsWishlist(!isWishlist);
     window.dispatchEvent(new Event('wishlist-updated'));
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewComment.trim()) {
+      toast.error('Please write a review');
+      return;
+    }
+    if (!user) {
+      toast.error('Please login to review');
+      return;
+    }
+    setReviewSubmitting(true);
+    try {
+      const res = await reviewService.createReview(product.id || product._id, {
+        rating: reviewRating,
+        title: reviewTitle,
+        comment: reviewComment,
+      });
+      setReviews(prev => [res.data, ...prev]);
+      setHasReviewed(true);
+      setShowReviewForm(false);
+      setReviewComment('');
+      setReviewTitle('');
+      setReviewRating(5);
+      toast.success('Review submitted!');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to submit review');
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
   return (
@@ -125,7 +212,7 @@ export function ProductDetails() {
             onClick={handleShare}
             className="w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-900 shadow-sm"
           >
-            <Share2 size={20} />
+            {copied ? <Check size={20} className="text-green-500" /> : <Share2 size={20} />}
           </button>
         </div>
       </div>
@@ -156,7 +243,7 @@ export function ProductDetails() {
         </div>
       </div>
 
-      <div className="px-6 pt-6 pb-32 lg:pb-6 flex-1 flex flex-col bg-white -mt-4 rounded-t-3xl relative z-20 overflow-y-auto">
+      <div className="px-6 pt-6 pb-4 flex-1 flex flex-col bg-white -mt-4 rounded-t-3xl relative z-20 overflow-y-auto">
         <div className="flex justify-between items-start mb-2">
           <div>
             <p className="text-blue-600 font-medium text-sm mb-1">{product.category}</p>
@@ -175,7 +262,9 @@ export function ProductDetails() {
             <Star size={16} className="text-amber-500 fill-amber-500" />
             <span className="font-bold text-amber-700">{product.rating}</span>
           </div>
-          <span className="text-gray-500 text-sm underline">{product.reviews} reviews</span>
+          <span className="text-gray-500 text-sm underline cursor-pointer" onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })}>
+            {product.reviews} review{product.reviews !== 1 ? 's' : ''}
+          </span>
         </div>
 
         <div className="mb-6">
@@ -204,6 +293,128 @@ export function ProductDetails() {
                 <button key={idx} className={cn("px-4 py-2 rounded-xl border text-sm font-medium transition-colors", idx === 1 ? "bg-blue-600 text-white border-blue-600" : "border-gray-200 text-gray-600")}>
                   {s}
                 </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Reviews Section */}
+        <div id="reviews-section" className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-bold text-gray-900 text-lg">Reviews</h3>
+            {user && !hasReviewed && (
+              <button
+                onClick={() => setShowReviewForm(!showReviewForm)}
+                className="text-blue-600 text-sm font-semibold"
+              >
+                {showReviewForm ? 'Cancel' : 'Write a Review'}
+              </button>
+            )}
+          </div>
+
+          {showReviewForm && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gray-50 rounded-2xl p-4 mb-4 space-y-3"
+            >
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Rating</label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button key={star} onClick={() => setReviewRating(star)}>
+                      <Star
+                        size={22}
+                        className={cn("transition-colors", star <= reviewRating ? "text-amber-400 fill-amber-400" : "text-gray-300")}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Title (optional)</label>
+                <input
+                  value={reviewTitle}
+                  onChange={(e) => setReviewTitle(e.target.value)}
+                  placeholder="Summarize your experience"
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 block mb-1">Review</label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Tell others about your experience..."
+                  rows={3}
+                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                />
+              </div>
+              <button
+                onClick={handleSubmitReview}
+                disabled={reviewSubmitting}
+                className="w-full bg-blue-600 text-white font-semibold rounded-xl py-2.5 text-sm disabled:opacity-60"
+              >
+                {reviewSubmitting ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </motion.div>
+          )}
+
+          {reviewsLoading ? (
+            <div className="space-y-3">
+              {[1, 2].map(i => (
+                <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100">
+                  <Skeleton className="h-4 w-32 mb-2" />
+                  <Skeleton className="h-3 w-full mb-1" />
+                  <Skeleton className="h-3 w-3/4" />
+                </div>
+              ))}
+            </div>
+          ) : reviews.length > 0 ? (
+            <div className="space-y-3">
+              {reviews.map((review: any) => (
+                <div key={review._id} className="bg-white rounded-2xl p-4 border border-gray-100">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs font-bold">
+                        {review.user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{review.user?.name || 'Anonymous'}</p>
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} size={12} className={star <= review.rating ? "text-amber-400 fill-amber-400" : "text-gray-200"} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  {review.title && <p className="text-sm font-bold text-gray-900 mb-1">{review.title}</p>}
+                  <p className="text-sm text-gray-600">{review.comment}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-white rounded-2xl border border-gray-100">
+              <Star size={32} className="mx-auto text-gray-300 mb-2" />
+              <p className="text-gray-500 text-sm">No reviews yet</p>
+              {user && (
+                <button onClick={() => setShowReviewForm(true)} className="text-blue-600 text-sm font-semibold mt-2">
+                  Be the first to review
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div className="mb-8">
+            <h3 className="font-bold text-gray-900 text-lg mb-4">Related Products</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {relatedProducts.map((p: any) => (
+                <ProductCard key={p._id} product={p} />
               ))}
             </div>
           </div>

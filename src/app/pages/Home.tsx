@@ -9,6 +9,7 @@ import { motion } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
+import { recentlyViewedService } from '../services/recentlyViewedService';
 import { ProductCard } from '../components/ProductCard';
 import { cn } from '../lib/utils';
 import { hapticService } from '../services/hapticService';
@@ -33,6 +34,18 @@ export function Home() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+
+  useEffect(() => {
+    setRecentlyViewed(recentlyViewedService.get());
+    const handler = () => setRecentlyViewed(recentlyViewedService.get());
+    window.addEventListener('recently-viewed-updated', handler);
+    window.addEventListener('storage', handler);
+    return () => {
+      window.removeEventListener('recently-viewed-updated', handler);
+      window.removeEventListener('storage', handler);
+    };
+  }, []);
 
   async function fetchData(isRefresh = false) {
     if (isRefresh) setRefreshing(true);
@@ -197,6 +210,27 @@ export function Home() {
               ))}
             </div>
           </div>
+
+          {recentlyViewed.length > 0 && (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-2">
+                  <Clock size={18} className="text-blue-600" />
+                  <h3 className="font-bold text-gray-900 text-lg">Recently Viewed</h3>
+                </div>
+                <button onClick={() => { recentlyViewedService.clear(); setRecentlyViewed([]); }} className="text-blue-600 text-sm font-semibold">
+                  Clear
+                </button>
+              </div>
+              <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar -mx-6 px-6">
+                {recentlyViewed.slice(0, 6).map((item: any) => (
+                  <div key={item.id} className="min-w-[120px] w-[120px]">
+                    <ProductCard product={item} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <div className="flex justify-between items-center mb-4">

@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import { cn, normalizeProduct } from '../lib/utils';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { hapticService } from '../services/hapticService';
+import { wishlistService } from '../services/wishlistService';
+import { useState, useEffect } from 'react';
 
 interface ProductCardProps {
   product: any;
@@ -14,7 +17,17 @@ interface ProductCardProps {
 export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const product = normalizeProduct(raw);
+  const [isWishlist, setIsWishlist] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('user_wishlist');
+    if (saved) {
+      const wl = JSON.parse(saved);
+      setIsWishlist(wl.some((p: any) => (p.id || p._id) === (product.id || product._id)));
+    }
+  }, [product.id, product._id]);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -39,12 +52,19 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
     if (exists) {
       wishlist = wishlist.filter((p: any) => (p.id || p._id) !== (product.id || product._id));
       toast.success('Removed from wishlist');
+      if (user) {
+        wishlistService.removeFromWishlist(product.id || product._id).catch(() => {});
+      }
     } else {
       wishlist.push(raw);
       toast.success('Added to wishlist');
+      if (user) {
+        wishlistService.addToWishlist(product.id || product._id).catch(() => {});
+      }
     }
 
     localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
+    setIsWishlist(!exists);
     window.dispatchEvent(new Event('wishlist-updated'));
   };
 
@@ -79,8 +99,8 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
             </div>
           </div>
         </div>
-        <button onClick={handleToggleWishlist} className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors">
-          <Heart size={18} />
+        <button onClick={handleToggleWishlist} className={cn("absolute top-3 right-3 transition-colors", isWishlist ? "text-red-500" : "text-gray-400 hover:text-red-500")}>
+          <Heart size={18} className={isWishlist ? "fill-red-500" : ""} />
         </button>
       </motion.div>
     );
@@ -106,9 +126,12 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
         )}
         <button
           onClick={handleToggleWishlist}
-          className="absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors"
+          className={cn(
+            "absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center transition-colors",
+            isWishlist ? "text-red-500" : "text-gray-500 hover:text-red-500"
+          )}
         >
-          <Heart size={16} />
+          <Heart size={16} className={isWishlist ? "fill-red-500" : ""} />
         </button>
       </div>
       <div className="p-3 flex-1 flex flex-col">

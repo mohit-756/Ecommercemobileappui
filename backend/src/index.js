@@ -11,6 +11,8 @@ import addressRoutes from './routes/addresses.js';
 import shippingRoutes from './routes/shipping.js';
 import adminRoutes from './routes/admin.js';
 import geocodingRoutes from './routes/geocoding.js';
+import wishlistRoutes from './routes/wishlist.js';
+import reviewRoutes from './routes/reviews.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -35,6 +37,8 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/shipping', shippingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/geocode', geocodingRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.use(errorHandler);
 

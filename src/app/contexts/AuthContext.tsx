@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { authService } from '../services/authService';
+import { wishlistService } from '../services/wishlistService';
 
 interface User {
   _id: string;
@@ -34,7 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     authService.getProfile()
-      .then(res => setUser(res.data))
+      .then(res => {
+        setUser(res.data);
+        syncWishlistFromServer();
+      })
       .catch(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -50,13 +54,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('auth:logout', handleLogout);
   }, []);
 
+  const syncWishlistFromServer = useCallback(async () => {
+    try {
+      const res = await wishlistService.getWishlist();
+      const serverList = res.data || [];
+      const localList = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
+      const merged = [...serverList];
+      for (const item of localList) {
+        if (!merged.some((m: any) => (m._id || m.id) === (item._id || item.id))) {
+          merged.push(item);
+        }
+      }
+      localStorage.setItem('user_wishlist', JSON.stringify(merged));
+      window.dispatchEvent(new Event('wishlist-updated'));
+    } catch {}
+  }, []);
+
   const login = useCallback(async (email: string, password: string) => {
     const res = await authService.login({ email, password });
     const { token: newToken, user: userData } = res.data;
     localStorage.setItem('token', newToken);
     setToken(newToken);
     setUser(userData);
-  }, []);
+    syncWishlistFromServer();
+  }, [syncWishlistFromServer]);
 
   const register = useCallback(async (name: string, email: string, password: string, phone?: string) => {
     const res = await authService.register({ name, email, password, phone });
@@ -64,7 +85,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('token', newToken);
     setToken(newToken);
     setUser(userData);
-  }, []);
+    syncWishlistFromServer();
+  }, [syncWishlistFromServer]);
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
