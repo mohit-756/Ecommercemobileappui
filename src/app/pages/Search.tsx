@@ -28,7 +28,7 @@ export function Search() {
   const [maxPrice, setMaxPrice] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  const recentSearches = ['Milk', 'Bread', 'Amul Butter', 'Lays', 'Coke'];
+  const recentSearches = ['Almonds', 'Cashews', 'Dates', 'Walnuts', 'Raisins'];
 
   useEffect(() => {
     categoryService.getCategories().then((res) => {

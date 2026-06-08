@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
-import { ShoppingBag } from 'lucide-react';
+import { Leaf } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useMobileFeatures } from '../hooks/useMobileFeatures';
 
@@ -25,26 +25,26 @@ export function Splash() {
   }, [navigate, user, isLoading]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full min-h-screen bg-blue-600">
+    <div className="flex flex-col items-center justify-center h-full min-h-screen bg-gradient-to-br from-amber-500 to-orange-600">
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ 
+        transition={{
           type: "spring",
           stiffness: 260,
-          damping: 20 
+          damping: 20
         }}
         className="bg-white p-6 rounded-[28px] shadow-2xl mb-6"
       >
-        <ShoppingBag size={64} className="text-blue-600" strokeWidth={1.5} />
+        <Leaf size={64} className="text-amber-600" strokeWidth={1.5} />
       </motion.div>
-      <motion.h1 
+      <motion.h1
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
         className="text-white text-4xl font-bold tracking-tight"
       >
-        Luminar
+        DryFruit Hub
       </motion.h1>
       <motion.div 
         initial={{ opacity: 0 }}

@@ -1,6 +1,6 @@
 {
-  "appId": "com.retailshop",
-  "appName": "Retail Shop",
+  "appId": "com.dryfruitshub",
+  "appName": "DryFruit Hub",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

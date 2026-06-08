@@ -21,9 +21,9 @@ const bannerIcons: Record<string, any> = {
 };
 
 const banners = [
-  { id: 1, title: 'Summer Sale', subtitle: 'Up to 50% Off', bg: 'bg-gradient-to-r from-blue-500 to-indigo-600' },
-  { id: 2, title: 'New Arrivals', subtitle: 'Explore Latest Tech', bg: 'bg-gradient-to-r from-emerald-500 to-teal-600' },
-  { id: 3, title: 'Exclusive', subtitle: 'Members Only Deals', bg: 'bg-gradient-to-r from-amber-500 to-orange-600' },
+  { id: 1, title: 'Premium Dry Fruits', subtitle: 'Fresh & Organic', bg: 'bg-gradient-to-r from-amber-500 to-yellow-600' },
+  { id: 2, title: 'Healthy Living', subtitle: 'Nutrition You Trust', bg: 'bg-gradient-to-r from-green-500 to-emerald-600' },
+  { id: 3, title: 'Special Offers', subtitle: 'Up to 26% Off', bg: 'bg-gradient-to-r from-orange-500 to-red-600' },
 ];
 
 export function Home() {
@@ -126,12 +126,6 @@ export function Home() {
               <Bell size={20} className="text-gray-700" />
               <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            <div
-              onClick={() => navigate('/profile')}
-              className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden cursor-pointer active:scale-95 transition-transform border border-gray-100"
-            >
-              <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User" />
-            </div>
           </div>
         </div>
 
@@ -140,7 +134,7 @@ export function Home() {
           className="bg-gray-100/80 flex items-center px-4 py-3 rounded-2xl border border-gray-100 cursor-text group"
         >
           <Search size={20} className="text-gray-400 mr-2 group-focus-within:text-blue-600 transition-colors" />
-          <span className="text-gray-400 text-sm">Search "milk", "bread" or "chips"...</span>
+          <span className="text-gray-400 text-sm">Search almonds, dates, walnuts...</span>
         </div>
       </div>
 
@@ -197,14 +191,14 @@ export function Home() {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-900 text-lg">Daily Essentials</h3>
+              <h3 className="font-bold text-gray-900 text-lg">Best Sellers</h3>
               <button className="text-blue-600 text-sm font-semibold flex items-center gap-1">
                 See all <ArrowRight size={14} />
               </button>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar -mx-6 px-6">
-              {products.filter((p: any) => p.tags?.includes('dairy') || p.tags?.includes('staples')).map((product: any) => (
-                <div key={product._id} className="min-w-[140px] w-[140px]">
+              {products.slice(0, 5).map((product: any) => (
+                <div key={product.id} className="min-w-[140px] w-[140px]">
                   <ProductCard product={product} />
                 </div>
               ))}
