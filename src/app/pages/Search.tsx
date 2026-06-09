@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { ChevronLeft, Search as SearchIcon, X, SlidersHorizontal, ChevronDown, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { productService } from '../services/productService';
-import { categoryService } from '../services/categoryService';
 import { ProductCard } from '../components/ProductCard';
 import { cn } from '../lib/utils';
+import { products as mockProducts, categories as mockCategories } from '../data/mock';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Relevance' },
@@ -31,9 +30,7 @@ export function Search() {
   const recentSearches = ['Almonds', 'Cashews', 'Dates', 'Walnuts', 'Raisins'];
 
   useEffect(() => {
-    categoryService.getCategories().then((res) => {
-      setCategories(res.data || []);
-    }).catch(() => {});
+    setCategories(mockCategories);
   }, []);
 
   useEffect(() => {
@@ -42,22 +39,13 @@ export function Search() {
       return;
     }
 
-    const timer = setTimeout(async () => {
+    const timer = setTimeout(() => {
       setLoading(true);
-      try {
-        const params: any = { search: query, limit: 20 };
-        if (sort) params.sort = sort;
-        if (minPrice) params.minPrice = Number(minPrice);
-        if (maxPrice) params.maxPrice = Number(maxPrice);
-        if (categoryFilter) params.category = categoryFilter;
-
-        const res = await productService.getProducts(params);
-        setResults(res.data.products);
-      } catch {
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
+      const filtered = mockProducts.filter((p: any) =>
+        p.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setResults(filtered);
+      setLoading(false);
     }, 300);
 
     return () => clearTimeout(timer);

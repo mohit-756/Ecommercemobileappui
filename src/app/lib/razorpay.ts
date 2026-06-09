@@ -41,7 +41,7 @@ export function openRazorpayCheckout(options: RazorpayOptions) {
     key: options.key,
     amount: options.amount,
     currency: options.currency || 'INR',
-    name: options.name || 'Retail Shop',
+    name: options.name || 'DryFruit Hub',
     description: options.description || '',
     image: options.image || '',
     order_id: options.order_id,

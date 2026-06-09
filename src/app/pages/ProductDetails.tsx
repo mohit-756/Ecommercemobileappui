@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ChevronLeft, Heart, Share2, Star, Minus, Plus, ShoppingBag, Check } from 'lucide-react';
+import { products as mockProducts } from '../data/mock';
 import useEmblaCarousel from 'embla-carousel-react';
-import { productService } from '../services/productService';
-import { reviewService } from '../services/reviewService';
 import { recentlyViewedService } from '../services/recentlyViewedService';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -57,38 +56,17 @@ export function ProductDetails() {
 
   useEffect(() => {
     if (!id) return;
-    productService.getProductById(id)
-      .then(res => {
-        const prod = normalizeProduct(res.data);
-        setProduct(prod);
-        checkWishlistStatus(prod);
-        recentlyViewedService.add(res.data);
-
-        if (res.data.category) {
-          const catId = typeof res.data.category === 'object' ? res.data.category._id : res.data.category;
-          productService.getProducts({ category: catId, limit: 5 }).then(r => {
-            setRelatedProducts((r.data.products || []).filter((p: any) => (p._id || p.id) !== id).slice(0, 4));
-          }).catch(() => {});
-        }
-      })
-      .catch(() => navigate(-1))
-      .finally(() => setLoading(false));
-  }, [id, navigate]);
-
-  useEffect(() => {
-    if (!id) return;
-    setReviewsLoading(true);
-    reviewService.getProductReviews(id).then(res => {
-      setReviews(res.data.reviews || []);
-      setReviewStats(res.data);
-    }).catch(() => {}).finally(() => setReviewsLoading(false));
-
-    if (user) {
-      reviewService.checkUserReview(id).then(res => {
-        setHasReviewed(res.data.hasReviewed);
-      }).catch(() => {});
+    const mockProd = mockProducts.find((p: any) => p.id === id);
+    if (mockProd) {
+      const prod = normalizeProduct(mockProd);
+      setProduct(prod);
+      checkWishlistStatus(prod);
+      recentlyViewedService.add(mockProd);
+      setRelatedProducts(mockProducts.filter((p: any) => p.id !== id).slice(0, 4));
     }
-  }, [id, user]);
+    setLoading(false);
+    setReviewsLoading(false);
+  }, [id, navigate]);
 
   if (loading) {
     return (
@@ -132,7 +110,7 @@ export function ProductDetails() {
     if (Capacitor.isNativePlatform()) {
       await Share.share({
         title: product.name,
-        text: `Check out this ${product.name} on Luminar!`,
+        text: `Check out this ${product.name} on DryFruit Hub!`,
         url,
         dialogTitle: 'Share with friends',
       });
