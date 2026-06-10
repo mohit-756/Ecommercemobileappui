@@ -92,7 +92,9 @@ export function Login() {
       }
       navigate(from, { replace: true });
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Something went wrong');
+      console.error('Login error:', err);
+      const message = err.response?.data?.message || err.message || 'Something went wrong';
+      toast.error(message);
     } finally {
       setLoading(false);
     }

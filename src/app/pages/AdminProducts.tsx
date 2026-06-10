@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router';
 import { ArrowLeft, Plus, Edit3, Trash2, Search } from 'lucide-react';
 import { productService } from '../services/productService';
 import { toast } from 'sonner';
+import api from '../services/api';
 
 export function AdminProducts() {
   const navigate = useNavigate();
   const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -21,7 +23,10 @@ export function AdminProducts() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchProducts(); }, [search]);
+  useEffect(() => {
+    fetchProducts();
+    api.get('/categories').then(res => setCategories(res.data)).catch(() => {});
+  }, [search]);
 
   const openEdit = (product: any) => {
     setForm({
@@ -44,8 +49,8 @@ export function AdminProducts() {
   };
 
   const handleSave = async () => {
-    if (!form.name || !form.price) {
-      toast.error('Name and price are required');
+    if (!form.name || !form.price || !form.description || !form.category) {
+      toast.error('Name, description, price, and category are required');
       return;
     }
     try {
@@ -55,7 +60,7 @@ export function AdminProducts() {
         price: Number(form.price),
         originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined,
         stock: Number(form.stock) || 0,
-        category: form.category || undefined,
+        category: form.category,
         images: form.image ? [form.image] : [],
       };
       if (editing) {
@@ -175,8 +180,13 @@ export function AdminProducts() {
                   <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))} className="w-full bg-gray-50 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500">Category ID</label>
-                  <input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full bg-gray-50 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200" />
+                  <label className="text-xs font-medium text-gray-500">Category *</label>
+                  <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full bg-gray-50 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200">
+                    <option value="">Select category</option>
+                    {categories.map(c => (
+                      <option key={c._id} value={c._id}>{c.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div>

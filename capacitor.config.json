@@ -3,7 +3,11 @@
   "appName": "DryFruit Hub",
   "webDir": "dist",
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "hostname": "app.dryfruitshub.com",
+    "allowNavigation": [
+      "retail-shop-backend-ekc8.onrender.com"
+    ]
   },
   "plugins": {
     "SplashScreen": {
