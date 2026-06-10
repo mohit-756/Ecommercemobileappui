@@ -29,9 +29,43 @@ See [PLAN.md](./PLAN.md) for the detailed build phases.
 | Shipping | Shiprocket / Delhivery |
 | UI Library | MUI 7, Radix UI, shadcn/ui |
 
-## Quick Start
+## Prerequisites
 
-### Web (Laptop / Desktop / Mobile Browser)
+- Node.js 18+
+- Android Studio (for building the APK)
+- A physical Android device or emulator
+- MongoDB Atlas account (backend) or local MongoDB
+
+## Setup
+
+### 1. Environment Variables
+
+Copy the example env file and adjust as needed:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_API_URL` | Backend API URL — use Render URL for production, `http://localhost:5000/api` for local dev |
+| `VITE_RAZORPAY_KEY_ID` | Razorpay payment gateway key |
+
+**Important:** The `.env` file contains secrets and is excluded from git. After changing `.env`, rebuild the app with `npm run build` for the changes to take effect.
+
+### 2. Backend (Render — Deployed)
+
+The backend is already deployed at:
+```
+https://retail-shop-backend-ekc8.onrender.com
+```
+
+Make sure these env vars are set in Render's dashboard:
+- `MONGODB_URI` — your Atlas MongoDB connection string
+- `JWT_SECRET` — a strong random secret
+- `CORS_ORIGIN` — `*` (or leave unset for default)
+
+### 3. Web (Laptop / Desktop / Mobile Browser)
 
 ```bash
 # Install dependencies
@@ -46,10 +80,10 @@ npm run build
 
 The web version uses **full desktop layout** (top nav, no phone frame). Works on any browser.
 
-### Android (Phone / Tablet)
+### 4. Android (Phone / Tablet)
 
 ```bash
-# 1. Build the frontend
+# 1. Build the frontend (picks up .env vars at build time)
 npm run build
 
 # 2. Sync the build to the Android project
@@ -58,7 +92,7 @@ npx cap sync android
 # 3. Open in Android Studio
 npx cap open android
 
-# 4. In Android Studio, click Run (▶) to install on connected device
+# 4. In Android Studio, go to Build → Build APK(s), or click Run (▶) to install on device
 ```
 
 Or combine build + sync into one step:
@@ -69,7 +103,9 @@ npm run cap:build       # vite build + npx cap sync android
 
 The Android app uses the **mobile layout** with bottom navigation.
 
-### Backend
+**Note:** The Capacitor WebView is configured to allow requests to the Render backend domain. If you switch to a different backend URL, update `allowNavigation` in `capacitor.config.json`.
+
+### 5. Backend (Local Dev — Optional)
 
 ```bash
 cd backend
