@@ -55,11 +55,10 @@ export async function sendOtp(req, res, next) {
       expiresAt: new Date(Date.now() + 5 * 60 * 1000),
     });
 
-    try {
-      await sendOtpEmail(email, otp);
-    } catch (emailError) {
-      console.error('Email send error:', emailError);
-      return res.status(500).json({ message: 'Failed to send OTP email: ' + emailError.message });
+    const emailResult = await sendOtpEmail(email, otp);
+
+    if (emailResult.messageId === 'dev-mode') {
+      return res.json({ message: 'OTP sent to your email', otp, dev: true });
     }
 
     res.json({ message: 'OTP sent to your email' });

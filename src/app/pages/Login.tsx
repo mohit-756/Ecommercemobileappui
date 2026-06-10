@@ -89,8 +89,12 @@ export function Login() {
         navigate(from, { replace: true });
       } else {
         const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-        await authService.sendOtp({ email });
-        toast.success('OTP sent to your email');
+        const res = await authService.sendOtp({ email });
+        if (res.data.dev && res.data.otp) {
+          toast.success(`Dev mode — OTP: ${res.data.otp}`, { duration: 10000 });
+        } else {
+          toast.success('OTP sent to your email');
+        }
         navigate('/verify-otp', { state: { name, email, password } });
       }
     } catch (err: any) {
