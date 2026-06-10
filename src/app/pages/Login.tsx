@@ -35,7 +35,7 @@ export function Login() {
         password = 'password123';
       }
 
-      const auth = await biometricService.authenticate('Log in to Luminar');
+      const auth = await biometricService.authenticate('Log in to DryFruit Hub');
       if (auth.success) {
         await login(email, password);
         toast.success('Welcome back!');

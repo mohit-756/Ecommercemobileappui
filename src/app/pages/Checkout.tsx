@@ -117,7 +117,7 @@ export function Checkout() {
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         order_id: razorpayOrder.id,
-        name: 'Retail Shop',
+        name: 'DryFruit Hub',
         description: `Order #${order._id.slice(-6).toUpperCase()}`,
         prefill: {
           name: user?.name || '',

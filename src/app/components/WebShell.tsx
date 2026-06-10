@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from 'react-router';
-import { ShoppingCart, User, Search, Heart } from 'lucide-react';
+import { ShoppingCart, User, Search, Heart, Leaf } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Capacitor } from '@capacitor/core';
 
@@ -20,10 +20,10 @@ export function WebShell() {
               onClick={() => navigate('/home')}
               className="flex-shrink-0 cursor-pointer flex items-center gap-2"
             >
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">L</span>
+              <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
+                <Leaf size={18} className="text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">Luminar</span>
+              <span className="text-xl font-bold text-gray-900">DryFruit Hub</span>
             </div>
 
             <div className="flex-1 max-w-lg mx-8 hidden sm:block">
@@ -76,7 +76,7 @@ export function WebShell() {
       <footer className="bg-white border-t border-gray-200 py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-500 text-sm">&copy; 2026 Luminar. All rights reserved.</p>
+            <p className="text-gray-500 text-sm">&copy; 2026 DryFruit Hub. All rights reserved.</p>
             <div className="flex gap-6">
               <button onClick={() => navigate('/support')} className="text-gray-500 text-sm hover:text-blue-600 transition-colors">
                 Support

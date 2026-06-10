@@ -8,7 +8,7 @@ export function Support() {
   const contactMethods = [
     { icon: MessageCircle, label: 'Live Chat', description: 'Typical response time: 2 mins', color: 'bg-blue-50 text-blue-600' },
     { icon: Phone, label: 'Call Support', description: 'Mon-Fri, 9am - 6pm', color: 'bg-emerald-50 text-emerald-600' },
-    { icon: Mail, label: 'Email Us', description: 'support@retailshop.com', color: 'bg-purple-50 text-purple-600' },
+    { icon: Mail, label: 'Email Us', description: 'support@dryfruithub.com', color: 'bg-purple-50 text-purple-600' },
   ];
 
   return (

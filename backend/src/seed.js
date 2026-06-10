@@ -6,221 +6,169 @@ import Product from './models/Product.js';
 import User from './models/User.js';
 
 const categories = [
-  { name: 'Grocery', icon: 'ShoppingCart' },
-  { name: 'Dairy & Eggs', icon: 'Milk' },
-  { name: 'Snacks', icon: 'Candy' },
-  { name: 'Beverages', icon: 'CupSoda' },
-  { name: 'Fruits & Veg', icon: 'Apple' },
-  { name: 'Electronics', icon: 'Smartphone' },
-  { name: 'Fashion', icon: 'Shirt' },
-  { name: 'Home', icon: 'Home' },
-  { name: 'Beauty', icon: 'Sparkles' },
+  { name: 'Nuts', icon: 'Apple' },
+  { name: 'Dried Fruits', icon: 'Cherry' },
+  { name: 'Mixed Combos', icon: 'ShoppingBag' },
+  { name: 'Seeds & Grains', icon: 'Sprout' },
 ];
 
 const products = [
-  // Grocery / Staples
   {
-    name: 'Fortune Sunlite Refined Sunflower Oil',
-    price: 155.00,
-    originalPrice: 175.00,
-    rating: 4.8,
-    reviewsCount: 5400,
-    images: ['https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=600'],
-    description: 'Fortune Sunlite Refined Sunflower Oil is a light, healthy and nutritious cooking oil. Being rich in vitamins and consisting mainly of polyunsaturated fatty acids, it makes it edible and good for cooking.',
-    stock: 500,
-    discount: '11%',
-    tags: ['oil', 'staples', 'grocery'],
-    categoryName: 'Grocery'
-  },
-  {
-    name: 'Aashirvaad Select Sharbati Atta',
-    price: 280.00,
-    originalPrice: 320.00,
-    rating: 4.9,
-    reviewsCount: 8900,
-    images: ['https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600'],
-    description: 'Aashirvaad Select is a premium quality atta made from the King of Wheat – Sharbati wheat grains which are sourced from the select regions of Madhya Pradesh.',
-    stock: 300,
-    discount: '12%',
-    tags: ['atta', 'staples', 'flour'],
-    categoryName: 'Grocery'
-  },
-  {
-    name: 'TATA Salt - Vaccum Evaporated',
-    price: 28.00,
-    originalPrice: 28.00,
-    rating: 4.9,
-    reviewsCount: 15000,
-    images: ['https://images.unsplash.com/photo-1518110925495-5fe2fda0442c?w=600'],
-    description: 'Desh Ka Namak - Tata Salt offers a consistent salty taste. It is iodine-fortified and vacuum evaporated.',
-    stock: 1000,
-    discount: null,
-    tags: ['salt', 'staples'],
-    categoryName: 'Grocery'
-  },
-
-  // Dairy & Eggs
-  {
-    name: 'Amul Taaza Homogenised Toned Milk',
-    price: 72.00,
-    originalPrice: 72.00,
-    rating: 4.7,
-    reviewsCount: 12000,
-    images: ['https://images.unsplash.com/photo-1563636619-e9107da5a76a?w=600'],
-    description: 'Amul Taaza Toned Milk is fresh and healthy milk. It is enriched with Vitamin A and D.',
-    stock: 200,
-    discount: null,
-    tags: ['milk', 'dairy'],
-    categoryName: 'Dairy & Eggs'
-  },
-  {
-    name: 'Amul Butter - Pasteurized',
-    price: 275.00,
-    originalPrice: 280.00,
-    rating: 4.9,
-    reviewsCount: 9500,
-    images: ['https://images.unsplash.com/photo-1589923188900-85dae523342b?w=600'],
-    description: 'Amul Butter is made from the finest fresh cream and has a delicious taste.',
-    stock: 150,
-    discount: '2%',
-    tags: ['butter', 'dairy'],
-    categoryName: 'Dairy & Eggs'
-  },
-  {
-    name: 'Farm Fresh White Eggs - Pack of 6',
-    price: 55.00,
-    originalPrice: 65.00,
-    rating: 4.6,
-    reviewsCount: 4500,
-    images: ['https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=600'],
-    description: 'Farm fresh white eggs, high in protein and nutrition.',
-    stock: 100,
-    discount: '15%',
-    tags: ['eggs', 'protein', 'dairy'],
-    categoryName: 'Dairy & Eggs'
-  },
-
-  // Snacks & Beverages
-  {
-    name: 'Lay\'s Classic Salted Potato Chips',
-    price: 20.00,
-    originalPrice: 20.00,
-    rating: 4.5,
-    reviewsCount: 20000,
-    images: ['https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=600'],
-    description: 'Lay\'s Classic Salted Potato Chips are made from best quality potatoes and seasoned with salt.',
-    stock: 800,
-    discount: null,
-    tags: ['chips', 'snacks', 'lays'],
-    categoryName: 'Snacks'
-  },
-  {
-    name: 'Coca-Cola Soft Drink 750ml',
-    price: 45.00,
-    originalPrice: 50.00,
-    rating: 4.7,
-    reviewsCount: 15000,
-    images: ['https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=600'],
-    description: 'Refresh yourself with the great taste of Coca-Cola.',
-    stock: 400,
-    discount: '10%',
-    tags: ['drink', 'beverages', 'coke'],
-    categoryName: 'Beverages'
-  },
-  {
-    name: 'Cadbury Dairy Milk Silk Chocolate',
-    price: 80.00,
-    originalPrice: 85.00,
-    rating: 4.9,
-    reviewsCount: 12000,
-    images: ['https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=600'],
-    description: 'The classic taste of Cadbury chocolates enriched with the goodness of milk.',
-    stock: 600,
-    discount: '6%',
-    tags: ['chocolate', 'snacks', 'sweet'],
-    categoryName: 'Snacks'
-  },
-
-  // Fruits & Veg
-  {
-    name: 'Fresh Banana (Robusta) - 1kg',
-    price: 48.00,
-    originalPrice: 60.00,
-    rating: 4.5,
-    reviewsCount: 8000,
-    images: ['https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=600'],
-    description: 'Fresh and ripe bananas, high in potassium and energy.',
-    stock: 100,
-    discount: '20%',
-    tags: ['fruit', 'banana', 'fresh'],
-    categoryName: 'Fruits & Veg'
-  },
-  {
-    name: 'Onion (Pyaj) - 1kg',
-    price: 35.00,
-    originalPrice: 45.00,
-    rating: 4.4,
-    reviewsCount: 15000,
-    images: ['https://images.unsplash.com/photo-1508747703725-719777637510?w=600'],
-    description: 'Fresh pink onions, perfect for every kitchen.',
-    stock: 200,
-    discount: '22%',
-    tags: ['vegetable', 'onion', 'fresh'],
-    categoryName: 'Fruits & Veg'
-  },
-
-  // Electronics (Existing/Updated)
-  {
-    name: 'Sony WH-1000XM5 Wireless Headphones',
-    price: 24990.00,
-    originalPrice: 34990.00,
+    name: 'Premium Almonds',
+    price: 15.99,
+    originalPrice: 18.99,
     rating: 4.8,
     reviewsCount: 1240,
-    images: ['https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600'],
-    description: 'Industry leading noise canceling with two processors and 8 microphones. Magnificent sound, engineered to perfection.',
-    stock: 50,
-    discount: '28%',
-    tags: ['headphones', 'wireless', 'noise-cancelling', 'sony'],
-    categoryName: 'Electronics'
+    images: ['/images/products/almonds.jpg'],
+
+    description: 'Organic premium almonds, rich in protein and healthy fats. Perfect for snacking and recipes.',
+    stock: 500,
+    discount: '15%',
+    tags: ['almonds', 'nuts', 'premium'],
+    categoryName: 'Nuts'
   },
   {
-    name: 'Minimalist Smart Watch Pro',
-    price: 4999.00,
-    originalPrice: 7999.00,
+    name: 'Cashew Kernels',
+    price: 18.99,
+    originalPrice: 24.99,
     rating: 4.6,
     reviewsCount: 856,
-    images: ['https://images.unsplash.com/photo-1660844817855-3ecc7ef21f12?w=600'],
-    description: 'Track your fitness, heart rate, and notifications with this sleek, minimalist smart watch.',
-    stock: 100,
-    discount: '37%',
-    tags: ['smartwatch', 'wearable', 'fitness', 'minimalist'],
-    categoryName: 'Electronics'
+    images: ['/images/products/cashews.webp'],
+    description: 'Premium cashew kernels, freshly roasted with a buttery taste. Great source of minerals.',
+    stock: 400,
+    discount: '20%',
+    tags: ['cashew', 'nuts', 'kaju'],
+    categoryName: 'Nuts'
   },
   {
-    name: 'Urban Explorer Sneakers',
-    price: 2999.00,
-    originalPrice: 4500.00,
+    name: 'Raisins Kishmish',
+    price: 8.99,
+    originalPrice: 11.99,
     rating: 4.9,
     reviewsCount: 2100,
-    images: ['https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600'],
-    description: 'Comfort meets style with these versatile urban sneakers, perfect for all-day wear.',
-    stock: 200,
-    discount: '33%',
-    tags: ['sneakers', 'shoes', 'fashion', 'urban'],
-    categoryName: 'Fashion'
+    images: ['/images/products/raisins.webp'],
+    description: 'Premium golden raisins from Kishmish, naturally sweet and full of antioxidants.',
+    stock: 600,
+    discount: '25%',
+    tags: ['raisins', 'kishmish', 'dried-fruits'],
+    categoryName: 'Dried Fruits'
   },
   {
-    name: 'Classic Leather Backpack',
-    price: 1899.00,
-    originalPrice: 2499.00,
+    name: 'Dates Combo Pack',
+    price: 12.99,
+    originalPrice: 16.99,
     rating: 4.7,
     reviewsCount: 432,
-    images: ['https://images.unsplash.com/photo-1622560480654-d96214fdc887?w=600'],
-    description: 'Premium handcrafted leather backpack with dedicated laptop compartment and multiple pockets.',
-    stock: 75,
+    images: ['/images/products/dates.jpg'],
+    description: 'Mix of premium ajwa and medjool dates. Rich in fiber and natural sweetness.',
+    stock: 300,
     discount: '24%',
-    tags: ['backpack', 'leather', 'accessories', 'travel'],
-    categoryName: 'Beauty'
+    tags: ['dates', 'ajwa', 'medjool'],
+    categoryName: 'Dried Fruits'
+  },
+  {
+    name: 'Walnuts Premium',
+    price: 14.99,
+    originalPrice: 19.99,
+    rating: 4.5,
+    reviewsCount: 128,
+    images: ['/images/products/walnuts.webp'],
+    description: 'Organic walnuts, excellent source of omega-3 fatty acids and brain health.',
+    stock: 350,
+    discount: '25%',
+    tags: ['walnuts', 'nuts', 'omega-3'],
+    categoryName: 'Nuts'
+  },
+  {
+    name: 'Apricots Dried',
+    price: 10.99,
+    originalPrice: 13.99,
+    rating: 4.7,
+    reviewsCount: 654,
+    images: ['/images/products/apricots.webp'],
+    description: 'Naturally dried apricots, sweet and tangy flavor. Rich in vitamins and minerals.',
+    stock: 250,
+    discount: '21%',
+    tags: ['apricots', 'dried-fruits', 'khumani'],
+    categoryName: 'Dried Fruits'
+  },
+  {
+    name: 'Pistachio Premium',
+    price: 16.99,
+    originalPrice: 21.99,
+    rating: 4.8,
+    reviewsCount: 987,
+    images: ['/images/products/pistachio.png'],
+    description: 'Premium californian pistachios, roasted and lightly salted for perfect taste.',
+    stock: 450,
+    discount: '22%',
+    tags: ['pistachio', 'nuts', 'pista'],
+    categoryName: 'Nuts'
+  },
+  {
+    name: 'Mixed Dry Fruits',
+    price: 19.99,
+    originalPrice: 26.99,
+    rating: 4.9,
+    reviewsCount: 1450,
+    images: ['https://images.unsplash.com/photo-1584649925549-6c79efd85c8f?w=600'],
+    description: 'Delicious mix of almonds, cashews, walnuts, and raisins in one pack.',
+    stock: 500,
+    discount: '26%',
+    tags: ['mixed', 'combo', 'assorted'],
+    categoryName: 'Mixed Combos'
+  },
+  {
+    name: 'Black Raisins Munakka',
+    price: 9.99,
+    originalPrice: 12.99,
+    rating: 4.8,
+    reviewsCount: 523,
+    images: ['https://images.unsplash.com/photo-1584649925549-6c79efd85c8f?w=600'],
+    description: 'Premium black raisins (Munakka) with natural sweetness and high iron content.',
+    stock: 400,
+    discount: '23%',
+    tags: ['munakka', 'raisins', 'dried-fruits'],
+    categoryName: 'Dried Fruits'
+  },
+  {
+    name: 'Pecan Nuts',
+    price: 17.99,
+    originalPrice: 22.99,
+    rating: 4.7,
+    reviewsCount: 341,
+    images: ['https://images.unsplash.com/photo-1599599810694-a5d2f0be27d6?w=600'],
+    description: 'Rich and creamy pecan nuts, perfect for baking and snacking.',
+    stock: 200,
+    discount: '22%',
+    tags: ['pecan', 'nuts', 'baking'],
+    categoryName: 'Nuts'
+  },
+  {
+    name: 'Cranberries Dried',
+    price: 11.99,
+    originalPrice: 14.99,
+    rating: 4.6,
+    reviewsCount: 287,
+    images: ['https://images.unsplash.com/photo-1584649925549-6c79efd85c8f?w=600'],
+    description: 'Tart and tangy dried cranberries, rich in antioxidants and vitamins.',
+    stock: 300,
+    discount: '20%',
+    tags: ['cranberries', 'dried-fruits', 'antioxidants'],
+    categoryName: 'Dried Fruits'
+  },
+  {
+    name: 'Supreme Mix Bundle',
+    price: 24.99,
+    originalPrice: 34.99,
+    rating: 4.9,
+    reviewsCount: 876,
+    images: ['https://images.unsplash.com/photo-1585518419759-87c1dcf13189?w=600'],
+    description: 'Ultimate premium mix: almonds, cashews, walnuts, pistachios, dates, and raisins.',
+    stock: 250,
+    discount: '29%',
+    tags: ['supreme', 'mixed', 'premium', 'combo'],
+    categoryName: 'Mixed Combos'
   },
 ];
 
@@ -230,22 +178,22 @@ async function seed() {
   await Category.deleteMany({});
   await Product.deleteMany({});
 
-  const existingGuest = await User.findOne({ email: 'guest@luminar.app' });
+  const existingGuest = await User.findOne({ email: 'guest@dryfruit.com' });
   if (!existingGuest) {
     await User.create({
       name: 'Guest User',
-      email: 'guest@luminar.app',
+      email: 'guest@dryfruit.com',
       password: 'guest0000',
       role: 'user',
     });
     console.log('Created guest user');
   }
 
-  const existingAdmin = await User.findOne({ email: 'admin@luminar.app' });
+  const existingAdmin = await User.findOne({ email: 'admin@dryfruit.com' });
   if (!existingAdmin) {
     await User.create({
       name: 'Admin',
-      email: 'admin@luminar.app',
+      email: 'admin@dryfruit.com',
       password: 'admin0000',
       role: 'admin',
     });
@@ -264,11 +212,7 @@ async function seed() {
     const { categoryName, ...rest } = p;
     return {
       ...rest,
-      category: categoryMap[categoryName] || categoryMap['Electronics'],
-      sizes: p.tags?.includes('sneakers') ? ['7', '8', '9', '10'] : undefined,
-      colors: p.tags?.includes('sneakers')
-        ? [{ name: 'White', hex: '#FFFFFF' }, { name: 'Black', hex: '#000000' }]
-        : undefined,
+      category: categoryMap[categoryName] || createdCategories[0]._id,
     };
   });
 

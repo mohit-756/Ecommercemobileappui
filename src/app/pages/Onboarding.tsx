@@ -1,27 +1,27 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, ShoppingBag, Truck, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Leaf, Truck, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const slides = [
   {
-    title: "Discover Something New",
-    description: "Explore our latest collection of premium products tailored just for you.",
-    icon: ShoppingBag,
-    color: "bg-blue-100 text-blue-600"
+    title: "Premium Dry Fruits",
+    description: "Explore our finest collection of organic dry fruits and nuts, handpicked for quality.",
+    icon: Leaf,
+    color: "bg-amber-100 text-amber-600"
   },
   {
-    title: "Fast & Free Delivery",
-    description: "Get your orders delivered to your doorstep at lightning speed.",
+    title: "Fresh & Fast Delivery",
+    description: "Get your orders delivered to your doorstep at lightning speed, keeping them fresh.",
     icon: Truck,
     color: "bg-emerald-100 text-emerald-600"
   },
   {
-    title: "Secure Payments",
-    description: "Experience hassle-free and 100% secure payment options.",
-    icon: ShieldCheck,
-    color: "bg-amber-100 text-amber-600"
+    title: "Healthy & Delicious",
+    description: "100% natural, no preservatives. Pure nutrition and taste in every bite.",
+    icon: Sparkles,
+    color: "bg-rose-100 text-rose-600"
   }
 ];
 

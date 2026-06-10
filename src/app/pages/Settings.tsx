@@ -126,7 +126,7 @@ export function Settings() {
         </div>
 
         <div className="pt-4 text-center">
-          <p className="text-xs text-gray-400 font-medium">Luminar Retail Shop</p>
+          <p className="text-xs text-gray-400 font-medium">DryFruit Hub</p>
           <p className="text-[10px] text-gray-300 mt-1">Version 1.0.0 (Build 2024.06)</p>
         </div>
       </div>
