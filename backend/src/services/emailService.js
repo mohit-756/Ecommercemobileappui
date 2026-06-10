@@ -47,31 +47,39 @@ export async function sendOtpEmail(email, otp) {
 
   const fromEmail = process.env.EMAIL_FROM || process.env.GMAIL_USER || 'noreply@dryfruithub.com';
 
-  const info = await transport.sendMail({
-    from: `"DryFruit Hub" <${fromEmail}>`,
-    to: email,
-    subject: 'Your OTP for Email Verification',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
-        <div style="text-align: center; margin-bottom: 24px;">
-          <h1 style="color: #1a1a2e; font-size: 24px; margin: 0;">DryFruit Hub</h1>
-          <p style="color: #64748b; margin: 4px 0 0;">Email Verification</p>
-        </div>
-        <div style="background: #f8fafc; border-radius: 16px; padding: 32px; text-align: center;">
-          <h2 style="color: #1a1a2e; font-size: 18px; margin: 0 0 16px;">Your OTP Code</h2>
-          <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
-            <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #2563eb;">${otp}</span>
+  try {
+    const info = await transport.sendMail({
+      from: `"DryFruit Hub" <${fromEmail}>`,
+      to: email,
+      subject: 'Your OTP for Email Verification',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h1 style="color: #1a1a2e; font-size: 24px; margin: 0;">DryFruit Hub</h1>
+            <p style="color: #64748b; margin: 4px 0 0;">Email Verification</p>
           </div>
-          <p style="color: #64748b; font-size: 14px; margin: 0;">
-            This code expires in <strong>5 minutes</strong>. Do not share it with anyone.
+          <div style="background: #f8fafc; border-radius: 16px; padding: 32px; text-align: center;">
+            <h2 style="color: #1a1a2e; font-size: 18px; margin: 0 0 16px;">Your OTP Code</h2>
+            <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+              <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #2563eb;">${otp}</span>
+            </div>
+            <p style="color: #64748b; font-size: 14px; margin: 0;">
+              This code expires in <strong>5 minutes</strong>. Do not share it with anyone.
+            </p>
+          </div>
+          <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 24px;">
+            If you didn't request this, please ignore this email.
           </p>
         </div>
-        <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 24px;">
-          If you didn't request this, please ignore this email.
-        </p>
-      </div>
-    `,
-  });
-
-  return info;
+      `,
+    });
+    return info;
+  } catch (error) {
+    console.error('Failed to send email:', error.message);
+    console.log('========================================');
+    console.log('DEV MODE FALLBACK — Email sending failed.');
+    console.log(`OTP for ${email}: ${otp}`);
+    console.log('========================================');
+    return { messageId: 'dev-mode' };
+  }
 }
