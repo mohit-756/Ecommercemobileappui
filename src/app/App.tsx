@@ -7,6 +7,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Splash } from './pages/Splash';
 import { Onboarding } from './pages/Onboarding';
 import { Login } from './pages/Login';
+import { VerifyOtp } from './pages/VerifyOtp';
 import { Home } from './pages/Home';
 import { Search } from './pages/Search';
 import { Cart } from './pages/Cart';
@@ -35,6 +36,7 @@ export default function App() {
               <Route index element={<Splash />} />
               <Route path="onboarding" element={<Onboarding />} />
               <Route path="login" element={<Login />} />
+              <Route path="verify-otp" element={<VerifyOtp />} />
               <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
               <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
               <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />

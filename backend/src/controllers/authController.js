@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import Otp from '../models/Otp.js';
+import { generateOtp, sendOtpEmail } from '../services/emailService.js';
 
 function generateToken(userId) {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -16,10 +18,89 @@ export async function register(req, res, next) {
       return res.status(409).json({ message: 'Email already registered' });
     }
 
+    const otpRecord = await Otp.findOne({ email, verified: true });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Email not verified. Please verify OTP first.' });
+    }
+
     const user = await User.create({ name, email, password, phone });
+    await Otp.deleteMany({ email });
     const token = generateToken(user._id);
 
     res.status(201).json({ token, user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function sendOtp(req, res, next) {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const exists = await User.findOne({ email });
+    if (exists) {
+      return res.status(409).json({ message: 'Email already registered' });
+    }
+
+    await Otp.deleteMany({ email });
+
+    const otp = generateOtp();
+    await Otp.create({
+      email,
+      otp,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+    });
+
+    try {
+      await sendOtpEmail(email, otp);
+    } catch (emailError) {
+      console.error('Email send error:', emailError);
+      return res.status(500).json({ message: 'Failed to send OTP email: ' + emailError.message });
+    }
+
+    res.json({ message: 'OTP sent to your email' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function verifyOtp(req, res, next) {
+  try {
+    const { email, otp, name, password } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: 'Email and OTP are required' });
+    }
+
+    const otpRecord = await Otp.findOne({ email, verified: false });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'No OTP found. Request a new one.' });
+    }
+
+    if (new Date() > otpRecord.expiresAt) {
+      await Otp.deleteMany({ email });
+      return res.status(400).json({ message: 'OTP expired. Request a new one.' });
+    }
+
+    if (otpRecord.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    otpRecord.verified = true;
+    await otpRecord.save();
+
+    if (name && password) {
+      const user = await User.create({ name, email, password });
+      await Otp.deleteMany({ email });
+      const token = generateToken(user._id);
+      return res.status(201).json({ token, user });
+    }
+
+    res.json({ message: 'OTP verified successfully' });
   } catch (error) {
     next(error);
   }

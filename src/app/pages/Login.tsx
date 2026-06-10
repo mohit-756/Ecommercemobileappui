@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Navigate } from 'react-router';
 import { Mail, Lock, Eye, EyeOff, Apple, Fingerprint } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/authService';
 import { biometricService } from '../services/biometricService';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
@@ -85,12 +86,13 @@ export function Login() {
           localStorage.setItem('bio_password', password);
         }
         toast.success('Welcome back!');
+        navigate(from, { replace: true });
       } else {
         const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-        await register(name, email, password);
-        toast.success('Account created successfully!');
+        await authService.sendOtp({ email });
+        toast.success('OTP sent to your email');
+        navigate('/verify-otp', { state: { name, email, password } });
       }
-      navigate(from, { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
       const message = err.response?.data?.message || err.message || 'Something went wrong';

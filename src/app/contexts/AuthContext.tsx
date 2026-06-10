@@ -50,8 +50,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(null);
       setUser(null);
     };
+    const handleLogin = (e: CustomEvent) => {
+      const { token, user } = e.detail;
+      localStorage.setItem('token', token);
+      setToken(token);
+      setUser(user);
+    };
     window.addEventListener('auth:logout', handleLogout);
-    return () => window.removeEventListener('auth:logout', handleLogout);
+    window.addEventListener('auth:login', handleLogin as EventListener);
+    return () => {
+      window.removeEventListener('auth:logout', handleLogout);
+      window.removeEventListener('auth:login', handleLogin as EventListener);
+    };
   }, []);
 
   const syncWishlistFromServer = useCallback(async () => {

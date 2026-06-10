@@ -4,9 +4,9 @@ A full-stack e-commerce mobile application for selling premium dry fruits, nuts,
 
 ## Current Status
 
-This is a **frontend UI prototype** with mock data. We are actively building the full-stack version with:
+Full-stack e-commerce application with:
 
-- **User auth** (JWT login/signup)
+- **User auth** (JWT login/signup + email OTP verification)
 - **Product catalog** with search & categories
 - **Shopping cart** (persisted for logged-in users)
 - **Razorpay** payment gateway (UPI, cards, net banking, COD)
@@ -35,50 +35,56 @@ See [PLAN.md](./PLAN.md) for the detailed build phases.
 - Android Studio (for building the APK)
 - A physical Android device or emulator
 - MongoDB Atlas account (backend) or local MongoDB
+- Gmail account with **2-Step Verification enabled** + an [App Password](https://myaccount.google.com/apppasswords) (for email OTP)
 
 ## Setup
 
 ### 1. Environment Variables
 
-Copy the example env file and adjust as needed:
-
-```bash
-cp .env.example .env
-```
+All configuration lives in a single `.env` file at the project root:
 
 | Variable | Description |
 |----------|-------------|
-| `VITE_API_URL` | Backend API URL — use Render URL for production, `http://localhost:5000/api` for local dev |
-| `VITE_RAZORPAY_KEY_ID` | Razorpay payment gateway key |
+| `PORT` | Backend server port (default: 5000) |
+| `MONGODB_URI` | MongoDB connection string (Atlas or local) |
+| `JWT_SECRET` | A strong random secret for JWT tokens |
+| `JWT_EXPIRES_IN` | JWT expiry duration (default: 7d) |
+| `RAZORPAY_KEY_ID` | Razorpay payment gateway key |
+| `RAZORPAY_KEY_SECRET` | Razorpay payment gateway secret |
+| `GMAIL_USER` | Your Gmail address (for sending OTP emails) |
+| `GMAIL_APP_PASSWORD` | 16-character Gmail App Password |
+| `VITE_API_URL` | Backend API URL — `http://localhost:5000/api` for local, or Render URL for production |
+| `VITE_RAZORPAY_KEY_ID` | Razorpay key (same as above, exposed to frontend) |
 
-**Important:** The `.env` file contains secrets and is excluded from git. After changing `.env`, rebuild the app with `npm run build` for the changes to take effect.
+To get a Gmail App Password:
+1. Go to [Google App Passwords](https://myaccount.google.com/apppasswords)
+2. Enable 2-Step Verification if not already done
+3. Generate a 16-character App Password for "Mail"
+4. Copy it into `GMAIL_APP_PASSWORD` in `.env`
 
-### 2. Backend (Render — Deployed)
+**Important:** The `.env` file contains secrets and is excluded from git.
 
-The backend is already deployed at:
-```
-https://retail-shop-backend-ekc8.onrender.com
-```
-
-Make sure these env vars are set in Render's dashboard:
-- `MONGODB_URI` — your Atlas MongoDB connection string
-- `JWT_SECRET` — a strong random secret
-- `CORS_ORIGIN` — `*` (or leave unset for default)
-
-### 3. Web (Laptop / Desktop / Mobile Browser)
+### 2. Run Backend (Local)
 
 ```bash
-# Install dependencies
+cd backend
+npm install           # first time only
+npm run dev           # starts at http://localhost:5000
+```
+
+The backend automatically loads env vars from the root `.env` file.
+
+### 3. Run Frontend (Web)
+
+```bash
+# Open a second terminal (keep backend running)
+
+# Install dependencies (first time only)
 npm install
 
 # Start dev server — opens at http://localhost:5173
 npm run dev
-
-# Production build
-npm run build
 ```
-
-The web version uses **full desktop layout** (top nav, no phone frame). Works on any browser.
 
 ### 4. Android (Phone / Tablet)
 
@@ -103,32 +109,51 @@ npm run cap:build       # vite build + npx cap sync android
 
 The Android app uses the **mobile layout** with bottom navigation.
 
-**Note:** The Capacitor WebView is configured to allow requests to the Render backend domain. If you switch to a different backend URL, update `allowNavigation` in `capacitor.config.json`.
+**Note:** The Capacitor WebView is configured to allow requests to the backend domain. If you switch URLs, update `allowNavigation` in `capacitor.config.json`.
 
-### 5. Backend (Local Dev — Optional)
+### 5. Quick Start (Local Dev)
 
 ```bash
+# Terminal 1 — Backend
 cd backend
 npm install
-npm run dev               # Backend server (default: port 5000)
+npm run dev
+
+# Terminal 2 — Frontend
+npm install
+npm run dev
 ```
+
+Then open http://localhost:5173 and sign up — an OTP will be sent to your Gmail inbox.
 
 ## Project Structure
 
 ```
+├── .env                       # Single env file (backend + frontend)
 ├── src/
 │   ├── app/
 │   │   ├── App.tsx           # Root component
 │   │   ├── routes.tsx         # Router config
 │   │   ├── components/        # Shared UI components
 │   │   ├── pages/             # Route pages (wired in router)
+│   │   │   ├── Login.tsx     # Login / signup with OTP
+│   │   │   └── VerifyOtp.tsx # Email OTP verification
 │   │   ├── screens/           # Screen components
+│   │   ├── contexts/          # Auth, Cart contexts
+│   │   ├── services/          # API services
 │   │   ├── data/mock.ts       # Mock data
 │   │   └── lib/utils.ts       # Utility functions
 │   ├── styles/                # Global styles
 │   └── main.tsx               # Entry point
 ├── android/                   # Capacitor Android project
-├── backend/                   # Node.js + Express server
+├── backend/
+│   ├── .env                   # (legacy — vars moved to root .env)
+│   ├── src/
+│   │   ├── controllers/       # Route handlers
+│   │   ├── models/            # Mongoose schemas (User, Otp, etc.)
+│   │   ├── routes/            # Express routes
+│   │   └── services/          # emailService (Nodemailer OTP)
+│   └── package.json
 ├── PLAN.md                    # Detailed build phases
 ├── capacitor.config.json
 └── vite.config.ts

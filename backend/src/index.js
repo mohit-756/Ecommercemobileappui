@@ -1,4 +1,8 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 import express from 'express';
 import cors from 'cors';
 import { connectDB } from './config/db.js';
@@ -55,6 +59,8 @@ async function start() {
   console.log('Starting server...');
   console.log('MONGODB_URI set:', !!process.env.MONGODB_URI);
   console.log('JWT_SECRET set:', !!process.env.JWT_SECRET);
+  console.log('GMAIL_USER set:', !!process.env.GMAIL_USER);
+  console.log('GMAIL_APP_PASSWORD set:', !!process.env.GMAIL_APP_PASSWORD);
   console.log('PORT:', process.env.PORT || PORT);
   try {
     await connectDB();
