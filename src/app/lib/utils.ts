@@ -5,6 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function formatPrice(price: number) {
+  return `₹${price.toFixed(2)}`;
+}
+
 export function normalizeProduct(p: any) {
   return {
     ...p,

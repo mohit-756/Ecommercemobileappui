@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { ChevronLeft, Package, Truck, CheckCircle2, Clock } from 'lucide-react';
 import { orderService } from '../services/orderService';
-import { cn } from '../lib/utils';
+import { cn, formatPrice } from '../lib/utils';
 
 interface TrackingEvent {
   status: string;
@@ -100,7 +100,7 @@ export function OrderTracking() {
             </div>
             <div className="text-right">
               <p className="text-gray-500 text-xs font-medium">Total</p>
-              <p className="font-bold text-gray-900">${order.total?.toFixed(2)}</p>
+              <p className="font-bold text-gray-900">{formatPrice(order.total || 0)}</p>
             </div>
           </div>
           {order.courierDetails?.trackingId && (

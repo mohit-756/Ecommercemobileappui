@@ -130,8 +130,8 @@ export function Search() {
               <div className="flex flex-wrap gap-2">
                 {categories.map((cat: any) => (
                   <button
-                    key={cat._id}
-                    onClick={() => { setCategoryFilter(cat._id); setQuery(cat.name); }}
+                    key={cat._id || cat.id}
+                    onClick={() => { setCategoryFilter(cat._id || cat.id); setQuery(cat.name); }}
                     className="bg-white border border-gray-200 text-gray-600 text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
                   >
                     {cat.name}
@@ -157,7 +157,7 @@ export function Search() {
             ) : results.length > 0 ? (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {results.map((product: any) => (
-                  <ProductCard key={product._id} product={product} />
+                  <ProductCard key={product._id || product.id} product={product} />
                 ))}
               </div>
             ) : (
@@ -245,11 +245,11 @@ export function Search() {
                     </button>
                     {categories.map((cat: any) => (
                       <button
-                        key={cat._id}
-                        onClick={() => setCategoryFilter(cat._id)}
+                        key={cat._id || cat.id}
+                        onClick={() => setCategoryFilter(cat._id || cat.id)}
                         className={cn(
                           "px-4 py-2 rounded-xl border text-sm font-medium transition-colors",
-                          categoryFilter === cat._id
+                          categoryFilter === (cat._id || cat.id)
                             ? "bg-blue-600 text-white border-blue-600"
                             : "border-gray-200 text-gray-600 hover:border-blue-300"
                         )}

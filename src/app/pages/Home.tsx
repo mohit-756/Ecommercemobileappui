@@ -105,7 +105,7 @@ export function Home() {
               <span className="text-gray-900 font-extrabold text-sm uppercase tracking-wider">Delivery in 12 mins</span>
             </div>
             <h2 className="text-gray-900 font-bold flex items-center gap-1 leading-none">
-              Home — New York, USA <span className="text-blue-600 text-[10px] mt-0.5">▾</span>
+              Home — Mumbai, India <span className="text-blue-600 text-[10px] mt-0.5">▾</span>
             </h2>
           </div>
           <div className="flex gap-3">

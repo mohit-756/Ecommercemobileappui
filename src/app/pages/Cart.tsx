@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router';
 import { Trash2, Minus, Plus, ArrowRight, Tag, ShoppingCart, BellOff, DoorOpen, UserCheck, PhoneOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../contexts/CartContext';
+import { formatPrice } from '../lib/utils';
 
 export function Cart() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ export function Cart() {
                   </button>
                 </div>
 
-                <span className="font-bold text-blue-600 mt-1">${(item.product.price || 0).toFixed(2)}</span>
+                <span className="font-bold text-blue-600 mt-1">{formatPrice(item.product.price || 0)}</span>
 
                 <div className="mt-auto flex items-center justify-between">
                   <div className="flex items-center bg-gray-100 rounded-full px-1">
@@ -130,20 +131,20 @@ export function Cart() {
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-3">
               <div className="flex justify-between text-gray-500 text-sm">
                 <span>Subtotal</span>
-                <span className="text-gray-900 font-medium">${subtotal.toFixed(2)}</span>
+                <span className="text-gray-900 font-medium">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-500 text-sm">
                 <span>Shipping</span>
-                <span className="text-gray-900 font-medium">{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                <span className="text-gray-900 font-medium">{shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</span>
               </div>
               <div className="flex justify-between text-gray-500 text-sm">
                 <span>Tax (Estimated)</span>
-                <span className="text-gray-900 font-medium">$0.00</span>
+                <span className="text-gray-900 font-medium">₹0.00</span>
               </div>
               <div className="h-px bg-gray-100 my-2" />
               <div className="flex justify-between items-end">
                 <span className="font-bold text-gray-900">Total</span>
-                <span className="text-2xl font-bold text-blue-600">${total.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-blue-600">{formatPrice(total)}</span>
               </div>
             </div>
           </>

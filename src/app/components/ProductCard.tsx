@@ -1,7 +1,7 @@
 import { Star, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
-import { cn, normalizeProduct } from '../lib/utils';
+import { cn, normalizeProduct, formatPrice } from '../lib/utils';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
@@ -92,9 +92,9 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
           </div>
           <div className="flex items-end justify-between mt-2">
             <div>
-              <span className="font-bold text-gray-900">${product.price.toFixed(2)}</span>
+              <span className="font-bold text-gray-900">{formatPrice(product.price)}</span>
               {product.originalPrice && product.originalPrice !== product.price && (
-                <span className="text-xs text-gray-400 line-through ml-1.5">${product.originalPrice.toFixed(2)}</span>
+                <span className="text-xs text-gray-400 line-through ml-1.5">{formatPrice(product.originalPrice)}</span>
               )}
             </div>
           </div>
@@ -142,9 +142,9 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
         </div>
         <div className="mt-auto flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="font-bold text-gray-900 leading-none">${product.price.toFixed(2)}</span>
+            <span className="font-bold text-gray-900 leading-none">{formatPrice(product.price)}</span>
             {product.originalPrice && product.originalPrice !== product.price && (
-              <span className="text-[10px] text-gray-400 line-through mt-0.5">${product.originalPrice.toFixed(2)}</span>
+              <span className="text-[10px] text-gray-400 line-through mt-0.5">{formatPrice(product.originalPrice)}</span>
             )}
           </div>
           <button

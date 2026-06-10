@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { ChevronLeft, Package, ChevronRight } from 'lucide-react';
 import { orderService } from '../services/orderService';
-import { cn } from '../lib/utils';
+import { cn, formatPrice } from '../lib/utils';
 import { motion } from 'motion/react';
 import { hapticService } from '../services/hapticService';
 
@@ -136,7 +136,7 @@ export function Orders() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{order.items?.length || 0} Item{(order.items?.length || 0) !== 1 ? 's' : ''}</p>
-                    <p className="text-xs font-bold text-gray-900 mt-0.5">${order.total?.toFixed(2)}</p>
+                    <p className="text-xs font-bold text-gray-900 mt-0.5">{formatPrice(order.total || 0)}</p>
                   </div>
                 </div>
                 <button className="flex items-center gap-1 text-sm font-semibold text-blue-600">

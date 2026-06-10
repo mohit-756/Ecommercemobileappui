@@ -1,15 +1,15 @@
 import mongoose from 'mongoose';
 
 const orderItemSchema = new mongoose.Schema({
-  product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  name: String,
-  price: Number,
+  product: { type: String, required: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
   quantity: { type: Number, required: true, min: 1 },
   image: String,
 });
 
 const trackingEventSchema = new mongoose.Schema({
-  status: { type: String, enum: ['placed', 'processing', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'] },
+  status: { type: String, enum: ['placed', 'confirmed', 'processing', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'] },
   label: String,
   description: String,
   timestamp: { type: Date, default: Date.now },

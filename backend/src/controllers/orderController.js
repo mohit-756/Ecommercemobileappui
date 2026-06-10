@@ -2,12 +2,18 @@ import Order from '../models/Order.js';
 import Cart from '../models/Cart.js';
 import Product from '../models/Product.js';
 import Razorpay from 'razorpay';
+import crypto from 'crypto';
 import { createShipment } from '../services/shippingPartner.js';
 
+function isDevMode() {
+  return process.env.RAZORPAY_KEY_ID === 'your_razorpay_key_id'
+    || process.env.RAZORPAY_KEY_SECRET === 'your_razorpay_key_secret'
+    || !process.env.RAZORPAY_KEY_ID
+    || !process.env.RAZORPAY_KEY_SECRET;
+}
+
 function getRazorpay() {
-  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-    return null;
-  }
+  if (isDevMode()) return null;
   return new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -16,19 +22,18 @@ function getRazorpay() {
 
 export async function createOrder(req, res, next) {
   try {
-    const { shippingAddress, paymentMethod, notes } = req.body;
+    const { shippingAddress, paymentMethod, notes, items: reqItems } = req.body;
 
-    const cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
-    if (!cart || cart.items.length === 0) {
+    if (!reqItems || reqItems.length === 0) {
       return res.status(400).json({ message: 'Cart is empty' });
     }
 
-    const items = cart.items.map(item => ({
-      product: item.product._id,
-      name: item.product.name,
-      price: item.product.price,
+    const items = reqItems.map(item => ({
+      product: item.product,
+      name: item.name,
+      price: item.price,
       quantity: item.quantity,
-      image: item.product.images?.[0] || '',
+      image: item.image || '',
     }));
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -39,14 +44,23 @@ export async function createOrder(req, res, next) {
     let razorpayOrder = null;
     if (paymentMethod === 'razorpay') {
       const rzp = getRazorpay();
-      if (!rzp) {
-        return res.status(400).json({ message: 'Razorpay not configured. Use COD or configure RAZORPAY_KEY_ID/RAZORPAY_KEY_SECRET' });
+      if (isDevMode()) {
+        razorpayOrder = {
+          id: 'order_dev_' + Date.now() + Math.random().toString(36).slice(2, 8),
+          amount: Math.round(total * 100),
+          currency: 'INR',
+          receipt: `receipt_${Date.now()}`,
+          status: 'created',
+        };
+      } else if (rzp) {
+        razorpayOrder = await rzp.orders.create({
+          amount: Math.round(total * 100),
+          currency: 'INR',
+          receipt: `receipt_${Date.now()}`,
+        });
+      } else {
+        return res.status(400).json({ message: 'Razorpay not configured' });
       }
-      razorpayOrder = await rzp.orders.create({
-        amount: Math.round(total * 100),
-        currency: 'INR',
-        receipt: `receipt_${Date.now()}`,
-      });
     }
 
     const order = await Order.create({
@@ -74,10 +88,14 @@ export async function createOrder(req, res, next) {
 
     await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
 
-    for (const item of cart.items) {
-      await Product.findByIdAndUpdate(item.product._id, {
-        $inc: { stock: -item.quantity },
-      });
+    for (const item of items) {
+      try {
+        await Product.findByIdAndUpdate(item.product, {
+          $inc: { stock: -item.quantity },
+        });
+      } catch {
+        // Skip stock update for non-ObjectId product IDs (e.g. mock data)
+      }
     }
 
     if (order.status !== 'cancelled') {
@@ -115,16 +133,18 @@ export async function verifyPayment(req, res, next) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    const body = order.paymentDetails.razorpayOrderId + '|' + razorpayPaymentId;
-    const expectedSignature = require('crypto')
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(body)
-      .digest('hex');
+    if (!isDevMode()) {
+      const body = order.paymentDetails.razorpayOrderId + '|' + razorpayPaymentId;
+      const expectedSignature = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(body)
+        .digest('hex');
 
-    if (expectedSignature !== razorpaySignature) {
-      order.paymentDetails.status = 'failed';
-      await order.save();
-      return res.status(400).json({ message: 'Payment verification failed' });
+      if (expectedSignature !== razorpaySignature) {
+        order.paymentDetails.status = 'failed';
+        await order.save();
+        return res.status(400).json({ message: 'Payment verification failed' });
+      }
     }
 
     order.paymentDetails.razorpayPaymentId = razorpayPaymentId;

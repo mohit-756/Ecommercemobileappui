@@ -7,7 +7,7 @@ import { recentlyViewedService } from '../services/recentlyViewedService';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { cn, normalizeProduct } from '../lib/utils';
+import { cn, normalizeProduct, formatPrice } from '../lib/utils';
 import { motion } from 'motion/react';
 import { hapticService } from '../services/hapticService';
 import { Share } from '@capacitor/share';
@@ -392,7 +392,7 @@ export function ProductDetails() {
             <h3 className="font-bold text-gray-900 text-lg mb-4">Related Products</h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {relatedProducts.map((p: any) => (
-                <ProductCard key={p._id} product={p} />
+                <ProductCard key={p._id || p.id} product={p} />
               ))}
             </div>
           </div>
@@ -403,7 +403,7 @@ export function ProductDetails() {
         <div className="flex flex-col">
           <p className="text-xs text-gray-500 font-medium">Total Price</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-gray-900">${(product.price * quantity).toFixed(2)}</span>
+            <span className="text-2xl font-bold text-gray-900">{formatPrice(product.price * quantity)}</span>
           </div>
         </div>
 
