@@ -180,8 +180,8 @@ export function Checkout() {
   ];
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 flex items-center">
+    <div className="min-h-full flex flex-col bg-gray-50 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
+      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 flex items-center">
         <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
           <ChevronLeft size={24} />
         </button>
@@ -192,117 +192,142 @@ export function Checkout() {
         {loading ? (
           <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
         ) : (
-          <>
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-bold text-gray-900">Shipping Address</h3>
-                <button onClick={() => navigate('/addresses')} className="text-blue-600 text-sm font-medium flex items-center gap-1">
-                  Manage <ExternalLink size={14} />
-                </button>
+          <div className="lg:grid lg:grid-cols-3 lg:gap-8 items-start">
+            {/* Left Column */}
+            <div className="lg:col-span-2 space-y-6">
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-bold text-gray-900">Shipping Address</h3>
+                  <button onClick={() => navigate('/addresses')} className="text-blue-600 text-sm font-medium flex items-center gap-1 cursor-pointer">
+                    Manage <ExternalLink size={14} />
+                  </button>
+                </div>
+
+                {addresses.length === 0 ? (
+                  <button onClick={() => navigate('/addresses')} className="w-full bg-white p-4 rounded-2xl border border-dashed border-gray-300 flex items-center justify-center gap-2 text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer">
+                    <MapPin size={20} /> Add Shipping Address
+                  </button>
+                ) : (
+                  <div className="space-y-2">
+                    {addresses.map((addr) => (
+                      <label key={addr._id} className={cn(
+                        "flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all bg-white",
+                        selectedAddress?._id === addr._id ? 'border-blue-600 ring-1 ring-blue-600 shadow-sm' : 'border-gray-100'
+                      )}>
+                        <div className="mt-0.5">
+                          <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", selectedAddress?._id === addr._id ? 'border-blue-600' : 'border-gray-300')}>
+                            {selectedAddress?._id === addr._id && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0" onClick={() => setSelectedAddress(addr)}>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="font-semibold text-gray-900 capitalize text-sm">{addr.label}</span>
+                            {addr.isDefault && <Star size={12} className="text-amber-500 fill-amber-500" />}
+                          </div>
+                          <p className="text-sm text-gray-500 line-clamp-1">{addr.fullName}, {addr.addressLine1}, {addr.city}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">{addr.phone}</p>
+                        </div>
+                        <input type="radio" name="address" className="hidden" checked={selectedAddress?._id === addr._id} onChange={() => setSelectedAddress(addr)} />
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {selectedAddress && (
+                  <div className="mt-3 flex items-center gap-2">
+                    {checkingPincode ? (
+                      <div className="flex items-center gap-2 text-sm text-gray-500"><div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /> Checking delivery...</div>
+                    ) : pincodeStatus ? (
+                      pincodeStatus.serviceable ? (
+                        <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full font-bold">
+                          <Zap size={12} className="fill-emerald-600" /> FREE DELIVERY IN 12 MINS
+                        </div>
+                      ) : (
+                        <span className="text-sm text-red-600 bg-red-50 px-3 py-1 rounded-full font-medium">✕ Delivery not available</span>
+                      )
+                    ) : null}
+                  </div>
+                )}
               </div>
 
-              {addresses.length === 0 ? (
-                <button onClick={() => navigate('/addresses')} className="w-full bg-white p-4 rounded-2xl border border-dashed border-gray-300 flex items-center justify-center gap-2 text-gray-500 hover:bg-gray-50 transition-colors">
-                  <MapPin size={20} /> Add Shipping Address
-                </button>
-              ) : (
+              <div>
+                <h3 className="font-bold text-gray-900 mb-3">Order Summary</h3>
+                <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-2">
+                  <div className="flex justify-between text-sm text-gray-500">
+                    <span>Items ({items.length})</span>
+                    <span className="text-gray-900 font-medium">{formatPrice(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-500">
+                    <span>Delivery Fee</span>
+                    <span className="text-emerald-600 font-bold uppercase text-[10px]">Free</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-500">
+                    <span>Handling Charge</span>
+                    <span className="text-gray-900 font-medium">₹2.00</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-bold text-gray-900">Payment Method</h3>
+                  <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase">
+                    <ShieldCheck size={12} /> Secure
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  {addresses.map((addr) => (
-                    <label key={addr._id} className={cn(
-                      "flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all bg-white",
-                      selectedAddress?._id === addr._id ? 'border-blue-600 ring-1 ring-blue-600 shadow-sm' : 'border-gray-100'
-                    )}>
-                      <div className="mt-0.5">
-                        <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", selectedAddress?._id === addr._id ? 'border-blue-600' : 'border-gray-300')}>
-                          {selectedAddress?._id === addr._id && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
+                  {paymentMethods.map((method, idx) => {
+                    const methodId = method.id === 'cod' ? 'cod' : 'razorpay';
+                    return (
+                      <label key={idx} className={cn(
+                        "flex items-center p-4 rounded-2xl border cursor-pointer transition-all bg-white relative",
+                        paymentMethod === methodId ? "border-blue-600 ring-1 ring-blue-600 shadow-sm" : "border-gray-100"
+                      )}>
+                        <method.icon size={24} className={cn("mr-4", paymentMethod === methodId ? "text-blue-600" : "text-gray-400")} />
+                        <div className="flex-1">
+                          <span className={cn("font-bold block text-sm", paymentMethod === methodId ? "text-blue-900" : "text-gray-700")}>{method.name}</span>
+                          {(method as any).popular && <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">Popular</span>}
                         </div>
-                      </div>
-                      <div className="flex-1 min-w-0" onClick={() => setSelectedAddress(addr)}>
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="font-semibold text-gray-900 capitalize text-sm">{addr.label}</span>
-                          {addr.isDefault && <Star size={12} className="text-amber-500 fill-amber-500" />}
+                        <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === methodId ? "border-blue-600" : "border-gray-300")}>
+                          {paymentMethod === methodId && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
                         </div>
-                        <p className="text-sm text-gray-500 line-clamp-1">{addr.fullName}, {addr.addressLine1}, {addr.city}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{addr.phone}</p>
-                      </div>
-                      <input type="radio" name="address" className="hidden" checked={selectedAddress?._id === addr._id} onChange={() => setSelectedAddress(addr)} />
-                    </label>
-                  ))}
+                        <input type="radio" name="payment" className="hidden" checked={paymentMethod === methodId} onChange={() => setPaymentMethod(methodId)} />
+                      </label>
+                    );
+                  })}
                 </div>
-              )}
-
-              {selectedAddress && (
-                <div className="mt-3 flex items-center gap-2">
-                  {checkingPincode ? (
-                    <div className="flex items-center gap-2 text-sm text-gray-500"><div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /> Checking delivery...</div>
-                  ) : pincodeStatus ? (
-                    pincodeStatus.serviceable ? (
-                      <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full font-bold">
-                        <Zap size={12} className="fill-emerald-600" /> FREE DELIVERY IN 12 MINS
-                      </div>
-                    ) : (
-                      <span className="text-sm text-red-600 bg-red-50 px-3 py-1 rounded-full font-medium">✕ Delivery not available</span>
-                    )
-                  ) : null}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <h3 className="font-bold text-gray-900 mb-3">Order Summary</h3>
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-2">
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>Items ({items.length})</span>
-                  <span className="text-gray-900 font-medium">{formatPrice(subtotal)}</span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>Delivery Fee</span>
-                  <span className="text-emerald-600 font-bold uppercase text-[10px]">Free</span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>Handling Charge</span>
-                  <span className="text-gray-900 font-medium">₹2.00</span>
-                </div>
+                {paymentMethod === 'razorpay' && (
+                  <p className="text-xs text-gray-400 mt-2">You will be redirected to Razorpay to complete payment</p>
+                )}
               </div>
             </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-bold text-gray-900">Payment Method</h3>
-                <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase">
-                  <ShieldCheck size={12} /> Secure
+            {/* Right Column */}
+            <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <h3 className="font-bold text-gray-900 mb-2">Order Total</h3>
+                <div className="flex justify-between items-end mb-4">
+                  <span className="text-gray-500 text-sm">Total Payment</span>
+                  <span className="text-2xl font-bold text-gray-900">{formatPrice(total)}</span>
                 </div>
+                <button
+                  onClick={handlePlaceOrder}
+                  disabled={!selectedAddress || (pincodeStatus && !pincodeStatus.serviceable) || placing}
+                  className="w-full bg-gray-900 text-white font-semibold rounded-xl py-4 flex items-center justify-center gap-2 shadow-lg hover:bg-gray-800 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {placing ? (
+                    <><Loader2 size={20} className="animate-spin" /> Processing...</>
+                  ) : (
+                    <>Place Order — {formatPrice(total)}</>
+                  )}
+                </button>
               </div>
-              <div className="space-y-2">
-                {paymentMethods.map((method, idx) => {
-                  const methodId = method.id === 'cod' ? 'cod' : 'razorpay';
-                  return (
-                    <label key={idx} className={cn(
-                      "flex items-center p-4 rounded-2xl border cursor-pointer transition-all bg-white relative",
-                      paymentMethod === methodId ? "border-blue-600 ring-1 ring-blue-600 shadow-sm" : "border-gray-100"
-                    )}>
-                      <method.icon size={24} className={cn("mr-4", paymentMethod === methodId ? "text-blue-600" : "text-gray-400")} />
-                      <div className="flex-1">
-                        <span className={cn("font-bold block text-sm", paymentMethod === methodId ? "text-blue-900" : "text-gray-700")}>{method.name}</span>
-                        {(method as any).popular && <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">Popular</span>}
-                      </div>
-                      <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === methodId ? "border-blue-600" : "border-gray-300")}>
-                        {paymentMethod === methodId && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
-                      </div>
-                      <input type="radio" name="payment" className="hidden" checked={paymentMethod === methodId} onChange={() => setPaymentMethod(methodId)} />
-                    </label>
-                  );
-                })}
-              </div>
-              {paymentMethod === 'razorpay' && (
-                <p className="text-xs text-gray-400 mt-2">You will be redirected to Razorpay to complete payment</p>
-              )}
             </div>
-          </>
+          </div>
         )}
       </div>
 
-      <div className="bg-white border-t border-gray-100 p-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] relative z-10">
+      <div className="lg:hidden bg-white border-t border-gray-100 p-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] relative z-10">
         <div className="flex justify-between items-end mb-4">
           <span className="text-gray-500">Total Payment</span>
           <span className="text-2xl font-bold text-gray-900">{formatPrice(total)}</span>

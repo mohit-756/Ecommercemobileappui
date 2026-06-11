@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { ChevronLeft, Search as SearchIcon, X, SlidersHorizontal, ChevronDown, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ProductCard } from '../components/ProductCard';
@@ -16,7 +16,17 @@ const SORT_OPTIONS = [
 
 export function Search() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get('q') || '';
+
+  const setQuery = (newVal: string) => {
+    if (newVal) {
+      setSearchParams({ q: newVal }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  };
+
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -62,14 +72,14 @@ export function Search() {
 
   return (
     <div className="min-h-full flex flex-col bg-white">
-      <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white lg:pt-0 border-b border-gray-100 flex items-center gap-3">
+      <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white lg:pt-4 lg:pb-4 border-b border-gray-100 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 flex-shrink-0"
+          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 flex-shrink-0 lg:hidden"
         >
           <ChevronLeft size={24} />
         </button>
-        <div className="flex-1 relative">
+        <div className="flex-1 relative lg:hidden">
           <SearchIcon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
@@ -88,14 +98,19 @@ export function Search() {
             </button>
           )}
         </div>
+        
+        {/* Desktop Header Title */}
+        <h1 className="hidden lg:block text-2xl font-black text-gray-900 flex-1">Search Results</h1>
+
         <button
           onClick={() => setShowFilters(true)}
           className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative transition-colors",
+            "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative transition-colors lg:w-auto lg:px-4 lg:gap-2",
             activeFilterCount > 0 ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"
           )}
         >
           <SlidersHorizontal size={20} />
+          <span className="hidden lg:inline font-semibold text-sm">Filters</span>
           {activeFilterCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white">
               {activeFilterCount}
@@ -155,7 +170,7 @@ export function Search() {
                 <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : results.length > 0 ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6">
                 {results.map((product: any) => (
                   <ProductCard key={product._id || product.id} product={product} />
                 ))}

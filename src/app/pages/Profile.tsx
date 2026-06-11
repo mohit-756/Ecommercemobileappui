@@ -6,19 +6,21 @@ import { useAuth } from '../contexts/AuthContext';
 import { cameraService } from '../services/cameraService';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
+import { useTranslation } from '../hooks/useTranslation';
 
 export function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [avatarLoading, setAvatarLoading] = useState(false);
+  const { t } = useTranslation();
 
   const menuItems = [
-    { icon: Heart, label: 'My Wishlist', path: '/wishlist' },
-    { icon: Package, label: 'My Orders', path: '/orders' },
-    { icon: MapPin, label: 'Shipping Addresses', path: '/addresses' },
-    { icon: CreditCard, label: 'Payment Methods', path: '/payments' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
-    { icon: HelpCircle, label: 'Help & Support', path: '/support' },
+    { icon: Heart, label: t('myWishlist'), path: '/wishlist' },
+    { icon: Package, label: t('myOrders'), path: '/orders' },
+    { icon: MapPin, label: t('shippingAddresses'), path: '/addresses' },
+    { icon: CreditCard, label: t('paymentMethods'), path: '/payments' },
+    { icon: Settings, label: t('settings'), path: '/settings' },
+    { icon: HelpCircle, label: t('helpSupport'), path: '/support' },
   ];
 
   if (user?.role === 'admin') {
@@ -32,8 +34,8 @@ export function Profile() {
   };
 
   return (
-    <div className="min-h-full bg-gray-50 pb-6">
-      <div className="bg-white px-6 pt-16 pb-8 lg:pt-6 rounded-b-3xl shadow-sm mb-6 relative">
+    <div className="min-h-full bg-gray-50 pb-6 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
+      <div className="bg-white px-6 pt-16 pb-8 lg:pt-8 rounded-b-3xl shadow-sm mb-6 relative">
         <div className="absolute top-12 right-6 md:top-6">
           <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
             <Settings size={20} />
@@ -77,15 +79,15 @@ export function Profile() {
         <div className="grid grid-cols-3 gap-4 mt-8">
           <div onClick={() => navigate('/orders')} className="bg-gray-50 rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 transition-colors">
             <span className="block text-xl font-bold text-gray-900">0</span>
-            <span className="text-xs text-gray-500 font-medium">Orders</span>
+            <span className="text-xs text-gray-500 font-medium">{t('orders')}</span>
           </div>
           <div className="bg-gray-50 rounded-2xl p-3 text-center">
             <span className="block text-xl font-bold text-gray-900">0</span>
-            <span className="text-xs text-gray-500 font-medium">Reviews</span>
+            <span className="text-xs text-gray-500 font-medium">{t('reviews')}</span>
           </div>
           <div onClick={() => navigate('/wishlist')} className="bg-gray-50 rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 transition-colors">
             <span className="block text-xl font-bold text-gray-900">{user?.wishlist?.length || 0}</span>
-            <span className="text-xs text-gray-500 font-medium">Saved</span>
+            <span className="text-xs text-gray-500 font-medium">{t('saved')}</span>
           </div>
         </div>
       </div>
@@ -117,7 +119,7 @@ export function Profile() {
             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-red-500">
               <LogOut size={20} />
             </div>
-            <span className="font-semibold text-red-600">Logout</span>
+            <span className="font-semibold text-red-600">{t('logout')}</span>
           </div>
         </motion.button>
       </div>

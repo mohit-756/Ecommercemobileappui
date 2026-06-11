@@ -161,8 +161,8 @@ export function Addresses() {
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 flex items-center justify-between">
+    <div className="min-h-full flex flex-col bg-gray-50 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
+      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center">
           <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
             <ChevronLeft size={24} />
@@ -197,59 +197,61 @@ export function Addresses() {
           </div>
         ) : (
           <AnimatePresence>
-            {addresses.map((addr) => {
-              const cfg = labelConfig[addr.label] || labelConfig.other;
-              const Icon = cfg.icon;
-              return (
-                <motion.div key={addr._id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative">
-                  <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`}>
-                      <Icon size={20} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="font-semibold text-gray-900 capitalize">{addr.label}</span>
-                        {addr.isDefault && (
-                          <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-sm">
-                            <Star size={10} /> DEFAULT
-                          </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {addresses.map((addr) => {
+                const cfg = labelConfig[addr.label] || labelConfig.other;
+                const Icon = cfg.icon;
+                return (
+                  <motion.div key={addr._id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative">
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`}>
+                        <Icon size={20} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="font-semibold text-gray-900 capitalize">{addr.label}</span>
+                          {addr.isDefault && (
+                            <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-sm">
+                              <Star size={10} /> DEFAULT
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">{addr.fullName}</p>
+                        <p className="text-sm text-gray-500 leading-relaxed">
+                          {addr.addressLine1}{addr.addressLine2 ? `, ${addr.addressLine2}` : ''}<br />
+                          {addr.city}, {addr.state} - {addr.pincode}
+                          {addr.landmark ? <><br />Landmark: {addr.landmark}</> : ''}
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">Phone: {addr.phone}</p>
+                      </div>
+                      <div className="relative">
+                        <button onClick={() => setMenuOpenId(menuOpenId === addr._id ? null : addr._id)} className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 cursor-pointer">
+                          <MoreHorizontal size={18} />
+                        </button>
+                        {menuOpenId === addr._id && (
+                          <>
+                            <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
+                            <div className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20 w-40">
+                              <button onClick={() => { openEditForm(addr); setMenuOpenId(null); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
+                                <Pencil size={16} /> Edit
+                              </button>
+                              {!addr.isDefault && (
+                                <button onClick={() => handleSetDefault(addr._id)} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
+                                  <Star size={16} /> Set as Default
+                                </button>
+                              )}
+                              <button onClick={() => handleDelete(addr._id)} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 cursor-pointer">
+                                <Trash2 size={16} /> Delete
+                              </button>
+                            </div>
+                          </>
                         )}
                       </div>
-                      <p className="text-sm font-medium text-gray-900">{addr.fullName}</p>
-                      <p className="text-sm text-gray-500 leading-relaxed">
-                        {addr.addressLine1}{addr.addressLine2 ? `, ${addr.addressLine2}` : ''}<br />
-                        {addr.city}, {addr.state} - {addr.pincode}
-                        {addr.landmark ? <><br />Landmark: {addr.landmark}</> : ''}
-                      </p>
-                      <p className="text-sm text-gray-400 mt-1">Phone: {addr.phone}</p>
                     </div>
-                    <div className="relative">
-                      <button onClick={() => setMenuOpenId(menuOpenId === addr._id ? null : addr._id)} className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100">
-                        <MoreHorizontal size={18} />
-                      </button>
-                      {menuOpenId === addr._id && (
-                        <>
-                          <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
-                          <div className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20 w-40">
-                            <button onClick={() => { openEditForm(addr); setMenuOpenId(null); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
-                              <Pencil size={16} /> Edit
-                            </button>
-                            {!addr.isDefault && (
-                              <button onClick={() => handleSetDefault(addr._id)} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
-                                <Star size={16} /> Set as Default
-                              </button>
-                            )}
-                            <button onClick={() => handleDelete(addr._id)} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
-                              <Trash2 size={16} /> Delete
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+                  </motion.div>
+                );
+              })}
+            </div>
           </AnimatePresence>
         )}
       </div>

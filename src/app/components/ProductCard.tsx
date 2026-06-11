@@ -76,7 +76,7 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
         className="bg-white rounded-2xl p-3 flex gap-4 shadow-sm border border-gray-100 mb-3 relative overflow-hidden"
       >
         <div className="w-24 h-24 rounded-xl bg-gray-100 flex-shrink-0 relative overflow-hidden">
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+          <img src={product.image} alt={product.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/products/cashews.webp'; }} />
           {product.discount && (
             <div className="absolute top-0 left-0 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg">
               -{product.discount}
@@ -118,6 +118,7 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
           alt={product.name}
           loading="lazy"
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => { e.currentTarget.src = '/images/products/cashews.webp'; }}
         />
         {product.discount && (
           <div className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Search, Bell, LayoutGrid, Apple, Cherry, ShoppingBag, Sprout, Clock, Zap, ArrowRight } from 'lucide-react';
+import { Search, Bell, LayoutGrid, Apple, Cherry, ShoppingBag, Sprout, Clock, Zap, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { recentlyViewedService } from '../services/recentlyViewedService';
@@ -22,13 +22,34 @@ const banners = [
 
 export function Home() {
   const navigate = useNavigate();
-  const [emblaRef] = useEmblaCarousel({ loop: true });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState('all');
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      setSelectedIndex(emblaApi.selectedScrollSnap());
+    };
+    emblaApi.on('select', onSelect);
+    onSelect();
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const intervalId = setInterval(() => {
+      emblaApi.scrollNext();
+    }, 4000);
+    return () => clearInterval(intervalId);
+  }, [emblaApi]);
 
   useEffect(() => {
     setRecentlyViewed(recentlyViewedService.get());
@@ -97,7 +118,8 @@ export function Home() {
           </motion.div>
         </div>
       )}
-      <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-50">
+      {/* Mobile Page Header (hidden on large screens) */}
+      <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 lg:hidden border-b border-gray-50">
         <div className="flex justify-between items-center mb-4">
           <div onClick={() => navigate('/addresses')} className="cursor-pointer active:opacity-70 transition-opacity">
             <div className="flex items-center gap-1.5 mb-0.5">
@@ -127,13 +149,13 @@ export function Home() {
 
       {loading ? (
         <div className="px-6 pt-4 space-y-8">
-          <Skeleton className="h-40 w-full rounded-2xl" />
+          <Skeleton className="h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 w-full rounded-2xl" />
           <div>
             <Skeleton className="h-6 w-32 mb-4" />
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-6 px-6">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="flex flex-col items-center gap-2 min-w-[72px]">
-                  <Skeleton className="w-14 h-14 rounded-2xl" />
+            <div className="flex gap-4 overflow-x-auto pb-2 lg:mx-0 lg:px-0 -mx-6 px-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
+                <div key={i} className="flex flex-col items-center gap-2 min-w-[72px] sm:min-w-[84px] md:min-w-[96px]">
+                  <Skeleton className="w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-2xl" />
                   <Skeleton className="h-3 w-12" />
                 </div>
               ))}
@@ -141,8 +163,8 @@ export function Home() {
           </div>
           <div>
             <Skeleton className="h-6 w-40 mb-4" />
-            <div className="grid grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map(i => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                 <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col">
                   <Skeleton className="aspect-square w-full" />
                   <div className="p-3 space-y-2">
@@ -156,22 +178,52 @@ export function Home() {
         </div>
       ) : (
         <div className="px-6 pt-4 space-y-8">
-          <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
-            <div className="flex">
-              {banners.map((banner) => (
-                <div key={banner.id} className="flex-[0_0_100%] min-w-0 pr-4">
-                  <div className={cn("h-40 rounded-2xl p-6 flex flex-col justify-center relative overflow-hidden", banner.bg)}>
-                    <div className="relative z-10">
-                      <p className="text-white/80 text-sm font-medium mb-1">{banner.subtitle}</p>
-                      <h3 className="text-white text-2xl font-bold mb-3">{banner.title}</h3>
-                      <button className="bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/30 transition-colors w-fit">
-                        Shop Now
-                      </button>
+          <div className="relative group">
+            <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
+              <div className="flex">
+                {banners.map((banner) => (
+                  <div key={banner.id} className="flex-[0_0_100%] min-w-0 pr-4">
+                    <div className={cn("h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 rounded-2xl p-6 md:p-10 lg:p-12 flex flex-col justify-center relative overflow-hidden", banner.bg)}>
+                      <div className="relative z-10">
+                        <p className="text-white/80 text-sm sm:text-base md:text-lg font-medium mb-1">{banner.subtitle}</p>
+                        <h3 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-5">{banner.title}</h3>
+                        <button className="bg-white/20 backdrop-blur-sm text-white text-xs md:text-sm font-semibold px-4 py-2 md:px-6 md:py-3 rounded-full hover:bg-white/30 transition-colors w-fit">
+                          Shop Now
+                        </button>
+                      </div>
+                      <div className="absolute -right-8 -bottom-8 w-32 h-32 md:w-48 md:h-48 bg-white/10 rounded-full blur-2xl"></div>
+                      <div className="absolute right-12 -top-12 w-24 h-24 md:w-36 md:h-36 bg-white/10 rounded-full blur-xl"></div>
                     </div>
-                    <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                    <div className="absolute right-12 -top-12 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
                   </div>
-                </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => emblaApi && emblaApi.scrollPrev()}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/30 backdrop-blur-md hover:bg-white/50 text-white rounded-full flex items-center justify-center opacity-0 lg:group-hover:opacity-100 transition-opacity z-20"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button
+              onClick={() => emblaApi && emblaApi.scrollNext()}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/30 backdrop-blur-md hover:bg-white/50 text-white rounded-full flex items-center justify-center opacity-0 lg:group-hover:opacity-100 transition-opacity z-20"
+            >
+              <ChevronRight size={24} />
+            </button>
+
+            {/* Dot Indicators */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-20">
+              {banners.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => emblaApi && emblaApi.scrollTo(idx)}
+                  className={cn(
+                    "w-2 h-2 rounded-full transition-all duration-300",
+                    selectedIndex === idx ? "w-6 bg-white" : "bg-white/50 hover:bg-white/80"
+                  )}
+                />
               ))}
             </div>
           </div>
@@ -183,9 +235,9 @@ export function Home() {
                 See all <ArrowRight size={14} />
               </button>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar -mx-6 px-6">
-              {products.slice(0, 5).map((product: any) => (
-                <div key={product.id} className="min-w-[140px] w-[140px]">
+            <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
+              {products.slice(0, 10).map((product: any) => (
+                <div key={product.id} className="min-w-[140px] w-[140px] sm:min-w-[150px] sm:w-[150px] md:min-w-[160px] md:w-[160px] lg:min-w-[180px] lg:w-[180px]">
                   <ProductCard product={product} />
                 </div>
               ))}
@@ -203,9 +255,9 @@ export function Home() {
                   Clear
                 </button>
               </div>
-              <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar -mx-6 px-6">
-                {recentlyViewed.slice(0, 6).map((item: any) => (
-                  <div key={item.id} className="min-w-[120px] w-[120px]">
+              <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
+                {recentlyViewed.slice(0, 8).map((item: any) => (
+                  <div key={item.id} className="min-w-[120px] w-[120px] sm:min-w-[130px] sm:w-[130px] md:min-w-[140px] md:w-[140px] lg:min-w-[160px] lg:w-[160px]">
                     <ProductCard product={item} />
                   </div>
                 ))}
@@ -217,7 +269,7 @@ export function Home() {
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-gray-900 text-lg">Categories</h3>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar -mx-6 px-6">
+            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
               {categories.map((cat: any) => {
                 const catId = cat._id || cat.id;
                 const Icon = bannerIcons[cat.icon] || LayoutGrid;
@@ -226,16 +278,16 @@ export function Home() {
                   <button
                     key={catId}
                     onClick={() => setActiveCategory(catId)}
-                    className="flex flex-col items-center gap-2 min-w-[72px]"
+                    className="flex flex-col items-center gap-2 min-w-[72px] sm:min-w-[84px] md:min-w-[96px]"
                   >
                     <div className={cn(
-                      "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300",
-                      isActive ? "bg-blue-600 text-white shadow-lg shadow-blue-200 scale-105" : "bg-white border border-gray-100 text-gray-600"
+                      "w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-2xl flex items-center justify-center transition-all duration-300",
+                      isActive ? "bg-blue-600 text-white shadow-lg shadow-blue-200 scale-105" : "bg-white border border-gray-100 text-gray-600 hover:border-gray-200"
                     )}>
-                      <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                      <Icon size={24} className="sm:w-7 sm:h-7 md:w-8 md:h-8" strokeWidth={isActive ? 2.5 : 2} />
                     </div>
                     <span className={cn(
-                      "text-xs font-medium transition-colors",
+                      "text-xs md:text-sm font-medium transition-colors",
                       isActive ? "text-blue-600" : "text-gray-500"
                     )}>
                       {cat.name}
@@ -250,8 +302,8 @@ export function Home() {
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-gray-900 text-lg">Featured Products</h3>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredProducts.slice(0, 8).map((product: any) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6">
+              {filteredProducts.slice(0, 16).map((product: any) => (
                 <ProductCard key={product._id || product.id} product={product} />
               ))}
             </div>

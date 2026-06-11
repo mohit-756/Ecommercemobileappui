@@ -5,8 +5,8 @@ export function Terms() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-full flex flex-col bg-white">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 flex items-center">
+    <div className="min-h-full flex flex-col bg-white lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none overflow-hidden">
+      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 flex items-center">
         <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
           <ChevronLeft size={24} />
         </button>

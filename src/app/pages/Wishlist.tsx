@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router';
 import { ChevronLeft, Heart, ShoppingBag } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslation } from '../hooks/useTranslation';
 
 export function Wishlist() {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<any[]>([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const saved = localStorage.getItem('user_wishlist');
@@ -25,18 +27,18 @@ export function Wishlist() {
   }, []);
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 flex items-center">
+    <div className="min-h-full flex flex-col bg-gray-50 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
+      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 flex items-center">
         <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
           <ChevronLeft size={24} />
         </button>
-        <h1 className="text-xl font-bold text-gray-900 ml-2">My Wishlist</h1>
+        <h1 className="text-xl font-bold text-gray-900 ml-2">{t('myWishlist')}</h1>
       </div>
 
       <div className="flex-1 px-6 py-6 overflow-y-auto">
         <AnimatePresence mode="popLayout">
           {wishlist.length > 0 ? (
-            <div className="space-y-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
               {wishlist.map((product) => (
                 <motion.div
                   key={product.id || product._id}
@@ -45,7 +47,12 @@ export function Wishlist() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                 >
-                  <ProductCard product={product} layout="list" />
+                  <div className="md:hidden">
+                    <ProductCard product={product} layout="list" />
+                  </div>
+                  <div className="hidden md:block">
+                    <ProductCard product={product} layout="grid" />
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -54,13 +61,13 @@ export function Wishlist() {
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Heart size={36} className="text-gray-300" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Your wishlist is empty</h2>
-              <p className="text-gray-500 text-sm mb-8">Save items you love to find them later!</p>
+              <h2 className="text-lg font-bold text-gray-900 mb-2">{t('wishlistEmpty')}</h2>
+              <p className="text-gray-500 text-sm mb-8">{t('wishlistEmptyDesc')}</p>
               <button
                 onClick={() => navigate('/home')}
-                className="bg-blue-600 text-white font-semibold rounded-xl py-3 px-8 shadow-lg shadow-blue-200"
+                className="bg-blue-600 text-white font-semibold rounded-xl py-3 px-8 shadow-lg shadow-blue-200 cursor-pointer"
               >
-                Explore Products
+                {t('exploreProducts')}
               </button>
             </div>
           )}
