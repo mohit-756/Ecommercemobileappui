@@ -25,7 +25,7 @@ export function Splash() {
   }, [navigate, user, isLoading]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full min-h-screen bg-gradient-to-br from-amber-500 to-orange-600">
+    <div className="flex flex-col items-center justify-center h-full min-h-screen bg-gradient-to-br from-amber-500 to-orange-600 transition-colors duration-300">
       <motion.div
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -34,7 +34,7 @@ export function Splash() {
           stiffness: 260,
           damping: 20
         }}
-        className="bg-white p-6 rounded-[28px] shadow-2xl mb-6"
+        className="bg-white dark:bg-surface p-6 rounded-[28px] shadow-2xl mb-6"
       >
         <Leaf size={64} className="text-amber-600" strokeWidth={1.5} />
       </motion.div>

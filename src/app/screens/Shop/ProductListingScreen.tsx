@@ -13,17 +13,17 @@ export default function ProductListingScreen() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col bg-gray-50 min-h-full pb-safe">
-      <div className="bg-white pt-12 pb-4 px-5 flex items-center sticky top-0 z-10 shadow-sm">
-        <button onClick={() => navigate(-1)} className="text-gray-900">
+    <div className="flex flex-col bg-gray-50 dark:bg-background min-h-full pb-safe transition-colors duration-300">
+      <div className="bg-white dark:bg-surface pt-12 pb-4 px-5 flex items-center sticky top-0 z-10 shadow-sm">
+        <button onClick={() => navigate(-1)} className="text-gray-900 dark:text-text-primary">
           <ArrowLeft size={24} />
         </button>
-        <h1 className="text-xl font-bold text-gray-900 mx-auto">Products</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-text-primary mx-auto">Products</h1>
         <div className="flex space-x-2">
-          <button className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-900">
+          <button className="w-10 h-10 bg-gray-50 dark:bg-background rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary">
             <SlidersHorizontal size={18} />
           </button>
-          <button className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-900">
+          <button className="w-10 h-10 bg-gray-50 dark:bg-background rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary">
             <Filter size={18} />
           </button>
         </div>
@@ -32,7 +32,7 @@ export default function ProductListingScreen() {
       <div className="p-5 flex-1 overflow-y-auto">
         <div className="flex gap-2 mb-6 overflow-x-auto no-scrollbar pb-2">
           {["All", "Shoes", "Electronics", "Fashion", "Watches"].map((cat, i) => (
-            <button key={i} className={`px-5 py-2 rounded-full text-sm font-medium flex-shrink-0 ${i === 0 ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-200"}`}>
+            <button key={i} className={`px-5 py-2 rounded-full text-sm font-medium flex-shrink-0 ${i === 0 ? "bg-blue-600 text-white" : "bg-white dark:bg-surface text-gray-600 dark:text-text-secondary border border-gray-200 dark:border-border-medium"}`}>
               {cat}
             </button>
           ))}

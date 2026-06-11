@@ -56,21 +56,21 @@ export function Profile() {
   };
 
   return (
-    <div className="min-h-full bg-gray-50 pb-6 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
-      <div className="bg-white px-6 pt-16 pb-8 lg:pt-8 rounded-b-3xl shadow-sm mb-6 relative">
+    <div className="min-h-full bg-gray-50 dark:bg-background pb-6 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden transition-colors duration-300">
+      <div className="bg-white dark:bg-surface px-6 pt-16 pb-8 lg:pt-8 rounded-b-3xl shadow-sm mb-6 relative">
         <div className="absolute top-12 right-6 md:top-6">
-          <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
+          <button className="w-10 h-10 rounded-full bg-gray-50 dark:bg-surface-tertiary flex items-center justify-center text-gray-600 dark:text-text-secondary hover:bg-gray-100 dark:hover:bg-surface-tertiary transition-colors">
             <Settings size={20} />
           </button>
         </div>
         
         <div className="flex items-center gap-5">
           <div className="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-blue-600 to-indigo-400 relative">
-            <div className="w-full h-full bg-white rounded-full overflow-hidden border-2 border-white">
+            <div className="w-full h-full bg-white dark:bg-surface rounded-full overflow-hidden border-2 border-white dark:border-surface">
               {user?.avatar ? (
                 <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl font-bold">
+                <div className="w-full h-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 text-2xl font-bold">
                   {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
               )}
@@ -93,23 +93,23 @@ export function Profile() {
             )}
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight mb-1">{user?.name || 'User'}</h1>
-            <p className="text-gray-500 text-sm">{user?.email || ''}</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-text-primary leading-tight mb-1">{user?.name || 'User'}</h1>
+            <p className="text-gray-500 dark:text-text-secondary text-sm">{user?.email || ''}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-8">
-          <div onClick={() => navigate('/orders')} className="bg-gray-50 rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 transition-colors">
-            <span className="block text-xl font-bold text-gray-900">{ordersCount}</span>
-            <span className="text-xs text-gray-500 font-medium">{t('orders')}</span>
+          <div onClick={() => navigate('/orders')} className="bg-gray-50 dark:bg-surface-tertiary rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 dark:active:bg-surface-tertiary transition-colors">
+            <span className="block text-xl font-bold text-gray-900 dark:text-text-primary">{ordersCount}</span>
+            <span className="text-xs text-gray-500 dark:text-text-secondary font-medium">{t('orders')}</span>
           </div>
-          <div className="bg-gray-50 rounded-2xl p-3 text-center">
-            <span className="block text-xl font-bold text-gray-900">0</span>
-            <span className="text-xs text-gray-500 font-medium">{t('reviews')}</span>
+          <div className="bg-gray-50 dark:bg-surface-tertiary rounded-2xl p-3 text-center">
+            <span className="block text-xl font-bold text-gray-900 dark:text-text-primary">0</span>
+            <span className="text-xs text-gray-500 dark:text-text-secondary font-medium">{t('reviews')}</span>
           </div>
-          <div onClick={() => navigate('/wishlist')} className="bg-gray-50 rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 transition-colors">
-            <span className="block text-xl font-bold text-gray-900">{wishlistCount}</span>
-            <span className="text-xs text-gray-500 font-medium">{t('saved')}</span>
+          <div onClick={() => navigate('/wishlist')} className="bg-gray-50 dark:bg-surface-tertiary rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 dark:active:bg-surface-tertiary transition-colors">
+            <span className="block text-xl font-bold text-gray-900 dark:text-text-primary">{wishlistCount}</span>
+            <span className="text-xs text-gray-500 dark:text-text-secondary font-medium">{t('saved')}</span>
           </div>
         </div>
       </div>
@@ -120,22 +120,22 @@ export function Profile() {
             key={idx}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate(item.path)}
-            className="w-full bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100"
+            className="w-full bg-white dark:bg-surface p-4 rounded-2xl flex items-center justify-between shadow-sm border border-gray-100 dark:border-border-light"
           >
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
+              <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-surface-tertiary flex items-center justify-center text-gray-600 dark:text-text-secondary">
                 <item.icon size={20} />
               </div>
-              <span className="font-semibold text-gray-900">{item.label}</span>
+              <span className="font-semibold text-gray-900 dark:text-text-primary">{item.label}</span>
             </div>
-            <ChevronRight size={20} className="text-gray-400" />
+            <ChevronRight size={20} className="text-gray-400 dark:text-text-tertiary" />
           </motion.button>
         ))}
 
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={handleLogout}
-          className="w-full bg-red-50 p-4 rounded-2xl flex items-center justify-between shadow-sm border border-red-100 mt-6"
+          className="w-full bg-red-50 dark:bg-red-500/20 p-4 rounded-2xl flex items-center justify-between shadow-sm border border-red-100 dark:border-red-500/30 mt-6"
         >
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-red-500">

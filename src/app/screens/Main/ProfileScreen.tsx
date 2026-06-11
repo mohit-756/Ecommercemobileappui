@@ -15,7 +15,7 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <div className="flex flex-col bg-gray-50 min-h-full pb-20">
+    <div className="flex flex-col bg-gray-50 dark:bg-background min-h-full pb-20 transition-colors duration-300">
       <div className="bg-blue-600 pt-16 pb-20 px-5 relative">
         <h1 className="text-xl font-bold text-white text-center mb-6">Profile</h1>
         <div className="flex items-center gap-4">
@@ -30,44 +30,44 @@ export default function ProfileScreen() {
       </div>
 
       <div className="px-5 -mt-10 relative z-10 flex-1">
-        <div className="bg-white rounded-3xl p-2 shadow-sm mb-6 flex justify-around">
+        <div className="bg-white dark:bg-surface rounded-3xl p-2 shadow-sm mb-6 flex justify-around border border-transparent dark:border-border-light transition-colors">
           <div className="text-center p-3">
-            <p className="text-xl font-bold text-gray-900">12</p>
-            <p className="text-xs text-gray-500">Orders</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-text-primary">12</p>
+            <p className="text-xs text-gray-500 dark:text-text-secondary">Orders</p>
           </div>
-          <div className="w-px bg-gray-100 my-2"></div>
+          <div className="w-px bg-gray-100 dark:bg-border-light my-2"></div>
           <div className="text-center p-3">
-            <p className="text-xl font-bold text-gray-900">4</p>
-            <p className="text-xs text-gray-500">Reviews</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-text-primary">4</p>
+            <p className="text-xs text-gray-500 dark:text-text-secondary">Reviews</p>
           </div>
-          <div className="w-px bg-gray-100 my-2"></div>
+          <div className="w-px bg-gray-100 dark:bg-border-light my-2"></div>
           <div className="text-center p-3">
-            <p className="text-xl font-bold text-gray-900">89</p>
-            <p className="text-xs text-gray-500">Points</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-text-primary">89</p>
+            <p className="text-xs text-gray-500 dark:text-text-secondary">Points</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-2 shadow-sm space-y-1 mb-6">
+        <div className="bg-white dark:bg-surface rounded-3xl p-2 shadow-sm space-y-1 mb-6 border border-transparent dark:border-border-light transition-colors">
           {MENU_ITEMS.map((item, index) => (
             <button 
               key={index} 
               onClick={() => navigate(item.path)}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-2xl transition-colors"
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-surface-secondary rounded-2xl transition-colors"
             >
               <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${item.bg}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${item.bg} dark:bg-surface-tertiary`}>
                   <item.icon size={20} className={item.color} />
                 </div>
-                <span className="font-semibold text-gray-900 text-sm">{item.label}</span>
+                <span className="font-semibold text-gray-900 dark:text-text-primary text-sm">{item.label}</span>
               </div>
-              <ChevronRight size={18} className="text-gray-400" />
+              <ChevronRight size={18} className="text-gray-400 dark:text-text-tertiary" />
             </button>
           ))}
         </div>
 
         <button 
           onClick={() => navigate("/auth/login")}
-          className="w-full bg-white rounded-3xl p-4 shadow-sm flex items-center justify-center gap-2 text-red-500 font-bold mb-6 hover:bg-red-50 transition-colors border border-red-100"
+          className="w-full bg-white dark:bg-surface rounded-3xl p-4 shadow-sm flex items-center justify-center gap-2 text-red-500 font-bold mb-6 hover:bg-red-50 dark:hover:bg-red-500/20 transition-colors border border-red-100 dark:border-red-500/30"
         >
           <LogOut size={20} />
           Logout

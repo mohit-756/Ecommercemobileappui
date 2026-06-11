@@ -41,10 +41,10 @@ export function OrderTracking() {
 
   if (!order) {
     return (
-      <div className="flex flex-col items-center justify-center h-full min-h-screen bg-gray-50 px-6">
+      <div className="flex flex-col items-center justify-center h-full min-h-screen bg-gray-50 dark:bg-background px-6">
         <Package size={48} className="text-gray-300 mb-4" />
-        <h2 className="text-lg font-bold text-gray-900 mb-2">No order selected</h2>
-        <p className="text-gray-500 text-sm mb-6">Select an order from your order history</p>
+        <h2 className="text-lg font-bold text-gray-900 dark:text-text-primary mb-2">No order selected</h2>
+        <p className="text-gray-500 dark:text-text-secondary text-sm mb-6">Select an order from your order history</p>
         <button onClick={() => navigate('/orders')} className="bg-blue-600 text-white font-semibold rounded-xl py-3 px-8">
           View Orders
         </button>
@@ -80,46 +80,46 @@ export function OrderTracking() {
   const displayId = `ORD-${order._id.slice(-6).toUpperCase()}`;
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 flex items-center">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
+    <div className="min-h-full flex flex-col bg-gray-50 dark:bg-background transition-colors duration-300">
+      <div className="bg-white dark:bg-surface pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-0 border-b border-gray-100 dark:border-border-light flex items-center">
+        <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary">
           <ChevronLeft size={24} />
         </button>
-        <h1 className="text-xl font-bold text-gray-900 ml-2">Track Order</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-text-primary ml-2">Track Order</h1>
       </div>
 
       <div className="flex-1 px-6 py-6 overflow-y-auto">
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
+        <div className="bg-white dark:bg-surface p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-border-light mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/20 text-blue-600 rounded-xl flex items-center justify-center">
               <Package size={24} />
             </div>
             <div className="flex-1">
-              <p className="text-gray-500 text-xs font-medium">Order ID</p>
-              <p className="font-bold text-gray-900">{displayId}</p>
+              <p className="text-gray-500 dark:text-text-secondary text-xs font-medium">Order ID</p>
+              <p className="font-bold text-gray-900 dark:text-text-primary">{displayId}</p>
             </div>
             <div className="text-right">
-              <p className="text-gray-500 text-xs font-medium">Total</p>
-              <p className="font-bold text-gray-900">{formatPrice(order.total || 0)}</p>
+              <p className="text-gray-500 dark:text-text-secondary text-xs font-medium">Total</p>
+              <p className="font-bold text-gray-900 dark:text-text-primary">{formatPrice(order.total || 0)}</p>
             </div>
           </div>
           {order.courierDetails?.trackingId && (
-            <div className="mt-3 pt-3 border-t border-gray-50 flex items-center gap-2 text-sm text-gray-600">
-              <Truck size={16} className="text-gray-400" />
+            <div className="mt-3 pt-3 border-t border-gray-50 dark:border-border-light flex items-center gap-2 text-sm text-gray-600 dark:text-text-secondary">
+              <Truck size={16} className="text-gray-400 dark:text-text-tertiary" />
               Courier: {order.courierDetails.name || 'Standard'} — {order.courierDetails.trackingId}
             </div>
           )}
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div className="bg-white dark:bg-surface p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-border-light">
           <div className="relative">
-            <div className="absolute left-[15px] top-4 bottom-4 w-[2px] bg-gray-100" />
+            <div className="absolute left-[15px] top-4 bottom-4 w-[2px] bg-gray-100 dark:bg-surface-tertiary" />
 
             {steps.map((step, idx) => (
               <div key={step.status} className="flex gap-4 mb-8 last:mb-0 relative">
                 <div className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center z-10 relative transition-all",
-                  step.completed ? "bg-blue-600 text-white" : step.current ? "bg-blue-100 border-2 border-blue-600 text-blue-600" : "bg-gray-100 text-gray-400"
+                  step.completed ? "bg-blue-600 text-white" : step.current ? "bg-blue-100 dark:bg-blue-500/20 border-2 border-blue-600 text-blue-600" : "bg-gray-100 dark:bg-surface-tertiary text-gray-400 dark:text-text-tertiary"
                 )}>
                   {step.completed ? (
                     <CheckCircle2 size={16} />
@@ -130,14 +130,14 @@ export function OrderTracking() {
                   )}
                 </div>
                 <div className={cn("pb-1", idx === steps.length - 1 ? '' : '')}>
-                  <h3 className={cn("font-bold text-sm", step.completed || step.current ? "text-gray-900" : "text-gray-400")}>
+                  <h3 className={cn("font-bold text-sm", step.completed || step.current ? "text-gray-900 dark:text-text-primary" : "text-gray-400 dark:text-text-tertiary")}>
                     {step.label}
                   </h3>
                   {step.description && (
-                    <p className="text-xs text-gray-500 mt-0.5">{step.description}</p>
+                    <p className="text-xs text-gray-500 dark:text-text-secondary mt-0.5">{step.description}</p>
                   )}
                   {step.timestamp && (
-                    <p className="text-gray-400 text-xs mt-0.5">{formatTime(step.timestamp)}</p>
+                    <p className="text-gray-400 dark:text-text-tertiary text-xs mt-0.5">{formatTime(step.timestamp)}</p>
                   )}
                 </div>
               </div>

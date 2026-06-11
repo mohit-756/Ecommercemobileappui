@@ -19,7 +19,7 @@ export default function SplashScreen() {
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="bg-white p-6 rounded-3xl shadow-2xl mb-6"
+        className="bg-white dark:bg-surface p-6 rounded-3xl shadow-2xl mb-6"
       >
         <ShoppingBag size={64} className="text-blue-600" />
       </motion.div>

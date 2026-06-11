@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { Toaster } from 'sonner';
-import { useEffect } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { PlatformShell } from './components/PlatformShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Splash } from './pages/Splash';
@@ -30,53 +30,65 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminProducts } from './pages/AdminProducts';
 import { AdminOrders } from './pages/AdminOrders';
 
-export default function App() {
-  useEffect(() => {
-    const isDark = localStorage.getItem('settings_dark') === 'true';
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
+function ThemeAwareToaster() {
+  const { mode } = useTheme();
 
   return (
+    <Toaster
+      position="top-center"
+      richColors
+      theme={mode}
+      toastOptions={{
+        style: {
+          background: 'var(--popover)',
+          color: 'var(--popover-foreground)',
+          borderColor: 'var(--border)',
+        },
+      }}
+    />
+  );
+}
+
+export default function App() {
+  return (
     <BrowserRouter>
-      <LanguageProvider>
-        <AuthProvider>
-          <CartProvider>
-            <Routes>
-              <Route element={<PlatformShell />}>
-                <Route index element={<Splash />} />
-                <Route path="onboarding" element={<Onboarding />} />
-                <Route path="login" element={<Login />} />
-                <Route path="verify-otp" element={<VerifyOtp />} />
-                <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-                <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-                <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                <Route path="product/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
-                <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-                <Route path="success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
-                <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
-                <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-                <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-                <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
-                <Route path="payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
-                <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                <Route path="support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
-                <Route path="privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
-                <Route path="terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
-                <Route path="admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-                <Route path="admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
-                <Route path="admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
-                <Route path="*" element={<Navigate to="/home" replace />} />
-              </Route>
-            </Routes>
-            <Toaster position="top-center" richColors />
-          </CartProvider>
-        </AuthProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <CartProvider>
+              <Routes>
+                <Route element={<PlatformShell />}>
+                  <Route index element={<Splash />} />
+                  <Route path="onboarding" element={<Onboarding />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="verify-otp" element={<VerifyOtp />} />
+                  <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                  <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+                  <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                  <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="product/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
+                  <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                  <Route path="success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+                  <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
+                  <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                  <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                  <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
+                  <Route path="payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
+                  <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                  <Route path="support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+                  <Route path="privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
+                  <Route path="terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
+                  <Route path="admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
+                  <Route path="admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
+                  <Route path="*" element={<Navigate to="/home" replace />} />
+                </Route>
+              </Routes>
+              <ThemeAwareToaster />
+            </CartProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

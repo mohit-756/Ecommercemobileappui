@@ -73,9 +73,9 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
       <motion.div
         whileTap={{ scale: 0.98 }}
         onClick={() => navigate(`/product/${product.id}`)}
-        className="bg-white rounded-2xl p-3 flex gap-4 shadow-sm border border-gray-100 mb-3 relative overflow-hidden"
+        className="bg-white dark:bg-surface rounded-2xl p-3 flex gap-4 shadow-sm border border-gray-100 dark:border-border-light mb-3 relative overflow-hidden"
       >
-        <div className="w-24 h-24 rounded-xl bg-gray-100 flex-shrink-0 relative overflow-hidden">
+        <div className="w-24 h-24 rounded-xl bg-gray-100 dark:bg-surface-tertiary flex-shrink-0 relative overflow-hidden">
           <img src={product.image} alt={product.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/images/products/cashews.webp'; }} />
           {product.discount && (
             <div className="absolute top-0 left-0 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg">
@@ -84,22 +84,22 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
           )}
         </div>
         <div className="flex-1 py-1 flex flex-col">
-          <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-tight mb-1">{product.name}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-text-primary text-sm line-clamp-2 leading-tight mb-1">{product.name}</h3>
           <div className="flex items-center gap-1 mb-auto">
             <Star size={12} className="text-amber-400 fill-amber-400" />
-            <span className="text-xs text-gray-600 font-medium">{product.rating}</span>
-            <span className="text-xs text-gray-400">({product.reviews})</span>
+            <span className="text-xs text-gray-600 dark:text-text-secondary font-medium">{product.rating}</span>
+            <span className="text-xs text-gray-400 dark:text-text-tertiary">({product.reviews})</span>
           </div>
           <div className="flex items-end justify-between mt-2">
             <div>
-              <span className="font-bold text-gray-900">{formatPrice(product.price)}</span>
+              <span className="font-bold text-gray-900 dark:text-text-primary">{formatPrice(product.price)}</span>
               {product.originalPrice && product.originalPrice !== product.price && (
-                <span className="text-xs text-gray-400 line-through ml-1.5">{formatPrice(product.originalPrice)}</span>
+                <span className="text-xs text-gray-400 dark:text-text-tertiary line-through ml-1.5">{formatPrice(product.originalPrice)}</span>
               )}
             </div>
           </div>
         </div>
-        <button onClick={handleToggleWishlist} className={cn("absolute top-3 right-3 transition-colors", isWishlist ? "text-red-500" : "text-gray-400 hover:text-red-500")}>
+        <button onClick={handleToggleWishlist} className={cn("absolute top-3 right-3 transition-colors", isWishlist ? "text-red-500" : "text-gray-400 dark:text-text-tertiary hover:text-red-500")}>
           <Heart size={18} className={isWishlist ? "fill-red-500" : ""} />
         </button>
       </motion.div>
@@ -110,9 +110,9 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
     <motion.div
       whileTap={{ scale: 0.96 }}
       onClick={() => navigate(`/product/${product.id}`)}
-      className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col relative group"
+      className="bg-white dark:bg-surface rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-border-light flex flex-col relative group w-full h-[262px] sm:h-[282px] md:h-[302px] lg:h-[322px] transition-colors duration-300"
     >
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+      <div className="relative w-full h-[140px] sm:h-[150px] md:h-[160px] lg:h-[180px] aspect-square bg-gray-100 dark:bg-surface-tertiary overflow-hidden flex-shrink-0">
         <img
           src={product.image}
           alt={product.name}
@@ -128,29 +128,31 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
         <button
           onClick={handleToggleWishlist}
           className={cn(
-            "absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center transition-colors",
-            isWishlist ? "text-red-500" : "text-gray-500 hover:text-red-500"
+            "absolute top-2 right-2 w-8 h-8 bg-white/80 dark:bg-surface/80 backdrop-blur-md rounded-full flex items-center justify-center transition-colors",
+            isWishlist ? "text-red-500" : "text-gray-500 dark:text-text-secondary hover:text-red-500"
           )}
         >
           <Heart size={16} className={isWishlist ? "fill-red-500" : ""} />
         </button>
       </div>
-      <div className="p-3 flex-1 flex flex-col">
-        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-tight mb-1">{product.name}</h3>
-        <div className="flex items-center gap-1 mb-2">
+      <div className="p-3 flex-1 flex flex-col min-h-0">
+        <h3 className="font-semibold text-gray-900 dark:text-text-primary text-sm line-clamp-2 leading-tight h-9 mb-1 overflow-hidden">
+          {product.name}
+        </h3>
+        <div className="flex items-center gap-1 h-5 mb-2">
           <Star size={12} className="text-amber-400 fill-amber-400" />
-          <span className="text-xs text-gray-600 font-medium">{product.rating}</span>
+          <span className="text-xs text-gray-600 dark:text-text-secondary font-medium">{product.rating}</span>
         </div>
-        <div className="mt-auto flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="font-bold text-gray-900 leading-none">{formatPrice(product.price)}</span>
+        <div className="mt-auto flex items-end justify-between gap-2 pt-1">
+          <div className="flex min-w-0 flex-col justify-end h-10">
+            <span className="font-bold text-gray-900 dark:text-text-primary leading-none truncate">{formatPrice(product.price)}</span>
             {product.originalPrice && product.originalPrice !== product.price && (
-              <span className="text-[10px] text-gray-400 line-through mt-0.5">{formatPrice(product.originalPrice)}</span>
+              <span className="text-[10px] text-gray-400 dark:text-text-tertiary line-through mt-1 truncate">{formatPrice(product.originalPrice)}</span>
             )}
           </div>
           <button
             onClick={handleAddToCart}
-            className="w-7 h-7 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors"
+            className="w-8 h-8 shrink-0 bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-colors"
           >
             <span className="text-lg font-medium leading-none mb-0.5">+</span>
           </button>

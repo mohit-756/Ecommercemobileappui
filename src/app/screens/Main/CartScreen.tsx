@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import { Button } from "../../components/Button";
 
@@ -47,81 +47,79 @@ export default function CartScreen() {
   const total = subtotal + tax;
 
   return (
-    <div className="flex flex-col bg-gray-50 min-h-full pb-20">
-      <div className="bg-white pt-12 pb-4 px-5 flex items-center sticky top-0 z-10 shadow-sm">
-        <h1 className="text-xl font-bold text-gray-900 mx-auto">My Cart</h1>
+    <div className="flex flex-col bg-gray-50 dark:bg-background min-h-full pb-20 transition-colors duration-300">
+      <div className="bg-white dark:bg-surface pt-12 pb-4 px-5 flex items-center sticky top-0 z-10 shadow-sm border-b border-transparent dark:border-border-light transition-colors">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-text-primary mx-auto">My Cart</h1>
       </div>
 
       {cartItems.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-          <div className="w-32 h-32 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+          <div className="w-32 h-32 bg-blue-50 dark:bg-blue-500/20 rounded-full flex items-center justify-center mb-6">
             <Trash2 size={40} className="text-blue-300" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-          <p className="text-gray-500 mb-8">Looks like you haven't added anything to your cart yet.</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-text-primary mb-2">Your cart is empty</h2>
+          <p className="text-gray-500 dark:text-text-secondary mb-8">Looks like you haven't added anything to your cart yet.</p>
           <Button onClick={() => navigate("/home")} className="w-48">Shop Now</Button>
         </div>
       ) : (
         <div className="p-5 space-y-4">
           {cartItems.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl p-4 flex gap-4 shadow-sm relative">
-              <div className="w-24 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover mix-blend-multiply" />
+            <div key={item.id} className="bg-white dark:bg-surface rounded-2xl p-4 flex gap-4 shadow-sm relative border border-transparent dark:border-border-light transition-colors">
+              <div className="w-24 h-24 bg-gray-100 dark:bg-surface-tertiary rounded-xl overflow-hidden flex-shrink-0">
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal" />
               </div>
               <div className="flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-900 line-clamp-1">{item.name}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{item.color} • {item.size}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-text-primary line-clamp-1">{item.name}</h3>
+                  <p className="text-xs text-gray-500 dark:text-text-secondary mt-1">{item.color} / {item.size}</p>
                 </div>
                 <div className="flex justify-between items-end">
-                  <span className="font-bold text-lg text-gray-900">${item.price}</span>
-                  <div className="flex items-center space-x-3 bg-gray-50 rounded-full px-2 py-1">
-                    <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-600 bg-white rounded-full shadow-sm">
+                  <span className="font-bold text-lg text-gray-900 dark:text-text-primary">${item.price}</span>
+                  <div className="flex items-center space-x-3 bg-gray-50 dark:bg-surface-tertiary rounded-full px-2 py-1">
+                    <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-600 dark:text-text-secondary bg-white dark:bg-surface rounded-full shadow-sm">
                       <Minus size={14} />
                     </button>
-                    <span className="font-semibold text-sm w-4 text-center">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-gray-600 bg-white rounded-full shadow-sm">
+                    <span className="font-semibold text-sm w-4 text-center text-gray-900 dark:text-text-primary">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-gray-600 dark:text-text-secondary bg-white dark:bg-surface rounded-full shadow-sm">
                       <Plus size={14} />
                     </button>
                   </div>
                 </div>
               </div>
-              <button onClick={() => removeItem(item.id)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors">
+              <button onClick={() => removeItem(item.id)} className="absolute top-4 right-4 text-gray-300 dark:text-text-tertiary hover:text-red-500 transition-colors">
                 <Trash2 size={18} />
               </button>
             </div>
           ))}
 
-          {/* Promo Code */}
-          <div className="bg-white rounded-2xl p-4 flex space-x-3 shadow-sm mt-6">
-            <input 
-              type="text" 
-              placeholder="Enter promo code" 
-              className="flex-1 bg-gray-50 rounded-xl px-4 text-sm outline-none focus:ring-2 focus:ring-blue-600"
+          <div className="bg-white dark:bg-surface rounded-2xl p-4 flex space-x-3 shadow-sm mt-6 border border-transparent dark:border-border-light transition-colors">
+            <input
+              type="text"
+              placeholder="Enter promo code"
+              className="flex-1 bg-gray-50 dark:bg-surface-secondary rounded-xl px-4 text-sm text-gray-900 dark:text-text-primary placeholder:text-gray-400 dark:placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-blue-600"
             />
-            <button className="bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-black">
+            <button className="bg-gray-900 dark:bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-black dark:hover:bg-blue-700">
               Apply
             </button>
           </div>
 
-          {/* Order Summary */}
-          <div className="bg-white rounded-3xl p-5 shadow-sm mt-6 mb-20 space-y-4">
-            <h3 className="font-bold text-gray-900 text-lg mb-2">Order Summary</h3>
+          <div className="bg-white dark:bg-surface rounded-3xl p-5 shadow-sm mt-6 mb-20 space-y-4 border border-transparent dark:border-border-light transition-colors">
+            <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg mb-2">Order Summary</h3>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Subtotal</span>
-              <span className="font-semibold text-gray-900">${subtotal.toFixed(2)}</span>
+              <span className="text-gray-500 dark:text-text-secondary">Subtotal</span>
+              <span className="font-semibold text-gray-900 dark:text-text-primary">${subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Shipping</span>
+              <span className="text-gray-500 dark:text-text-secondary">Shipping</span>
               <span className="font-semibold text-green-500">Free</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Tax</span>
-              <span className="font-semibold text-gray-900">${tax.toFixed(2)}</span>
+              <span className="text-gray-500 dark:text-text-secondary">Tax</span>
+              <span className="font-semibold text-gray-900 dark:text-text-primary">${tax.toFixed(2)}</span>
             </div>
-            <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
-              <span className="text-gray-500 font-medium">Total</span>
-              <span className="text-2xl font-bold text-gray-900">${total.toFixed(2)}</span>
+            <div className="border-t border-gray-100 dark:border-border-light pt-4 flex justify-between items-center">
+              <span className="text-gray-500 dark:text-text-secondary font-medium">Total</span>
+              <span className="text-2xl font-bold text-gray-900 dark:text-text-primary">${total.toFixed(2)}</span>
             </div>
             <Button fullWidth onClick={() => navigate("/checkout")} className="mt-4 shadow-xl shadow-blue-600/30">
               Checkout <ArrowRight size={18} className="ml-2" />

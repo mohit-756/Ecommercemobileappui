@@ -14,10 +14,10 @@ export default function LoginScreen() {
   };
 
   return (
-    <div className="flex-1 bg-white flex flex-col p-6 overflow-y-auto">
+    <div className="flex-1 bg-white dark:bg-surface transition-colors duration-300 flex flex-col p-6 overflow-y-auto">
       <div className="mt-12 mb-10">
-        <h1 className="text-3xl font-bold text-gray-900">Welcome Back! 👋</h1>
-        <p className="text-gray-500 mt-2">Sign in to your account to continue</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-text-primary">Welcome Back! 👋</h1>
+        <p className="text-gray-500 dark:text-text-secondary mt-2">Sign in to your account to continue</p>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-5 flex-1">
@@ -54,9 +54,9 @@ export default function LoginScreen() {
         </Button>
 
         <div className="relative flex items-center py-5">
-          <div className="flex-grow border-t border-gray-200"></div>
-          <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">Or continue with</span>
-          <div className="flex-grow border-t border-gray-200"></div>
+          <div className="flex-grow border-t border-gray-200 dark:border-border-medium"></div>
+          <span className="flex-shrink-0 mx-4 text-gray-400 dark:text-text-tertiary text-sm">Or continue with</span>
+          <div className="flex-grow border-t border-gray-200 dark:border-border-medium"></div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -71,7 +71,7 @@ export default function LoginScreen() {
         </div>
       </form>
 
-      <div className="mt-auto pt-8 text-center text-sm text-gray-600 pb-safe">
+      <div className="mt-auto pt-8 text-center text-sm text-gray-600 dark:text-text-secondary pb-safe">
         Don't have an account?{" "}
         <Link to="/auth/signup" className="text-blue-600 font-bold hover:underline">
           Sign Up

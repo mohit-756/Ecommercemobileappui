@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { recentlyViewedService } from '../services/recentlyViewedService';
 import { ProductCard } from '../components/ProductCard';
+import { LocationPermissionPopup } from '../components/LocationPermissionPopup';
 import { cn } from '../lib/utils';
 import { hapticService } from '../services/hapticService';
 import { Skeleton } from '../components/ui/skeleton';
@@ -32,6 +33,31 @@ export function Home() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+  const [showLocationPopup, setShowLocationPopup] = useState(false);
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem('location-popup-dismissed');
+    if (!dismissed) {
+      const timer = setTimeout(() => setShowLocationPopup(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  function handleAllowLocation() {
+    setShowLocationPopup(false);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        () => {},
+        () => {}
+      );
+    }
+    navigate('/addresses');
+  }
+
+  function handleDismissLocation() {
+    setShowLocationPopup(false);
+    sessionStorage.setItem('location-popup-dismissed', 'true');
+  }
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -116,7 +142,7 @@ export function Home() {
 
   return (
     <div
-      className="min-h-full pb-6"
+      className="min-h-full pb-6 transition-colors duration-300"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -125,38 +151,38 @@ export function Home() {
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="bg-white shadow-md rounded-full p-2"
+            className="bg-white dark:bg-surface shadow-md rounded-full p-2"
           >
             <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
           </motion.div>
         </div>
       )}
       {/* Mobile Page Header (hidden on large screens) */}
-      <div className="bg-white pt-14 pb-4 px-6 sticky top-0 z-30 lg:hidden border-b border-gray-50">
+      <div className="bg-white dark:bg-background pt-14 pb-4 px-6 sticky top-0 z-30 lg:hidden border-b border-gray-50 dark:border-border-light transition-colors duration-300">
         <div className="flex justify-between items-center mb-4">
           <div onClick={() => navigate('/addresses')} className="cursor-pointer active:opacity-70 transition-opacity">
             <div className="flex items-center gap-1.5 mb-0.5">
               <Zap size={14} className="text-amber-500 fill-amber-500" />
-              <span className="text-gray-900 font-extrabold text-sm uppercase tracking-wider">Delivery in 12 mins</span>
+              <span className="text-gray-900 dark:text-text-primary font-extrabold text-sm uppercase tracking-wider">Delivery in 12 mins</span>
             </div>
-            <h2 className="text-gray-900 font-bold flex items-center gap-1 leading-none">
+            <h2 className="text-gray-900 dark:text-text-primary font-bold flex items-center gap-1 leading-none">
               Home — Mumbai, India <span className="text-blue-600 text-[10px] mt-0.5">▾</span>
             </h2>
           </div>
           <div className="flex gap-3">
-            <button className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center relative active:scale-95 transition-transform">
-              <Bell size={20} className="text-gray-700" />
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            <button className="w-10 h-10 rounded-full border border-gray-100 dark:border-border-light flex items-center justify-center relative active:scale-95 transition-transform">
+              <Bell size={20} className="text-gray-700 dark:text-text-secondary" />
+              <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-surface"></span>
             </button>
           </div>
         </div>
 
         <div
           onClick={() => navigate('/search')}
-          className="bg-gray-100/80 flex items-center px-4 py-3 rounded-2xl border border-gray-100 cursor-text group"
+          className="bg-gray-100/80 dark:bg-surface-secondary flex items-center px-4 py-3 rounded-2xl border border-gray-100 dark:border-border-light cursor-text group"
         >
-          <Search size={20} className="text-gray-400 mr-2 group-focus-within:text-blue-600 transition-colors" />
-          <span className="text-gray-400 text-sm">Search almonds, dates, walnuts...</span>
+          <Search size={20} className="text-gray-400 dark:text-text-tertiary mr-2 group-focus-within:text-blue-600 transition-colors" />
+          <span className="text-gray-400 dark:text-text-tertiary text-sm">Search almonds, dates, walnuts...</span>
         </div>
       </div>
 
@@ -178,7 +204,7 @@ export function Home() {
             <Skeleton className="h-6 w-40 mb-4" />
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col">
+                <div key={i} className="bg-white dark:bg-surface rounded-2xl overflow-hidden border border-gray-100 dark:border-border-light flex flex-col">
                   <Skeleton className="aspect-square w-full" />
                   <div className="p-3 space-y-2">
                     <Skeleton className="h-4 w-full" />
@@ -243,14 +269,14 @@ export function Home() {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-900 text-lg">Best Sellers</h3>
+              <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Best Sellers</h3>
               <button className="text-blue-600 text-sm font-semibold flex items-center gap-1">
                 See all <ArrowRight size={14} />
               </button>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
               {products.slice(0, 10).map((product: any) => (
-                <div key={product.id} className="min-w-[140px] w-[140px] sm:min-w-[150px] sm:w-[150px] md:min-w-[160px] md:w-[160px] lg:min-w-[180px] lg:w-[180px]">
+                <div key={product.id || product._id} className="flex-none w-[140px] sm:w-[150px] md:w-[160px] lg:w-[180px]">
                   <ProductCard product={product} />
                 </div>
               ))}
@@ -262,7 +288,7 @@ export function Home() {
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
                   <Clock size={18} className="text-blue-600" />
-                  <h3 className="font-bold text-gray-900 text-lg">Recently Viewed</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Recently Viewed</h3>
                 </div>
                 <button onClick={() => { recentlyViewedService.clear(); setRecentlyViewed([]); }} className="text-blue-600 text-sm font-semibold">
                   Clear
@@ -270,7 +296,7 @@ export function Home() {
               </div>
               <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
                 {recentlyViewed.slice(0, 8).map((item: any) => (
-                  <div key={item.id} className="min-w-[120px] w-[120px] sm:min-w-[130px] sm:w-[130px] md:min-w-[140px] md:w-[140px] lg:min-w-[160px] lg:w-[160px]">
+                  <div key={item.id || item._id} className="flex-none w-[120px] sm:w-[130px] md:w-[140px] lg:w-[160px]">
                     <ProductCard product={item} />
                   </div>
                 ))}
@@ -280,7 +306,7 @@ export function Home() {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-900 text-lg">Categories</h3>
+              <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Categories</h3>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
               {categories.map((cat: any) => {
@@ -295,13 +321,13 @@ export function Home() {
                   >
                     <div className={cn(
                       "w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-2xl flex items-center justify-center transition-all duration-300",
-                      isActive ? "bg-blue-600 text-white shadow-lg shadow-blue-200 scale-105" : "bg-white border border-gray-100 text-gray-600 hover:border-gray-200"
+                      isActive ? "bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/30 scale-105" : "bg-white dark:bg-surface border border-gray-100 dark:border-border-light text-gray-600 dark:text-text-secondary hover:border-gray-200 dark:hover:border-border-medium"
                     )}>
                       <Icon size={24} className="sm:w-7 sm:h-7 md:w-8 md:h-8" strokeWidth={isActive ? 2.5 : 2} />
                     </div>
                     <span className={cn(
                       "text-xs md:text-sm font-medium transition-colors",
-                      isActive ? "text-blue-600" : "text-gray-500"
+                      isActive ? "text-blue-600" : "text-gray-500 dark:text-text-secondary"
                     )}>
                       {cat.name}
                     </span>
@@ -313,7 +339,7 @@ export function Home() {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-900 text-lg">Featured Products</h3>
+              <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Featured Products</h3>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6">
               {filteredProducts.slice(0, 16).map((product: any) => (
@@ -323,6 +349,12 @@ export function Home() {
           </div>
         </div>
       )}
+
+      <LocationPermissionPopup
+        open={showLocationPopup}
+        onAllow={handleAllowLocation}
+        onDismiss={handleDismissLocation}
+      />
     </div>
   );
 }

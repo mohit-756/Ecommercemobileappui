@@ -5,13 +5,13 @@ export function Payments() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 flex items-center justify-between">
+    <div className="min-h-full flex flex-col bg-gray-50 dark:bg-background transition-colors duration-300 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
+      <div className="bg-white dark:bg-surface pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 dark:border-border-light flex items-center justify-between">
         <div className="flex items-center">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary">
             <ChevronLeft size={24} />
           </button>
-          <h1 className="text-xl font-bold text-gray-900 ml-2">Payment Methods</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-text-primary ml-2">Payment Methods</h1>
         </div>
         <button className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-sm cursor-pointer">
           <Plus size={20} />
@@ -41,13 +41,13 @@ export function Payments() {
             <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
           </div>
 
-          <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center gap-3">
+          <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 p-4 rounded-2xl flex items-center gap-3">
             <div className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center">
               <ShieldCheck size={20} />
             </div>
             <div>
-              <p className="text-sm font-bold text-emerald-900">Safe & Secure</p>
-              <p className="text-xs text-emerald-600">Your payment data is encrypted</p>
+              <p className="text-sm font-bold text-emerald-900 dark:text-emerald-100">Safe & Secure</p>
+              <p className="text-xs text-emerald-600 dark:text-emerald-400">Your payment data is encrypted</p>
             </div>
           </div>
         </div>

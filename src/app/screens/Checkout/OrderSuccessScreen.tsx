@@ -18,12 +18,12 @@ export default function OrderSuccessScreen() {
   }, []);
 
   return (
-    <div className="flex-1 bg-white flex flex-col items-center justify-center p-6 text-center h-full">
+    <div className="flex-1 bg-white dark:bg-surface flex flex-col items-center justify-center p-6 text-center h-full transition-colors duration-300">
       <motion.div 
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-8"
+        className="w-24 h-24 bg-emerald-50 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mb-8"
       >
         <CheckCircle size={48} className="text-emerald-500" />
       </motion.div>
@@ -32,7 +32,7 @@ export default function OrderSuccessScreen() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="text-3xl font-bold text-gray-900 mb-3"
+        className="text-3xl font-bold text-gray-900 dark:text-text-primary mb-3"
       >
         Order Successful!
       </motion.h1>
@@ -41,7 +41,7 @@ export default function OrderSuccessScreen() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="text-gray-500 px-4 mb-8"
+        className="text-gray-500 dark:text-text-secondary px-4 mb-8"
       >
         Your order has been placed successfully. You will receive an email confirmation shortly.
       </motion.p>
@@ -50,13 +50,13 @@ export default function OrderSuccessScreen() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
-        className="bg-gray-50 rounded-2xl p-5 w-full mb-10 text-left flex items-center justify-between"
+        className="bg-gray-50 dark:bg-background rounded-2xl p-5 w-full mb-10 text-left flex items-center justify-between"
       >
         <div>
-          <p className="text-sm text-gray-500 mb-1">Order ID</p>
-          <p className="font-bold text-gray-900">#ORD-892471</p>
+          <p className="text-sm text-gray-500 dark:text-text-secondary mb-1">Order ID</p>
+          <p className="font-bold text-gray-900 dark:text-text-primary">#ORD-892471</p>
         </div>
-        <Package className="text-gray-400" size={32} />
+        <Package className="text-gray-400 dark:text-text-tertiary" size={32} />
       </motion.div>
 
       <motion.div 

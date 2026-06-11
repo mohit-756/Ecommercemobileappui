@@ -5,18 +5,17 @@ import { motion } from 'motion/react';
 import { Switch } from '../components/ui/switch';
 import { toast } from 'sonner';
 import { useTranslation } from '../hooks/useTranslation';
+import { useTheme } from '../contexts/ThemeContext';
 
 export function Settings() {
   const navigate = useNavigate();
   const { t, currentLanguage, setLanguage } = useTranslation();
+  const { isDark, setTheme } = useTheme();
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const savedNotifs = localStorage.getItem('settings_notifs');
-    const savedDark = localStorage.getItem('settings_dark');
     if (savedNotifs !== null) setNotifications(JSON.parse(savedNotifs));
-    if (savedDark !== null) setDarkMode(JSON.parse(savedDark));
   }, []);
 
   const handleToggleNotifs = (val: boolean) => {
@@ -26,13 +25,7 @@ export function Settings() {
   };
 
   const handleToggleDark = (val: boolean) => {
-    setDarkMode(val);
-    localStorage.setItem('settings_dark', JSON.stringify(val));
-    if (val) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    setTheme(val);
     toast.success(`Dark mode ${val ? 'enabled' : 'disabled'}`);
   };
 
@@ -51,98 +44,98 @@ export function Settings() {
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 flex items-center">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 cursor-pointer">
+    <div className="min-h-full flex flex-col bg-gray-50 dark:bg-background lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden transition-colors duration-300">
+      <div className="bg-white dark:bg-header-bg pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 dark:border-border-light flex items-center transition-colors duration-300">
+        <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary cursor-pointer">
           <ChevronLeft size={24} />
         </button>
-        <h1 className="text-xl font-bold text-gray-900 ml-2">{t('settings')}</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-text-primary ml-2 transition-colors">{t('settings')}</h1>
       </div>
 
       <div className="flex-1 px-6 py-6 space-y-8 overflow-y-auto">
         <div>
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">{t('preferences')}</h3>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-gray-50">
+          <h3 className="text-xs font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-3 px-1">{t('preferences')}</h3>
+          <div className="bg-white dark:bg-surface rounded-3xl shadow-sm border border-gray-100 dark:border-border-light overflow-hidden transition-colors duration-300">
+            <div className="flex items-center justify-between p-4 border-b border-gray-50 dark:border-border-light">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/20 text-blue-600 flex items-center justify-center">
                   <Bell size={20} />
                 </div>
-                <span className="font-semibold text-gray-900">{t('notifications')}</span>
+                <span className="font-semibold text-gray-900 dark:text-text-primary">{t('notifications')}</span>
               </div>
               <Switch checked={notifications} onCheckedChange={handleToggleNotifs} />
             </div>
 
-            <div className="flex items-center justify-between p-4 border-b border-gray-50">
+            <div className="flex items-center justify-between p-4 border-b border-gray-50 dark:border-border-light">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 flex items-center justify-center">
                   <Eye size={20} />
                 </div>
-                <span className="font-semibold text-gray-900">{t('darkMode')}</span>
+                <span className="font-semibold text-gray-900 dark:text-text-primary">{t('darkMode')}</span>
               </div>
-              <Switch checked={darkMode} onCheckedChange={handleToggleDark} />
+              <Switch checked={isDark} onCheckedChange={handleToggleDark} />
             </div>
 
             <motion.button
               onClick={handleToggleLanguage}
               whileTap={{ backgroundColor: '#f9fafb' }}
-              className="w-full flex items-center justify-between p-4 cursor-pointer"
+              className="w-full flex items-center justify-between p-4 cursor-pointer dark:hover:bg-surface-secondary"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-500/20 text-amber-600 flex items-center justify-center">
                   <Globe size={20} />
                 </div>
-                <span className="font-semibold text-gray-900">{t('language')}</span>
+                <span className="font-semibold text-gray-900 dark:text-text-primary">{t('language')}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-400">{currentLanguage}</span>
-                <ChevronRight size={18} className="text-gray-300" />
+                <span className="text-sm text-gray-400 dark:text-text-tertiary">{currentLanguage}</span>
+                <ChevronRight size={18} className="text-gray-300 dark:text-text-tertiary" />
               </div>
             </motion.button>
           </div>
         </div>
 
         <div>
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">{t('security')}</h3>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+          <h3 className="text-xs font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-3 px-1">{t('security')}</h3>
+          <div className="bg-white dark:bg-surface rounded-3xl shadow-sm border border-gray-100 dark:border-border-light overflow-hidden transition-colors duration-300">
             <motion.button
               onClick={() => navigate('/privacy')}
               whileTap={{ backgroundColor: '#f9fafb' }}
-              className="w-full flex items-center justify-between p-4 cursor-pointer"
+              className="w-full flex items-center justify-between p-4 cursor-pointer dark:hover:bg-surface-secondary"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-500/20 text-purple-600 flex items-center justify-center">
                   <Lock size={20} />
                 </div>
-                <span className="font-semibold text-gray-900">{t('privacySecurity')}</span>
+                <span className="font-semibold text-gray-900 dark:text-text-primary">{t('privacySecurity')}</span>
               </div>
-              <ChevronRight size={18} className="text-gray-300" />
+              <ChevronRight size={18} className="text-gray-300 dark:text-text-tertiary" />
             </motion.button>
           </div>
         </div>
 
         <div>
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">{t('system')}</h3>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+          <h3 className="text-xs font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-3 px-1">{t('system')}</h3>
+          <div className="bg-white dark:bg-surface rounded-3xl shadow-sm border border-gray-100 dark:border-border-light overflow-hidden transition-colors duration-300">
             <motion.button
               onClick={handleClearCache}
               whileTap={{ backgroundColor: '#fef2f2' }}
-              className="w-full flex items-center justify-between p-4 cursor-pointer"
+              className="w-full flex items-center justify-between p-4 cursor-pointer dark:hover:bg-surface-secondary"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/20 text-red-500 flex items-center justify-center">
                   <Trash2 size={20} />
                 </div>
                 <span className="font-semibold text-red-500">{t('clearCache')}</span>
               </div>
-              <span className="text-sm text-gray-400">24 MB</span>
+              <span className="text-sm text-gray-400 dark:text-text-tertiary">24 MB</span>
             </motion.button>
           </div>
         </div>
 
         <div className="pt-4 text-center">
-          <p className="text-xs text-gray-400 font-medium">DryFruit Hub</p>
-          <p className="text-[10px] text-gray-300 mt-1">{t('version')} 1.0.0 ({t('build')} 2024.06)</p>
+          <p className="text-xs text-gray-400 dark:text-text-tertiary font-medium">DryFruit Hub</p>
+          <p className="text-[10px] text-gray-300 dark:text-text-tertiary mt-1">{t('version')} 1.0.0 ({t('build')} 2024.06)</p>
         </div>
       </div>
     </div>

@@ -24,14 +24,14 @@ export default function SearchScreen() {
   ];
 
   return (
-    <div className="flex flex-col bg-white min-h-full pb-20">
-      <div className="pt-12 pb-4 px-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+    <div className="flex flex-col bg-white dark:bg-surface min-h-full pb-20 transition-colors duration-300">
+      <div className="pt-12 pb-4 px-5 border-b border-gray-100 dark:border-border-light sticky top-0 bg-white dark:bg-surface z-10">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="text-gray-900">
+          <button onClick={() => navigate(-1)} className="text-gray-900 dark:text-text-primary">
             <ArrowLeft size={24} />
           </button>
           <div className="flex-1 relative">
-            <SearchIcon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <SearchIcon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary" />
             <input 
               type="text" 
               placeholder="Search products..." 
@@ -40,16 +40,16 @@ export default function SearchScreen() {
                 setQuery(e.target.value);
                 setIsSearching(e.target.value.length > 0);
               }}
-              className="w-full h-12 bg-gray-50 rounded-xl pl-10 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full h-12 bg-gray-50 dark:bg-background rounded-xl pl-10 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
               autoFocus
             />
             {query && (
-              <button onClick={() => { setQuery(""); setIsSearching(false); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 bg-gray-200 rounded-full p-0.5">
+              <button onClick={() => { setQuery(""); setIsSearching(false); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary bg-gray-200 dark:bg-border-medium rounded-full p-0.5">
                 <X size={14} />
               </button>
             )}
           </div>
-          <button className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-900">
+          <button className="w-12 h-12 bg-gray-50 dark:bg-background rounded-xl flex items-center justify-center text-gray-900 dark:text-text-primary">
             <Filter size={20} />
           </button>
         </div>
@@ -59,12 +59,12 @@ export default function SearchScreen() {
         <div className="p-5 space-y-6">
           <div>
             <div className="flex justify-between items-center mb-3">
-              <h3 className="font-bold text-gray-900 text-sm">Recent Searches</h3>
+              <h3 className="font-bold text-gray-900 dark:text-text-primary text-sm">Recent Searches</h3>
               <button className="text-xs text-blue-600 font-medium">Clear All</button>
             </div>
             <div className="flex flex-wrap gap-2">
               {RECENT_SEARCHES.map((item, i) => (
-                <button key={i} onClick={() => { setQuery(item); setIsSearching(true); }} className="px-4 py-2 bg-gray-50 rounded-full text-xs font-medium text-gray-700 flex items-center">
+                <button key={i} onClick={() => { setQuery(item); setIsSearching(true); }} className="px-4 py-2 bg-gray-50 dark:bg-background rounded-full text-xs font-medium text-gray-700 dark:text-text-primary flex items-center">
                   {item}
                 </button>
               ))}
@@ -72,10 +72,10 @@ export default function SearchScreen() {
           </div>
 
           <div>
-            <h3 className="font-bold text-gray-900 text-sm mb-3">Popular Searches</h3>
+            <h3 className="font-bold text-gray-900 dark:text-text-primary text-sm mb-3">Popular Searches</h3>
             <div className="flex flex-wrap gap-2">
               {POPULAR_SEARCHES.map((item, i) => (
-                <button key={i} onClick={() => { setQuery(item); setIsSearching(true); }} className="px-4 py-2 border border-gray-200 rounded-full text-xs font-medium text-gray-700 hover:border-blue-600 hover:text-blue-600 transition-colors">
+                <button key={i} onClick={() => { setQuery(item); setIsSearching(true); }} className="px-4 py-2 border border-gray-200 dark:border-border-medium rounded-full text-xs font-medium text-gray-700 dark:text-text-primary hover:border-blue-600 hover:text-blue-600 transition-colors">
                   {item}
                 </button>
               ))}
@@ -84,7 +84,7 @@ export default function SearchScreen() {
         </div>
       ) : (
         <div className="p-5">
-          <p className="text-sm text-gray-500 mb-4">Found {RESULTS.length} results for "{query}"</p>
+          <p className="text-sm text-gray-500 dark:text-text-secondary mb-4">Found {RESULTS.length} results for "{query}"</p>
           <div className="grid grid-cols-2 gap-4">
             {RESULTS.map(product => (
               <ProductCard key={product.id} product={product} />

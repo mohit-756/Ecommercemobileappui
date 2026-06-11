@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { ChevronLeft, Search as SearchIcon, X, SlidersHorizontal, ChevronDown, Star } from 'lucide-react';
+import { ChevronLeft, Search as SearchIcon, X, SlidersHorizontal, ChevronDown, Star, RotateCcw, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ProductCard } from '../components/ProductCard';
 import { cn } from '../lib/utils';
@@ -95,28 +95,28 @@ export function Search() {
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-white">
-      <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white lg:pt-4 lg:pb-4 border-b border-gray-100 flex items-center gap-3">
+    <div className="min-h-full flex flex-col bg-white dark:bg-surface transition-colors duration-300">
+      <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white dark:bg-surface lg:pt-4 lg:pb-4 border-b border-gray-100 dark:border-border-light flex items-center gap-3 transition-colors duration-300">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 flex-shrink-0 lg:hidden"
+          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary flex-shrink-0 lg:hidden"
         >
           <ChevronLeft size={24} />
         </button>
         <div className="flex-1 relative lg:hidden">
-          <SearchIcon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <SearchIcon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary" />
           <input
             type="text"
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search products..."
-            className="w-full bg-gray-100 border-transparent text-gray-900 rounded-xl py-2.5 pl-10 pr-10 focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none transition-all"
+            className="w-full bg-gray-100 dark:bg-surface-tertiary border-transparent text-gray-900 dark:text-text-primary rounded-xl py-2.5 pl-10 pr-10 focus:ring-2 focus:ring-blue-600 focus:bg-white dark:focus:bg-surface outline-none transition-all"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary hover:text-gray-600 dark:hover:text-text-secondary"
             >
               <X size={16} />
             </button>
@@ -124,39 +124,39 @@ export function Search() {
         </div>
         
         {/* Desktop Header Title */}
-        <h1 className="hidden lg:block text-2xl font-black text-gray-900 flex-1">Search Results</h1>
+        <h1 className="hidden lg:block text-2xl font-black text-gray-900 dark:text-text-primary flex-1">Search Results</h1>
 
         <button
           onClick={() => setShowFilters(true)}
           className={cn(
             "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative transition-colors lg:w-auto lg:px-4 lg:gap-2",
-            activeFilterCount > 0 ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700"
+            activeFilterCount > 0 ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-surface-tertiary text-gray-700 dark:text-text-primary"
           )}
         >
           <SlidersHorizontal size={20} />
           <span className="hidden lg:inline font-semibold text-sm">Filters</span>
           {activeFilterCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white">
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-surface">
               {activeFilterCount}
             </span>
           )}
         </button>
       </div>
 
-      <div className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50">
+      <div className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50 dark:bg-surface-secondary transition-colors duration-300">
         {!query ? (
           <div className="space-y-8">
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-gray-900">Recent Searches</h3>
-                <button className="text-gray-400 text-sm">Clear All</button>
+                <h3 className="font-bold text-gray-900 dark:text-text-primary">Recent Searches</h3>
+                <button className="text-gray-400 dark:text-text-tertiary text-sm">Clear All</button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {recentSearches.map((search, idx) => (
                   <button
                     key={idx}
                     onClick={() => setQuery(search)}
-                    className="bg-white border border-gray-200 text-gray-600 text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
+                    className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium text-gray-600 dark:text-text-secondary text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
                   >
                     {search}
                   </button>
@@ -165,13 +165,13 @@ export function Search() {
             </div>
 
             <div>
-              <h3 className="font-bold text-gray-900 mb-4">Browse Categories</h3>
+              <h3 className="font-bold text-gray-900 dark:text-text-primary mb-4">Browse Categories</h3>
               <div className="flex flex-wrap gap-2">
                 {categories.map((cat: any) => (
                   <button
                     key={cat._id || cat.id}
                     onClick={() => { setCategoryFilter(cat._id || cat.id); setQuery(cat.name); }}
-                    className="bg-white border border-gray-200 text-gray-600 text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
+                    className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium text-gray-600 dark:text-text-secondary text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
                   >
                     {cat.name}
                   </button>
@@ -182,7 +182,7 @@ export function Search() {
         ) : (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900">
+              <h3 className="font-bold text-gray-900 dark:text-text-primary">
                 {loading ? 'Searching...' : `${results.length} Result${results.length !== 1 ? 's' : ''} for "${query}"`}
               </h3>
               {activeFilterCount > 0 && (
@@ -201,9 +201,9 @@ export function Search() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <SearchIcon size={48} className="mx-auto text-gray-300 mb-4" />
-                <h3 className="text-lg font-bold text-gray-900 mb-2">No results found</h3>
-                <p className="text-gray-500">Try adjusting your search or filters</p>
+                <SearchIcon size={48} className="mx-auto text-gray-300 dark:text-text-tertiary mb-4" />
+                <h3 className="text-lg font-bold text-gray-900 dark:text-text-primary mb-2">No results found</h3>
+                <p className="text-gray-500 dark:text-text-secondary">Try adjusting your search or filters</p>
               </div>
             )}
           </div>
@@ -213,71 +213,117 @@ export function Search() {
       <AnimatePresence>
         {showFilters && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowFilters(false)} />
             <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              className="relative bg-white w-full sm:max-w-md rounded-t-[32px] sm:rounded-3xl p-6 pb-10 shadow-2xl overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowFilters(false)}
+            />
+            <motion.div
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.9 }}
+              className="relative bg-white dark:bg-surface w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh] transition-colors duration-300"
             >
-              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6" />
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Filters</h3>
-                <button onClick={clearFilters} className="text-blue-600 text-sm font-bold">Clear All</button>
+              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 dark:border-border-light">
+                <h3 className="text-xl font-extrabold text-gray-900 dark:text-text-primary tracking-tight">Filters</h3>
+                <button
+                  onClick={clearFilters}
+                  className="flex items-center gap-1.5 text-blue-600 text-sm font-semibold hover:text-blue-700 active:scale-95 transition-all"
+                >
+                  <RotateCcw size={14} />
+                  Reset
+                </button>
               </div>
 
-              <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
-                <div>
-                  <label className="text-sm font-bold text-gray-900 block mb-3">Sort By</label>
-                  <div className="flex flex-wrap gap-2">
+              <div className="flex-1 overflow-y-auto hide-scrollbar px-6 py-5 space-y-5">
+                <div className="bg-gray-50/80 dark:bg-surface-secondary rounded-2xl p-5 border border-gray-100 dark:border-border-light">
+                  <label className="text-sm font-bold text-gray-900 dark:text-text-primary block mb-4 flex items-center gap-2">
+                    <span className="w-1 h-4 bg-blue-600 rounded-full" />
+                    Sort By
+                  </label>
+                  <div className="space-y-2">
                     {SORT_OPTIONS.map((opt) => (
                       <button
                         key={opt.value}
                         onClick={() => setSort(opt.value)}
                         className={cn(
-                          "px-4 py-2 rounded-xl border text-sm font-medium transition-colors",
-                          sort === opt.value
-                            ? "bg-blue-600 text-white border-blue-600"
-                            : "border-gray-200 text-gray-600 hover:border-blue-300"
+                          "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
+                            sort === opt.value
+                              ? "bg-blue-600 text-white shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
+                              : "bg-white dark:bg-surface text-gray-600 dark:text-text-secondary border border-gray-200 dark:border-border-medium hover:border-blue-300 hover:text-blue-600"
                         )}
                       >
-                        {opt.label}
+                        <span>{opt.label}</span>
+                        {sort === opt.value && (
+                          <Check size={16} strokeWidth={3} />
+                        )}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-sm font-bold text-gray-900 block mb-3">Price Range</label>
+                <div className="bg-gray-50/80 dark:bg-surface-secondary rounded-2xl p-5 border border-gray-100 dark:border-border-light">
+                  <label className="text-sm font-bold text-gray-900 dark:text-text-primary block mb-4 flex items-center gap-2">
+                    <span className="w-1 h-4 bg-blue-600 rounded-full" />
+                    Price Range
+                  </label>
                   <div className="flex items-center gap-3">
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      value={minPrice}
-                      onChange={(e) => setMinPrice(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200"
-                    />
-                    <span className="text-gray-400">—</span>
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200"
-                    />
+                    <div className="relative flex-1">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary text-sm font-medium">₹</span>
+                      <input
+                        type="number"
+                        placeholder="Min"
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(e.target.value)}
+                        className="w-full bg-white dark:bg-surface border border-gray-200 dark:border-border-medium rounded-xl pl-8 pr-4 py-3 text-sm text-gray-900 dark:text-text-primary outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all hide-scrollbar"
+                      />
+                    </div>
+                    <div className="w-3 h-px bg-gray-300 dark:bg-border-medium" />
+                    <div className="relative flex-1">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary text-sm font-medium">₹</span>
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(e.target.value)}
+                        className="w-full bg-white dark:bg-surface border border-gray-200 dark:border-border-medium rounded-xl pl-8 pr-4 py-3 text-sm text-gray-900 dark:text-text-primary outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all hide-scrollbar"
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-3 px-1">
+                    <div className="h-1.5 bg-gray-200 dark:bg-border-medium rounded-full relative">
+                      <div
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                        style={{
+                          left: `${minPrice ? Math.min(Number(minPrice) / 50, 100) : 0}%`,
+                          right: `${maxPrice ? 100 - Math.min(Number(maxPrice) / 50, 100) : 0}%`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between mt-1.5">
+                      <span className="text-[10px] text-gray-400 dark:text-text-tertiary font-medium">₹0</span>
+                      <span className="text-[10px] text-gray-400 dark:text-text-tertiary font-medium">₹5000+</span>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-sm font-bold text-gray-900 block mb-3">Category</label>
+                <div className="bg-gray-50/80 dark:bg-surface-secondary rounded-2xl p-5 border border-gray-100 dark:border-border-light">
+                  <label className="text-sm font-bold text-gray-900 dark:text-text-primary block mb-4 flex items-center gap-2">
+                    <span className="w-1 h-4 bg-blue-600 rounded-full" />
+                    Category
+                  </label>
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => setCategoryFilter('')}
                       className={cn(
-                        "px-4 py-2 rounded-xl border text-sm font-medium transition-colors",
+                        "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                         !categoryFilter
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "border-gray-200 text-gray-600 hover:border-blue-300"
+                          ? "bg-blue-600 text-white shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
+                          : "bg-white dark:bg-surface text-gray-600 dark:text-text-secondary border border-gray-200 dark:border-border-medium hover:border-blue-300 hover:text-blue-600"
                       )}
                     >
                       All
@@ -287,10 +333,10 @@ export function Search() {
                         key={cat._id || cat.id}
                         onClick={() => setCategoryFilter(cat._id || cat.id)}
                         className={cn(
-                          "px-4 py-2 rounded-xl border text-sm font-medium transition-colors",
+                          "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                           categoryFilter === (cat._id || cat.id)
-                            ? "bg-blue-600 text-white border-blue-600"
-                            : "border-gray-200 text-gray-600 hover:border-blue-300"
+                            ? "bg-blue-600 text-white shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
+                            : "bg-white dark:bg-surface text-gray-600 dark:text-text-secondary border border-gray-200 dark:border-border-medium hover:border-blue-300 hover:text-blue-600"
                         )}
                       >
                         {cat.name}
@@ -300,13 +346,21 @@ export function Search() {
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="flex-1 bg-gray-900 text-white font-semibold rounded-xl py-3.5"
-                >
-                  Apply Filters
-                </button>
+              <div className="sticky bottom-0 bg-white dark:bg-surface border-t border-gray-100 dark:border-border-light px-6 py-4 pb-6 sm:pb-4 transition-colors duration-300">
+                <div className="flex gap-3">
+                  <button
+                    onClick={clearFilters}
+                    className="flex-1 bg-gray-100 dark:bg-surface-tertiary text-gray-700 dark:text-text-primary font-semibold rounded-2xl py-3.5 hover:bg-gray-200 dark:hover:bg-surface-secondary active:scale-[0.98] transition-all duration-200 text-sm"
+                  >
+                    Reset All
+                  </button>
+                  <button
+                    onClick={() => setShowFilters(false)}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl py-3.5 shadow-lg shadow-blue-200/50 dark:shadow-blue-900/30 hover:shadow-xl hover:shadow-blue-200/60 dark:hover:shadow-blue-900/30 active:scale-[0.98] transition-all duration-200 text-sm"
+                  >
+                    Apply Filters
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>

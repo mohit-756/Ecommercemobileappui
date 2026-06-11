@@ -155,19 +155,19 @@ export function Addresses() {
   }
 
   const labelConfig = {
-    home: { icon: Home, bg: 'bg-blue-50 text-blue-600' },
-    work: { icon: Briefcase, bg: 'bg-amber-50 text-amber-600' },
-    other: { icon: MapPin, bg: 'bg-gray-50 text-gray-600' },
+    home: { icon: Home, bg: 'bg-blue-50 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400' },
+    work: { icon: Briefcase, bg: 'bg-amber-50 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' },
+    other: { icon: MapPin, bg: 'bg-gray-50 text-gray-600 dark:bg-surface-tertiary dark:text-text-secondary' },
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 flex items-center justify-between">
+    <div className="min-h-full flex flex-col bg-gray-50 dark:bg-surface lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden transition-colors duration-300">
+      <div className="bg-white dark:bg-surface pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 dark:border-border-light flex items-center justify-between">
         <div className="flex items-center">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary">
             <ChevronLeft size={24} />
           </button>
-          <h1 className="text-xl font-bold text-gray-900 ml-2">Shipping Addresses</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-text-primary ml-2">Shipping Addresses</h1>
         </div>
         <button onClick={openAddForm} className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-sm">
           <Plus size={20} />
@@ -177,7 +177,7 @@ export function Addresses() {
       <div className="flex-1 px-6 py-6 space-y-4 overflow-y-auto">
         <button
           onClick={handleUseLocation}
-          className="w-full bg-white p-4 rounded-2xl border border-dashed border-blue-300 flex items-center justify-center gap-2 text-blue-600 font-bold hover:bg-blue-50 transition-colors shadow-sm"
+          className="w-full bg-white dark:bg-surface p-4 rounded-2xl border border-dashed border-blue-300 flex items-center justify-center gap-2 text-blue-600 font-bold hover:bg-blue-50 dark:hover:bg-blue-500/20 transition-colors shadow-sm"
         >
           <Zap size={18} className="fill-blue-600" /> Use Current Location
         </button>
@@ -186,11 +186,11 @@ export function Addresses() {
           <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
         ) : addresses.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MapPin size={36} className="text-gray-400" />
+            <div className="w-20 h-20 bg-gray-100 dark:bg-surface-tertiary rounded-full flex items-center justify-center mx-auto mb-4">
+              <MapPin size={36} className="text-gray-400 dark:text-text-tertiary" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">No addresses saved</h2>
-            <p className="text-gray-500 text-sm mb-6">Add your first shipping address</p>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-text-primary mb-2">No addresses saved</h2>
+            <p className="text-gray-500 dark:text-text-secondary text-sm mb-6">Add your first shipping address</p>
             <button onClick={openAddForm} className="bg-blue-600 text-white font-semibold rounded-xl py-3 px-8 hover:bg-blue-700 transition-colors">
               Add Address
             </button>
@@ -202,45 +202,45 @@ export function Addresses() {
                 const cfg = labelConfig[addr.label] || labelConfig.other;
                 const Icon = cfg.icon;
                 return (
-                  <motion.div key={addr._id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative">
+                  <motion.div key={addr._id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-surface rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-border-light relative transition-colors duration-300">
                     <div className="flex items-start gap-3">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${cfg.bg}`}>
                         <Icon size={20} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="font-semibold text-gray-900 capitalize">{addr.label}</span>
+                          <span className="font-semibold text-gray-900 dark:text-text-primary capitalize">{addr.label}</span>
                           {addr.isDefault && (
-                            <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-sm">
+                            <span className="flex items-center gap-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/20 px-1.5 py-0.5 rounded-sm">
                               <Star size={10} /> DEFAULT
                             </span>
                           )}
                         </div>
-                        <p className="text-sm font-medium text-gray-900">{addr.fullName}</p>
-                        <p className="text-sm text-gray-500 leading-relaxed">
+                        <p className="text-sm font-medium text-gray-900 dark:text-text-primary">{addr.fullName}</p>
+                        <p className="text-sm text-gray-500 dark:text-text-secondary leading-relaxed">
                           {addr.addressLine1}{addr.addressLine2 ? `, ${addr.addressLine2}` : ''}<br />
                           {addr.city}, {addr.state} - {addr.pincode}
                           {addr.landmark ? <><br />Landmark: {addr.landmark}</> : ''}
                         </p>
-                        <p className="text-sm text-gray-400 mt-1">Phone: {addr.phone}</p>
+                        <p className="text-sm text-gray-400 dark:text-text-tertiary mt-1">Phone: {addr.phone}</p>
                       </div>
                       <div className="relative">
-                        <button onClick={() => setMenuOpenId(menuOpenId === addr._id ? null : addr._id)} className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 cursor-pointer">
+                        <button onClick={() => setMenuOpenId(menuOpenId === addr._id ? null : addr._id)} className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 dark:text-text-tertiary hover:bg-gray-100 dark:hover:bg-surface-tertiary cursor-pointer">
                           <MoreHorizontal size={18} />
                         </button>
                         {menuOpenId === addr._id && (
                           <>
                             <div className="fixed inset-0 z-10" onClick={() => setMenuOpenId(null)} />
-                            <div className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-20 w-40">
-                              <button onClick={() => { openEditForm(addr); setMenuOpenId(null); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
+                            <div className="absolute right-0 top-10 bg-white dark:bg-surface rounded-xl shadow-xl border border-gray-100 dark:border-border-light py-2 z-20 w-40">
+                              <button onClick={() => { openEditForm(addr); setMenuOpenId(null); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-text-primary hover:bg-gray-50 dark:hover:bg-surface-secondary cursor-pointer">
                                 <Pencil size={16} /> Edit
                               </button>
                               {!addr.isDefault && (
-                                <button onClick={() => handleSetDefault(addr._id)} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
+                                <button onClick={() => handleSetDefault(addr._id)} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-text-primary hover:bg-gray-50 dark:hover:bg-surface-secondary cursor-pointer">
                                   <Star size={16} /> Set as Default
                                 </button>
                               )}
-                              <button onClick={() => handleDelete(addr._id)} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 cursor-pointer">
+                              <button onClick={() => handleDelete(addr._id)} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-500/20 cursor-pointer">
                                 <Trash2 size={16} /> Delete
                               </button>
                             </div>
@@ -263,10 +263,10 @@ export function Addresses() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center">
           <div className="fixed inset-0 bg-black/40" onClick={() => setShowForm(false)} />
-          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} transition={{ type: 'spring', damping: 30, stiffness: 300 }} className="relative bg-white w-full md:max-w-[393px] rounded-t-3xl md:rounded-3xl max-h-[85vh] overflow-y-auto p-6 pb-10">
+          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} transition={{ type: 'spring', damping: 30, stiffness: 300 }} className="relative bg-white dark:bg-surface w-full md:max-w-[393px] rounded-t-3xl md:rounded-3xl max-h-[85vh] overflow-y-auto p-6 pb-10">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">{editingId ? 'Edit Address' : 'Add Address'}</h2>
-              <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-text-primary">{editingId ? 'Edit Address' : 'Add Address'}</h2>
+              <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-full bg-gray-100 dark:bg-surface-tertiary flex items-center justify-center text-gray-500 dark:text-text-secondary">
                 <span className="text-lg leading-none">✕</span>
               </button>
             </div>
@@ -277,9 +277,9 @@ export function Addresses() {
                   const cfg = labelConfig[lbl];
                   const Icon = cfg.icon;
                   return (
-                    <button key={lbl} type="button" onClick={() => setForm({ ...form, label: lbl })} className={`flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all ${form.label === lbl ? 'border-blue-600 bg-blue-50' : 'border-gray-200'}`}>
-                      <Icon size={20} className={form.label === lbl ? 'text-blue-600' : 'text-gray-400'} />
-                      <span className={`text-xs font-medium capitalize ${form.label === lbl ? 'text-blue-600' : 'text-gray-500'}`}>{lbl}</span>
+                    <button key={lbl} type="button" onClick={() => setForm({ ...form, label: lbl })} className={`flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all ${form.label === lbl ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/20' : 'border-gray-200 dark:border-border-medium'}`}>
+                      <Icon size={20} className={form.label === lbl ? 'text-blue-600' : 'text-gray-400 dark:text-text-tertiary'} />
+                      <span className={`text-xs font-medium capitalize ${form.label === lbl ? 'text-blue-600' : 'text-gray-500 dark:text-text-secondary'}`}>{lbl}</span>
                     </button>
                   );
                 })}
@@ -287,47 +287,47 @@ export function Addresses() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                  <input type="text" required value={form.fullName} onChange={e => setForm({ ...form, fullName: e.target.value })} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1">Full Name</label>
+                  <input type="text" required value={form.fullName} onChange={e => setForm({ ...form, fullName: e.target.value })} className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                  <input type="tel" required value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1">Phone</label>
+                  <input type="tel" required value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                  <input type="text" required value={form.pincode} onChange={e => setForm({ ...form, pincode: e.target.value })} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1">Pincode</label>
+                  <input type="text" required value={form.pincode} onChange={e => setForm({ ...form, pincode: e.target.value })} className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 1</label>
-                <input type="text" required value={form.addressLine1} onChange={e => setForm({ ...form, addressLine1: e.target.value })} placeholder="House/Flat No., Street" className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1">Address Line 1</label>
+                <input type="text" required value={form.addressLine1} onChange={e => setForm({ ...form, addressLine1: e.target.value })} placeholder="House/Flat No., Street" className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 2</label>
-                <input type="text" value={form.addressLine2} onChange={e => setForm({ ...form, addressLine2: e.target.value })} placeholder="Area, Landmark (optional)" className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1">Address Line 2</label>
+                <input type="text" value={form.addressLine2} onChange={e => setForm({ ...form, addressLine2: e.target.value })} placeholder="Area, Landmark (optional)" className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                  <input type="text" required value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1">City</label>
+                  <input type="text" required value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                  <input type="text" required value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1">State</label>
+                  <input type="text" required value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Landmark</label>
-                  <input type="text" value={form.landmark} onChange={e => setForm({ ...form, landmark: e.target.value })} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1">Landmark</label>
+                  <input type="text" value={form.landmark} onChange={e => setForm({ ...form, landmark: e.target.value })} className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none transition-all" />
                 </div>
               </div>
 
               <label className="flex items-center gap-3 py-2">
                 <input type="checkbox" checked={form.isDefault} onChange={e => setForm({ ...form, isDefault: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                <span className="text-sm font-medium text-gray-700">Set as default address</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-text-primary">Set as default address</span>
               </label>
 
               <button type="submit" disabled={saving} className="w-full bg-blue-600 text-white font-semibold rounded-xl py-3.5 hover:bg-blue-700 transition-colors disabled:opacity-60">

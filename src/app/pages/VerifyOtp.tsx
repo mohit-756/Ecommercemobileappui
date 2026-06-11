@@ -90,10 +90,10 @@ export function VerifyOtp() {
   const allFilled = otp.every(d => d !== '');
 
   return (
-    <div className="flex flex-col h-full min-h-screen bg-white px-6 pt-16 lg:pt-8 pb-8">
+    <div className="flex flex-col h-full min-h-screen bg-white dark:bg-background px-6 pt-16 lg:pt-8 pb-8 transition-colors duration-300">
       <button
         onClick={() => navigate('/login')}
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-900 mb-8 hover:bg-gray-100 transition-colors"
+        className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-surface-secondary text-gray-900 dark:text-text-primary mb-8 hover:bg-gray-100 transition-colors"
       >
         <ArrowLeft size={20} />
       </button>
@@ -102,10 +102,10 @@ export function VerifyOtp() {
         <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
           <CheckCircle2 size={32} className="text-blue-600" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Verify Email</h1>
-        <p className="text-gray-500">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-text-primary mb-2">Verify Email</h1>
+        <p className="text-gray-500 dark:text-text-secondary">
           Enter the 6-digit code sent to{' '}
-          <span className="font-medium text-gray-700">{state?.email}</span>
+          <span className="font-medium text-gray-700 dark:text-text-primary">{state?.email}</span>
         </p>
       </div>
 
@@ -120,7 +120,7 @@ export function VerifyOtp() {
             value={digit}
             onChange={e => handleChange(index, e.target.value)}
             onKeyDown={e => handleKeyDown(index, e)}
-            className="w-14 h-16 rounded-2xl border border-gray-200 bg-gray-50 text-center text-2xl font-bold text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all"
+            className="w-14 h-16 rounded-2xl border border-gray-200 dark:border-border-medium bg-gray-50 dark:bg-surface-secondary text-center text-2xl font-bold text-gray-900 dark:text-text-primary focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all"
           />
         ))}
       </div>
@@ -128,7 +128,7 @@ export function VerifyOtp() {
       <button
         onClick={handleVerify}
         disabled={!allFilled || loading}
-        className="w-full bg-blue-600 text-white font-semibold rounded-xl py-4 shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full bg-blue-600 text-white font-semibold rounded-xl py-4 shadow-lg shadow-blue-200 dark:shadow-blue-900/30 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
@@ -141,14 +141,14 @@ export function VerifyOtp() {
       </button>
 
       <div className="text-center mt-8 text-sm">
-        <span className="text-gray-500">Didn't receive the code? </span>
+        <span className="text-gray-500 dark:text-text-secondary">Didn't receive the code? </span>
         {countdown > 0 ? (
-          <span className="text-gray-400">Resend in {countdown}s</span>
+          <span className="text-gray-400 dark:text-text-tertiary">Resend in {countdown}s</span>
         ) : (
           <button
             onClick={handleResend}
             disabled={resending}
-            className="text-blue-600 font-semibold hover:underline disabled:text-gray-400"
+            className="text-blue-600 font-semibold hover:underline disabled:text-gray-400 dark:disabled:text-text-tertiary"
           >
             {resending ? 'Resending...' : 'Resend'}
           </button>

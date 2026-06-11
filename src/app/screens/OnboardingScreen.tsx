@@ -31,11 +31,11 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-white h-full relative">
+    <div className="flex-1 flex flex-col bg-white dark:bg-surface h-full relative transition-colors duration-300">
       <div className="absolute top-12 right-6 z-10">
         <button 
           onClick={() => navigate("/auth/login")}
-          className="text-gray-500 font-medium text-sm hover:text-gray-800"
+          className="text-gray-500 dark:text-text-secondary font-medium text-sm hover:text-gray-800"
         >
           Skip
         </button>
@@ -58,12 +58,12 @@ export default function OnboardingScreen() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         </div>
 
-        <div className="bg-white rounded-t-[40px] pt-10 px-8 pb-8 relative z-10 -mt-10 flex flex-col items-center text-center shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+        <div className="bg-white dark:bg-surface rounded-t-[40px] pt-10 px-8 pb-8 relative z-10 -mt-10 flex flex-col items-center text-center shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
           <div className="flex space-x-2 mb-8">
             {onboardingData.map((_, i) => (
               <div 
                 key={i} 
-                className={`h-2 rounded-full transition-all duration-300 ${i === step ? "w-8 bg-blue-600" : "w-2 bg-gray-200"}`}
+                className={`h-2 rounded-full transition-all duration-300 ${i === step ? "w-8 bg-blue-600" : "w-2 bg-gray-200 dark:bg-border-medium"}`}
               />
             ))}
           </div>
@@ -77,8 +77,8 @@ export default function OnboardingScreen() {
               transition={{ duration: 0.3 }}
               className="h-32 flex flex-col items-center"
             >
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">{onboardingData[step].title}</h2>
-              <p className="text-gray-500 leading-relaxed text-sm">{onboardingData[step].description}</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-text-primary mb-3">{onboardingData[step].title}</h2>
+              <p className="text-gray-500 dark:text-text-secondary leading-relaxed text-sm">{onboardingData[step].description}</p>
             </motion.div>
           </AnimatePresence>
 

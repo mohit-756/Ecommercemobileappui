@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin, Search, Crosshair, Loader2 } from 'lucide-react';
+import { MapPin, Search, Crosshair, Loader2, ChevronLeft } from 'lucide-react';
 import { geocodingService } from '../services/geocodingService';
 import { toast } from 'sonner';
 
-// Fix Leaflet default marker icon issue with bundlers
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -60,7 +60,6 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
     }).addTo(map);
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
-    L.control.attribution({ position: 'bottomright', prefix: false }).addTo(map);
 
     const marker = L.marker(center, { draggable: true }).addTo(map);
     markerRef.current = marker;
@@ -185,87 +184,113 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-white">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[60] flex flex-col bg-white dark:bg-surface transition-colors duration-300"
+    >
       <div className="absolute top-4 left-4 z-10">
-        <button onClick={onClose} className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-900 border border-gray-200">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        <button
+          onClick={onClose}
+          className="w-10 h-10 bg-white/90 dark:bg-surface/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-gray-900 dark:text-text-primary border border-gray-200/80 dark:border-border-light active:scale-90 transition-transform"
+        >
+          <ChevronLeft size={20} strokeWidth={2.5} />
         </button>
       </div>
 
-      {/* Search bar */}
       <div className="absolute top-4 left-16 right-4 z-10">
         <div className="relative">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary" />
           <input
             type="text"
             value={searchQuery}
             onChange={handleSearch}
             placeholder="Search for an address..."
-            className="w-full pl-10 pr-4 py-3 bg-white rounded-2xl shadow-lg border border-gray-200 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-3 bg-white/90 dark:bg-surface/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/80 dark:border-border-light text-gray-900 dark:text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-surface transition-all"
           />
           {searching && (
-            <Loader2 size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+            <Loader2 size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary animate-spin" />
           )}
         </div>
-        {suggestions.length > 0 && (
-          <div className="mt-1 bg-white rounded-2xl shadow-xl border border-gray-200 max-h-56 overflow-y-auto">
-            {suggestions.map((s, i) => (
-              <button
-                key={i}
-                onClick={() => handleSelectSuggestion(s)}
-                className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100 last:border-0 flex items-start gap-3"
-              >
-                <MapPin size={16} className="text-gray-400 mt-0.5 shrink-0" />
-                <span className="line-clamp-2">{s.displayName}</span>
-              </button>
-            ))}
-          </div>
-        )}
+        <AnimatePresence>
+          {suggestions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="mt-1 bg-white dark:bg-surface rounded-2xl shadow-xl border border-gray-200 dark:border-border-medium max-h-56 hide-scrollbar overflow-y-auto"
+            >
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSelectSuggestion(s)}
+                  className="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-text-primary hover:bg-gray-50 dark:hover:bg-surface-secondary border-b border-gray-100 dark:border-border-light last:border-0 flex items-start gap-3 active:bg-gray-100 dark:active:bg-surface-tertiary transition-colors"
+                >
+                  <MapPin size={16} className="text-gray-400 dark:text-text-tertiary mt-0.5 shrink-0" />
+                  <span className="line-clamp-2">{s.displayName}</span>
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Map */}
       <div ref={mapContainerRef} className="flex-1 w-full" />
 
-      {/* Locate me button */}
       <button
         onClick={handleLocateMe}
-        className="absolute z-10 bottom-44 right-4 w-11 h-11 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center text-blue-600 hover:bg-blue-50 transition-colors"
+        className="absolute z-10 bottom-48 right-4 w-11 h-11 bg-white dark:bg-surface rounded-full shadow-lg border border-gray-200 dark:border-border-medium flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/20 active:scale-90 transition-all"
         title="Use my location"
       >
         <Crosshair size={20} />
       </button>
 
-      {/* Bottom sheet */}
-      <div className="bg-white p-5 pb-8 shadow-[0_-8px_30px_rgba(0,0,0,0.1)] rounded-t-3xl">
+      <motion.div
+        initial={{ y: 20 }}
+        animate={{ y: 0 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="bg-white dark:bg-surface px-5 pt-4 pb-8 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] rounded-t-3xl transition-colors duration-300"
+      >
         {geocoding ? (
-          <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
+          <div className="flex items-center justify-center gap-2 py-4 text-gray-500 dark:text-text-secondary">
             <Loader2 size={18} className="animate-spin" />
-            <span className="text-sm">Getting address...</span>
+            <span className="text-sm font-medium">Getting address...</span>
           </div>
         ) : selectedLocation ? (
-          <div className="mb-4">
-            <div className="flex items-start gap-2 mb-1">
-              <MapPin size={16} className="text-blue-600 mt-0.5 shrink-0" />
-              <p className="text-sm text-gray-700 line-clamp-2">{selectedLocation.displayName}</p>
+          <div className="mb-4 px-1">
+            <div className="flex items-start gap-3 mb-1">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center shrink-0">
+                <MapPin size={16} className="text-blue-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-900 dark:text-text-primary line-clamp-1">{selectedLocation.displayName}</p>
+                {(selectedLocation.city || selectedLocation.state) && (
+                  <p className="text-xs text-gray-500 dark:text-text-secondary mt-0.5 line-clamp-1">
+                    {[selectedLocation.addressLine1, selectedLocation.city, selectedLocation.state, selectedLocation.pincode].filter(Boolean).join(', ')}
+                  </p>
+                )}
+              </div>
             </div>
-            {(selectedLocation.city || selectedLocation.state) && (
-              <p className="text-xs text-gray-500 ml-6">
-                {[selectedLocation.addressLine1, selectedLocation.city, selectedLocation.state, selectedLocation.pincode].filter(Boolean).join(', ')}
-              </p>
-            )}
           </div>
         ) : (
-          <p className="text-sm text-gray-400 mb-4 text-center">Tap on the map or search to select a location</p>
+          <div className="flex flex-col items-center py-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-surface-secondary flex items-center justify-center mb-2">
+              <MapPin size={18} className="text-gray-300 dark:text-text-tertiary" />
+            </div>
+            <p className="text-xs text-gray-400 dark:text-text-tertiary font-medium">Tap on the map or search to select a location</p>
+          </div>
         )}
 
         <button
           onClick={handleConfirm}
           disabled={!selectedLocation}
-          className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200/50 dark:shadow-blue-900/30 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-all duration-200"
         >
           Confirm Location
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

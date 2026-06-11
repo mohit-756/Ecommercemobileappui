@@ -9,19 +9,19 @@ const slides = [
     title: "Premium Dry Fruits",
     description: "Explore our finest collection of organic dry fruits and nuts, handpicked for quality.",
     icon: Leaf,
-    color: "bg-amber-100 text-amber-600"
+    color: "bg-amber-100 dark:bg-amber-500/20 dark:text-amber-400"
   },
   {
     title: "Fresh & Fast Delivery",
     description: "Get your orders delivered to your doorstep at lightning speed, keeping them fresh.",
     icon: Truck,
-    color: "bg-emerald-100 text-emerald-600"
+    color: "bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400"
   },
   {
     title: "Healthy & Delicious",
     description: "100% natural, no preservatives. Pure nutrition and taste in every bite.",
     icon: Sparkles,
-    color: "bg-rose-100 text-rose-600"
+    color: "bg-rose-100 dark:bg-rose-500/20 dark:text-rose-400"
   }
 ];
 
@@ -40,11 +40,11 @@ export function Onboarding() {
   const SlideIcon = slides[currentSlide].icon;
 
   return (
-    <div className="flex flex-col h-full min-h-[100vh] bg-white pt-12 pb-8 px-6">
+    <div className="flex flex-col h-full min-h-[100vh] bg-white dark:bg-background pt-12 pb-8 px-6 transition-colors duration-300">
       <div className="flex justify-end">
         <button 
           onClick={() => navigate('/login')}
-          className="text-gray-500 font-medium text-sm py-2 px-4 rounded-full hover:bg-gray-50 transition-colors"
+          className="text-gray-500 dark:text-text-secondary font-medium text-sm py-2 px-4 rounded-full hover:bg-gray-50 dark:hover:bg-surface-tertiary transition-colors"
         >
           Skip
         </button>
@@ -64,10 +64,10 @@ export function Onboarding() {
               <SlideIcon size={100} strokeWidth={1} />
             </div>
             
-            <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-text-primary mb-4 tracking-tight">
               {slides[currentSlide].title}
             </h2>
-            <p className="text-gray-500 text-base leading-relaxed px-4">
+            <p className="text-gray-500 dark:text-text-secondary text-base leading-relaxed px-4">
               {slides[currentSlide].description}
             </p>
           </motion.div>
@@ -81,7 +81,7 @@ export function Onboarding() {
               key={idx} 
               className={cn(
                 "h-2.5 rounded-full transition-all duration-300",
-                idx === currentSlide ? "w-8 bg-blue-600" : "w-2.5 bg-gray-200"
+                idx === currentSlide ? "w-8 bg-blue-600" : "w-2.5 bg-gray-200 dark:bg-border-medium"
               )}
             />
           ))}

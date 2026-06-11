@@ -10,13 +10,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = "", variant = "primary", size = "md", isLoading, fullWidth, children, disabled, ...props }, ref) => {
-    const baseStyles = "inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none rounded-2xl";
+    const baseStyles = "inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-background disabled:opacity-50 disabled:pointer-events-none rounded-2xl";
     
     const variants = {
       primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-600 shadow-lg shadow-blue-600/20",
       secondary: "bg-emerald-500 text-white hover:bg-emerald-600 focus:ring-emerald-500 shadow-lg shadow-emerald-500/20",
-      outline: "border-2 border-gray-200 bg-transparent hover:bg-gray-50 text-gray-900 focus:ring-gray-200",
-      ghost: "bg-transparent hover:bg-gray-100 text-gray-700 focus:ring-gray-200",
+      outline: "border-2 border-gray-200 dark:border-border-medium bg-transparent hover:bg-gray-50 dark:hover:bg-surface-secondary text-gray-900 dark:text-text-primary focus:ring-gray-200 dark:focus:ring-border-medium",
+      ghost: "bg-transparent hover:bg-gray-100 dark:hover:bg-surface-secondary text-gray-700 dark:text-text-secondary focus:ring-gray-200 dark:focus:ring-border-medium",
     };
 
     const sizes = {

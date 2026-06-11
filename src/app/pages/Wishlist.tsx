@@ -27,12 +27,12 @@ export function Wishlist() {
   }, []);
 
   return (
-    <div className="min-h-full flex flex-col bg-gray-50 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
-      <div className="bg-white pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 flex items-center">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900">
+    <div className="min-h-full flex flex-col bg-gray-50 dark:bg-background transition-colors duration-300 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
+      <div className="bg-white dark:bg-surface pt-12 pb-4 px-6 sticky top-0 z-30 lg:pt-4 border-b border-gray-100 dark:border-border-light flex items-center">
+        <button onClick={() => navigate(-1)} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary">
           <ChevronLeft size={24} />
         </button>
-        <h1 className="text-xl font-bold text-gray-900 ml-2">{t('myWishlist')}</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-text-primary ml-2">{t('myWishlist')}</h1>
       </div>
 
       <div className="flex-1 px-6 py-6 overflow-y-auto">
@@ -58,14 +58,14 @@ export function Wishlist() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart size={36} className="text-gray-300" />
+              <div className="w-20 h-20 bg-gray-100 dark:bg-surface-tertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart size={36} className="text-gray-300 dark:text-text-tertiary" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">{t('wishlistEmpty')}</h2>
-              <p className="text-gray-500 text-sm mb-8">{t('wishlistEmptyDesc')}</p>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-text-primary mb-2">{t('wishlistEmpty')}</h2>
+              <p className="text-gray-500 dark:text-text-secondary text-sm mb-8">{t('wishlistEmptyDesc')}</p>
               <button
                 onClick={() => navigate('/home')}
-                className="bg-blue-600 text-white font-semibold rounded-xl py-3 px-8 shadow-lg shadow-blue-200 cursor-pointer"
+                className="bg-blue-600 text-white font-semibold rounded-xl py-3 px-8 shadow-lg shadow-blue-200 dark:shadow-blue-900/30 cursor-pointer"
               >
                 {t('exploreProducts')}
               </button>

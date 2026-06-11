@@ -21,12 +21,11 @@ export function MobileShell() {
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 overflow-hidden">
-      <div className="w-full h-screen bg-white overflow-hidden relative flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-background font-sans text-gray-900 dark:text-text-primary overflow-hidden transition-colors duration-300">
+      <div className="w-full h-screen bg-white dark:bg-background overflow-hidden relative flex flex-col transition-colors duration-300">
         
-        {/* Content Area */}
         <div className={cn(
-          "flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth bg-gray-50",
+          "flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth bg-gray-50 dark:bg-background transition-colors duration-300",
           showBottomNav ? "pb-24" : "pb-0"
         )}>
           <AnimatePresence mode="wait" initial={false}>
@@ -43,9 +42,8 @@ export function MobileShell() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom Navigation */}
         {showBottomNav && (
-          <div className="absolute bottom-0 w-full bg-white border-t border-gray-100 pb-safe pt-2 px-6 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] z-50">
+          <div className="absolute bottom-0 w-full bg-white dark:bg-nav-bg border-t border-gray-100 dark:border-border-light pb-safe pt-2 px-6 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] dark:shadow-[0_-4px_24px_rgba(0,0,0,0.3)] z-50 transition-colors duration-300">
             <div className="flex justify-between items-center">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
@@ -60,19 +58,19 @@ export function MobileShell() {
                         size={24} 
                         className={cn(
                           "transition-colors duration-200",
-                          isActive ? "text-blue-600" : "text-gray-400"
+                          isActive ? "text-blue-600" : "text-gray-400 dark:text-text-tertiary"
                         )}
                         strokeWidth={isActive ? 2.5 : 2}
                       />
                       {(item.badge ?? 0) > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center ring-2 ring-white">
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-surface">
                           {item.badge}
                         </span>
                       )}
                     </div>
                     <span className={cn(
                       "text-[10px] font-medium transition-colors",
-                      isActive ? "text-blue-600" : "text-gray-400"
+                      isActive ? "text-blue-600" : "text-gray-400 dark:text-text-tertiary"
                     )}>
                       {item.label}
                     </span>
