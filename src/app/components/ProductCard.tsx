@@ -110,7 +110,7 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
     <motion.div
       whileTap={{ scale: 0.96 }}
       onClick={() => navigate(`/product/${product.id}`)}
-      className="bg-white dark:bg-surface rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-border-light flex flex-col relative group w-full h-[262px] sm:h-[282px] md:h-[302px] lg:h-[322px] transition-colors duration-300"
+      className="bg-white dark:bg-surface rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-border-light flex flex-col relative group w-full transition-colors duration-300"
     >
       <div className="relative w-full h-[140px] sm:h-[150px] md:h-[160px] lg:h-[180px] aspect-square bg-gray-100 dark:bg-surface-tertiary overflow-hidden flex-shrink-0">
         <img

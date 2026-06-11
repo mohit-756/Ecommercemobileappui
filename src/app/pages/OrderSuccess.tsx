@@ -4,6 +4,9 @@ import { motion } from 'motion/react';
 import { CheckCircle2, ArrowRight, Package, Truck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { hapticService } from '../services/hapticService';
+import { orderService } from '../services/orderService';
+import { localNotificationService } from '../services/localNotificationService';
+import { toast } from 'sonner';
 
 export function OrderSuccess() {
   const navigate = useNavigate();
@@ -13,6 +16,24 @@ export function OrderSuccess() {
   useEffect(() => {
     // Success haptic and confetti
     hapticService.notificationSuccess();
+
+    // Fetch order details and schedule restock reminders
+    if (orderId) {
+      orderService.getOrderById(orderId)
+        .then((res) => {
+          const order = res.data;
+          if (order && order.items && order.items.length > 0) {
+            order.items.forEach((item: any) => {
+              const productName = item.product?.name || 'Dry Fruits';
+              localNotificationService.scheduleRestockReminder(productName, 30);
+            });
+            toast.info('Restock reminders scheduled! A test notification will fire in 10 seconds.');
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to schedule restock reminders for order:', err);
+        });
+    }
 
     const duration = 3 * 1000;
     const animationEnd = Date.now() + duration;
@@ -36,7 +57,7 @@ export function OrderSuccess() {
     }, 250);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [orderId]);
 
   const displayId = useMemo(() => {
     if (!orderId) return 'ORD-12345';

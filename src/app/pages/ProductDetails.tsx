@@ -75,7 +75,7 @@ export function ProductDetails() {
         if (prod.colors?.length > 0) setSelectedColor(prod.colors[0]);
         checkWishlistStatus(prod);
         recentlyViewedService.add(prod);
-        setReviews(reviewsRes.data || []);
+        setReviews(Array.isArray(reviewsRes.data) ? reviewsRes.data : (reviewsRes.data.reviews || []));
 
         try {
           const catId = prodRes.data.category?._id || prodRes.data.category;

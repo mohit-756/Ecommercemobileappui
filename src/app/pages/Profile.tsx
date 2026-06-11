@@ -1,21 +1,50 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Settings, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, Shield, Camera, Heart } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Pencil, Loader2, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, Shield, Camera, Heart, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { cameraService } from '../services/cameraService';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
 import { useTranslation } from '../hooks/useTranslation';
 import { orderService } from '../services/orderService';
+import { authService } from '../services/authService';
+import { hapticService } from '../services/hapticService';
 
 export function Profile() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [avatarLoading, setAvatarLoading] = useState(false);
   const { t } = useTranslation();
   const [ordersCount, setOrdersCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
+
+  // Edit Profile States
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editName.trim()) {
+      toast.error('Name cannot be empty');
+      return;
+    }
+    setSavingProfile(true);
+    try {
+      await authService.updateProfile({ name: editName, phone: editPhone });
+      updateUser({ name: editName, phone: editPhone });
+      setShowEditDialog(false);
+      hapticService.notificationSuccess();
+      toast.success('Profile updated successfully!');
+    } catch (err: any) {
+      hapticService.impact();
+      toast.error(err.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   useEffect(() => {
     orderService.getUserOrders({ limit: 1 })
@@ -59,8 +88,17 @@ export function Profile() {
     <div className="min-h-full bg-gray-50 dark:bg-background pb-6 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden transition-colors duration-300">
       <div className="bg-white dark:bg-surface px-6 pt-16 pb-8 lg:pt-8 rounded-b-3xl shadow-sm mb-6 relative">
         <div className="absolute top-12 right-6 md:top-6">
-          <button className="w-10 h-10 rounded-full bg-gray-50 dark:bg-surface-tertiary flex items-center justify-center text-gray-600 dark:text-text-secondary hover:bg-gray-100 dark:hover:bg-surface-tertiary transition-colors">
-            <Settings size={20} />
+          <button
+            onClick={() => {
+              hapticService.impact();
+              setEditName(user?.name || '');
+              setEditPhone(user?.phone || '');
+              setShowEditDialog(true);
+            }}
+            className="w-10 h-10 rounded-full bg-gray-50 dark:bg-surface-tertiary flex items-center justify-center text-gray-600 dark:text-text-secondary hover:bg-gray-100 dark:hover:bg-surface-tertiary transition-colors active:scale-95 duration-200"
+            title="Edit Profile"
+          >
+            <Pencil size={18} />
           </button>
         </div>
         
@@ -145,6 +183,78 @@ export function Profile() {
           </div>
         </motion.button>
       </div>
+
+      <AnimatePresence>
+        {showEditDialog && (
+          <div className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center">
+            <div className="fixed inset-0 bg-black/40" onClick={() => setShowEditDialog(false)} />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="relative bg-white dark:bg-surface w-full md:max-w-[393px] rounded-t-3xl md:rounded-3xl max-h-[85vh] overflow-y-auto p-6 pb-10 z-10 shadow-2xl transition-colors duration-300"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-text-primary">Edit Profile</h2>
+                <button onClick={() => setShowEditDialog(false)} className="w-8 h-8 rounded-full bg-gray-100 dark:bg-surface-tertiary flex items-center justify-center text-gray-500 dark:text-text-secondary">
+                  <span className="text-lg leading-none">✕</span>
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveProfile} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-2">Email Address (Read-only)</label>
+                  <input
+                    type="email"
+                    value={user?.email || ''}
+                    disabled
+                    className="w-full bg-gray-100 dark:bg-surface-tertiary border border-gray-200 dark:border-border-light/50 rounded-xl py-3 px-4 text-sm text-gray-400 dark:text-text-tertiary outline-none cursor-not-allowed opacity-80"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-100 dark:border-border-light rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-blue-600 focus:bg-white dark:focus:bg-surface outline-none transition-all text-gray-900 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-tertiary"
+                    placeholder="Enter your name"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-100 dark:border-border-light rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-blue-600 focus:bg-white dark:focus:bg-surface outline-none transition-all text-gray-900 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-tertiary"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 dark:shadow-blue-900/30 hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                  {savingProfile ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 size={16} className="animate-spin" />
+                      Saving...
+                    </span>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

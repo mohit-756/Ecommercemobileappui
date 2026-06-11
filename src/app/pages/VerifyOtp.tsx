@@ -4,6 +4,8 @@ import { ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
 import { authService } from '../services/authService';
 import { toast } from 'sonner';
 
+import { hapticService } from '../services/hapticService';
+
 export function VerifyOtp() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,9 +62,11 @@ export function VerifyOtp() {
       const { token, user } = res.data;
       localStorage.setItem('token', token);
       window.dispatchEvent(new CustomEvent('auth:login', { detail: { token, user } }));
+      hapticService.notificationSuccess();
       toast.success('Account created successfully!');
       navigate('/home', { replace: true });
     } catch (err: any) {
+      hapticService.impact();
       const message = err.response?.data?.message || 'Invalid OTP. Try again.';
       toast.error(message);
       setOtp(['', '', '', '', '', '']);
@@ -81,6 +85,7 @@ export function VerifyOtp() {
       setOtp(['', '', '', '', '', '']);
       inputs.current[0]?.focus();
     } catch (err: any) {
+      hapticService.impact();
       toast.error(err.response?.data?.message || 'Failed to resend OTP');
     } finally {
       setResending(false);

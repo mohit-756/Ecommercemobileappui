@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Search, Crosshair, Loader2, ChevronLeft } from 'lucide-react';
+import { Geolocation } from '@capacitor/geolocation';
 import { geocodingService } from '../services/geocodingService';
 import { toast } from 'sonner';
 
@@ -59,7 +60,10 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
       maxZoom: 19,
     }).addTo(map);
 
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    // Force Leaflet to recalculate container size once animations/mounting completes
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
 
     const marker = L.marker(center, { draggable: true }).addTo(map);
     markerRef.current = marker;
@@ -156,23 +160,35 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
     });
   }
 
-  function handleLocateMe() {
-    if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by your browser');
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        if (mapRef.current && markerRef.current) {
-          mapRef.current.setView([latitude, longitude], 16);
-          markerRef.current.setLatLng([latitude, longitude]);
+  async function handleLocateMe() {
+    try {
+      const permission = await Geolocation.checkPermissions();
+      if (permission.location !== 'granted') {
+        const reqStatus = await Geolocation.requestPermissions();
+        if (reqStatus.location !== 'granted') {
+          toast.error('Location permission denied. Please enable it in Android app settings.');
+          return;
         }
-        reverseGeocodeAt(latitude, longitude);
-      },
-      () => toast.error('Could not get your location. Please search manually.'),
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
+      }
+
+      const pos = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 10000
+      });
+
+      const { latitude, longitude } = pos.coords;
+      if (mapRef.current && markerRef.current) {
+        mapRef.current.setView([latitude, longitude], 16);
+        markerRef.current.setLatLng([latitude, longitude]);
+      }
+      reverseGeocodeAt(latitude, longitude);
+    } catch (err: any) {
+      console.error('Geolocation error:', err);
+      let msg = 'Could not get your location.';
+      if (err.message?.includes('denied')) msg = 'Location permission denied.';
+      else if (err.code === 3) msg = 'Location request timed out.';
+      toast.error(msg + ' Please search manually.');
+    }
   }
 
   function handleConfirm() {
@@ -189,9 +205,13 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-[60] flex flex-col bg-white dark:bg-surface transition-colors duration-300"
+      className="fixed inset-0 z-[60] bg-white dark:bg-surface transition-colors duration-300"
     >
-      <div className="absolute top-4 left-4 z-10">
+      {/* Map Container - Fullscreen Background */}
+      <div ref={mapContainerRef} className="absolute inset-0 w-full h-full z-0" />
+
+      {/* Back Button */}
+      <div className="absolute top-4 left-4 z-[1000]">
         <button
           onClick={onClose}
           className="w-10 h-10 bg-white/90 dark:bg-surface/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-gray-900 dark:text-text-primary border border-gray-200/80 dark:border-border-light active:scale-90 transition-transform"
@@ -200,7 +220,8 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
         </button>
       </div>
 
-      <div className="absolute top-4 left-16 right-4 z-10">
+      {/* Search Input Container */}
+      <div className="absolute top-4 left-16 right-4 z-[1000]">
         <div className="relative">
           <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary" />
           <input
@@ -237,21 +258,22 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
         </AnimatePresence>
       </div>
 
-      <div ref={mapContainerRef} className="flex-1 w-full" />
-
+      {/* Locate Me Button - Floats on top of the Map area */}
       <button
+        type="button"
         onClick={handleLocateMe}
-        className="absolute z-10 bottom-48 right-4 w-11 h-11 bg-white dark:bg-surface rounded-full shadow-lg border border-gray-200 dark:border-border-medium flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/20 active:scale-90 transition-all"
+        className="absolute z-[1000] bottom-[220px] right-4 w-12 h-12 bg-white dark:bg-surface rounded-full shadow-xl border border-gray-200/80 dark:border-border-light flex items-center justify-center text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/20 active:scale-90 transition-all"
         title="Use my location"
       >
-        <Crosshair size={20} />
+        <Crosshair size={22} />
       </button>
 
+      {/* Bottom Address Card Sheet */}
       <motion.div
         initial={{ y: 20 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-white dark:bg-surface px-5 pt-4 pb-8 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] rounded-t-3xl transition-colors duration-300"
+        className="absolute bottom-0 left-0 right-0 z-[1000] bg-white dark:bg-surface px-5 pt-4 pb-8 shadow-[0_-12px_40px_rgba(0,0,0,0.12)] rounded-t-3xl transition-colors duration-300"
       >
         {geocoding ? (
           <div className="flex items-center justify-center gap-2 py-4 text-gray-500 dark:text-text-secondary">

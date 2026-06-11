@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Search, Bell, LayoutGrid, Apple, Cherry, ShoppingBag, Sprout, Clock, Zap, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Geolocation } from '@capacitor/geolocation';
 import useEmblaCarousel from 'embla-carousel-react';
+import { useAuth } from '../contexts/AuthContext';
+import { localNotificationService } from '../services/localNotificationService';
 import { recentlyViewedService } from '../services/recentlyViewedService';
 import { ProductCard } from '../components/ProductCard';
 import { LocationPermissionPopup } from '../components/LocationPermissionPopup';
@@ -25,9 +28,11 @@ const banners = [
 
 export function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,15 +48,18 @@ export function Home() {
     }
   }, []);
 
-  function handleAllowLocation() {
+  async function handleAllowLocation() {
     setShowLocationPopup(false);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        () => {},
-        () => {}
-      );
+    sessionStorage.setItem('location-popup-dismissed', 'true');
+    try {
+      await Geolocation.getCurrentPosition({
+        enableHighAccuracy: false,
+        timeout: 5000
+      });
+      // Success: maybe we could refresh product list based on location here
+    } catch (err) {
+      console.warn('Home location error:', err);
     }
-    navigate('/addresses');
   }
 
   function handleDismissLocation() {
@@ -140,6 +148,13 @@ export function Home() {
         return catId === activeCategory || p.category === catName || p.category === activeCategory;
       });
 
+  const finalFilteredProducts = filteredProducts.filter((p: any) => {
+    if (activeFilter === 'top_rated') return (p.rating || 5) >= 4.5;
+    if (activeFilter === 'discounts') return p.discount || (p.originalPrice && p.originalPrice > p.price);
+    if (activeFilter === 'under_500') return p.price < 500;
+    return true;
+  });
+
   return (
     <div
       className="min-h-full pb-6 transition-colors duration-300"
@@ -158,19 +173,23 @@ export function Home() {
         </div>
       )}
       {/* Mobile Page Header (hidden on large screens) */}
-      <div className="bg-white dark:bg-background pt-14 pb-4 px-6 sticky top-0 z-30 lg:hidden border-b border-gray-50 dark:border-border-light transition-colors duration-300">
-        <div className="flex justify-between items-center mb-4">
-          <div onClick={() => navigate('/addresses')} className="cursor-pointer active:opacity-70 transition-opacity">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <Zap size={14} className="text-amber-500 fill-amber-500" />
-              <span className="text-gray-900 dark:text-text-primary font-extrabold text-sm uppercase tracking-wider">Delivery in 12 mins</span>
+      <div className="bg-white dark:bg-background pt-4 pb-3 px-6 sticky top-0 z-30 lg:hidden border-b border-gray-50 dark:border-border-light transition-colors duration-300">
+        <div className="flex justify-between items-center mb-3">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-0.5 leading-none">
+              {user ? `Hi, ${user.name.split(' ')[0]} 👋` : 'Welcome to Dry Fruit Hub 🍎'}
+            </span>
+            <div onClick={() => navigate('/addresses')} className="cursor-pointer active:opacity-70 transition-opacity mt-1">
+              <h2 className="text-gray-900 dark:text-text-primary font-black text-sm flex items-center gap-1 leading-none">
+                Home — Mumbai, India <span className="text-blue-600 text-[10px] mt-0.5">▾</span>
+              </h2>
             </div>
-            <h2 className="text-gray-900 dark:text-text-primary font-bold flex items-center gap-1 leading-none">
-              Home — Mumbai, India <span className="text-blue-600 text-[10px] mt-0.5">▾</span>
-            </h2>
           </div>
           <div className="flex gap-3">
-            <button className="w-10 h-10 rounded-full border border-gray-100 dark:border-border-light flex items-center justify-center relative active:scale-95 transition-transform">
+            <button
+              onClick={() => { hapticService.impact(); localNotificationService.sendWelcomeNotification(); }}
+              className="w-10 h-10 rounded-full border border-gray-100 dark:border-border-light flex items-center justify-center relative active:scale-95 transition-transform"
+            >
               <Bell size={20} className="text-gray-700 dark:text-text-secondary" />
               <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-surface"></span>
             </button>
@@ -179,7 +198,7 @@ export function Home() {
 
         <div
           onClick={() => navigate('/search')}
-          className="bg-gray-100/80 dark:bg-surface-secondary flex items-center px-4 py-3 rounded-2xl border border-gray-100 dark:border-border-light cursor-text group"
+          className="bg-gray-100/60 hover:bg-gray-100/80 dark:bg-surface-secondary flex items-center px-4 py-3 rounded-2xl border border-gray-100/50 dark:border-border-light cursor-text active:scale-[0.99] transition-all duration-200 group shadow-sm"
         >
           <Search size={20} className="text-gray-400 dark:text-text-tertiary mr-2 group-focus-within:text-blue-600 transition-colors" />
           <span className="text-gray-400 dark:text-text-tertiary text-sm">Search almonds, dates, walnuts...</span>
@@ -187,8 +206,8 @@ export function Home() {
       </div>
 
       {loading ? (
-        <div className="px-6 pt-4 space-y-8">
-          <Skeleton className="h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 w-full rounded-2xl" />
+        <div className="px-6 pt-2 space-y-8">
+          <Skeleton className="h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 -mx-6 lg:mx-0 w-auto rounded-none lg:rounded-2xl" />
           <div>
             <Skeleton className="h-6 w-32 mb-4" />
             <div className="flex gap-4 overflow-x-auto pb-2 lg:mx-0 lg:px-0 -mx-6 px-6">
@@ -216,13 +235,13 @@ export function Home() {
           </div>
         </div>
       ) : (
-        <div className="px-6 pt-4 space-y-8">
-          <div className="relative group">
-            <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
+        <div className="px-6 pt-2 space-y-8">
+          <div className="relative group -mx-6 lg:mx-0">
+            <div className="overflow-hidden lg:rounded-2xl" ref={emblaRef}>
               <div className="flex">
                 {banners.map((banner) => (
-                  <div key={banner.id} className="flex-[0_0_100%] min-w-0 pr-4">
-                    <div className={cn("h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 rounded-2xl p-6 md:p-10 lg:p-12 flex flex-col justify-center relative overflow-hidden", banner.bg)}>
+                  <div key={banner.id} className="flex-[0_0_100%] min-w-0">
+                    <div className={cn("h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 p-6 md:p-10 lg:p-12 flex flex-col justify-center relative overflow-hidden rounded-none lg:rounded-2xl", banner.bg)}>
                       <div className="relative z-10">
                         <p className="text-white/80 text-sm sm:text-base md:text-lg font-medium mb-1">{banner.subtitle}</p>
                         <h3 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-5">{banner.title}</h3>
@@ -316,7 +335,7 @@ export function Home() {
                 return (
                   <button
                     key={catId}
-                    onClick={() => setActiveCategory(catId)}
+                    onClick={() => { hapticService.selection(); setActiveCategory(catId); }}
                     className="flex flex-col items-center gap-2 min-w-[72px] sm:min-w-[84px] md:min-w-[96px]"
                   >
                     <div className={cn(
@@ -338,11 +357,32 @@ export function Home() {
           </div>
 
           <div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col gap-3 mb-4">
               <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Featured Products</h3>
+              <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar -mx-6 px-6">
+                {[
+                  { id: 'all', label: '🔥 All Items' },
+                  { id: 'top_rated', label: '⭐ Top Rated' },
+                  { id: 'discounts', label: '💰 Best Discounts' },
+                  { id: 'under_500', label: '💸 Under ₹500' },
+                ].map((filter) => (
+                  <button
+                    key={filter.id}
+                    onClick={() => { hapticService.selection(); setActiveFilter(filter.id); }}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-200 active:scale-95",
+                      activeFilter === filter.id
+                        ? "bg-blue-600 border-blue-600 text-white shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
+                        : "bg-white dark:bg-surface border-gray-100 dark:border-border-light text-gray-600 dark:text-text-secondary hover:border-gray-200 dark:hover:border-border-medium"
+                    )}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6">
-              {filteredProducts.slice(0, 16).map((product: any) => (
+              {finalFilteredProducts.slice(0, 16).map((product: any) => (
                 <ProductCard key={product._id || product.id} product={product} />
               ))}
             </div>
