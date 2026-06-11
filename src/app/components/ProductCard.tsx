@@ -136,7 +136,7 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
         </button>
       </div>
       <div className="p-3 flex-1 flex flex-col">
-        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-tight mb-1">{product.name}</h3>
+        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-tight mb-1 h-9">{product.name}</h3>
         <div className="flex items-center gap-1 mb-2">
           <Star size={12} className="text-amber-400 fill-amber-400" />
           <span className="text-xs text-gray-600 font-medium">{product.rating}</span>

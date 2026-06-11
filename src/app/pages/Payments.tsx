@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 import { ChevronLeft, CreditCard, Plus, ShieldCheck } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function Payments() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export function Payments() {
           </button>
           <h1 className="text-xl font-bold text-gray-900 ml-2">Payment Methods</h1>
         </div>
-        <button className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-sm cursor-pointer">
+        <button onClick={() => toast.info('Payment methods are securely configured and managed during Checkout.')} className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-sm cursor-pointer">
           <Plus size={20} />
         </button>
       </div>

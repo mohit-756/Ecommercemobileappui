@@ -59,7 +59,7 @@ export function Profile() {
     <div className="min-h-full bg-gray-50 pb-6 lg:max-w-full lg:mx-0 lg:my-0 lg:rounded-none lg:shadow-none lg:border-none lg:bg-transparent overflow-hidden">
       <div className="bg-white px-6 pt-16 pb-8 lg:pt-8 rounded-b-3xl shadow-sm mb-6 relative">
         <div className="absolute top-12 right-6 md:top-6">
-          <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
+          <button onClick={() => navigate('/settings')} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
             <Settings size={20} />
           </button>
         </div>

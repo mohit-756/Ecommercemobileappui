@@ -144,7 +144,7 @@ export function Home() {
             </h2>
           </div>
           <div className="flex gap-3">
-            <button className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center relative active:scale-95 transition-transform">
+            <button onClick={() => navigate('/settings')} className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center relative active:scale-95 transition-transform cursor-pointer">
               <Bell size={20} className="text-gray-700" />
               <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
@@ -200,7 +200,7 @@ export function Home() {
                       <div className="relative z-10">
                         <p className="text-white/80 text-sm sm:text-base md:text-lg font-medium mb-1">{banner.subtitle}</p>
                         <h3 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-5">{banner.title}</h3>
-                        <button className="bg-white/20 backdrop-blur-sm text-white text-xs md:text-sm font-semibold px-4 py-2 md:px-6 md:py-3 rounded-full hover:bg-white/30 transition-colors w-fit">
+                        <button onClick={() => navigate('/search')} className="bg-white/20 backdrop-blur-sm text-white text-xs md:text-sm font-semibold px-4 py-2 md:px-6 md:py-3 rounded-full hover:bg-white/30 transition-colors w-fit cursor-pointer">
                           Shop Now
                         </button>
                       </div>
@@ -244,7 +244,7 @@ export function Home() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-gray-900 text-lg">Best Sellers</h3>
-              <button className="text-blue-600 text-sm font-semibold flex items-center gap-1">
+              <button onClick={() => navigate('/search')} className="text-blue-600 text-sm font-semibold flex items-center gap-1 cursor-pointer">
                 See all <ArrowRight size={14} />
               </button>
             </div>

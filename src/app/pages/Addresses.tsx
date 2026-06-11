@@ -263,7 +263,7 @@ export function Addresses() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center">
           <div className="fixed inset-0 bg-black/40" onClick={() => setShowForm(false)} />
-          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} transition={{ type: 'spring', damping: 30, stiffness: 300 }} className="relative bg-white w-full md:max-w-[393px] rounded-t-3xl md:rounded-3xl max-h-[85vh] overflow-y-auto p-6 pb-10">
+          <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} transition={{ type: 'spring', damping: 30, stiffness: 300 }} className="relative bg-white w-full md:max-w-[600px] rounded-t-3xl md:rounded-3xl max-h-[85vh] overflow-y-auto p-6 pb-10">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-gray-900">{editingId ? 'Edit Address' : 'Add Address'}</h2>
               <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
