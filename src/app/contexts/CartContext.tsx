@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { normalizeProduct } from '../lib/utils';
+import { cartService } from '../services/cartService';
+import { useAuth } from './AuthContext';
 
 interface CartItem {
   _id: string;
@@ -36,52 +38,140 @@ function setGuestCart(items: CartItem[]) {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { token } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setItems(getGuestCart());
-    setLoading(false);
-  }, []);
+    async function loadAndSyncCart() {
+      if (!token) {
+        setItems(getGuestCart());
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const guestItems = getGuestCart();
+        if (guestItems.length > 0) {
+          for (const item of guestItems) {
+            const prodId = item.product._id || item.product.id;
+            await cartService.addToCart(prodId, item.quantity);
+          }
+          localStorage.removeItem(GUEST_CART_KEY);
+        }
+
+        const res = await cartService.getCart();
+        const serverCart = res.data;
+        const normalized = (serverCart.items || []).map((item: any) => ({
+          _id: item._id,
+          product: normalizeProduct(item.product),
+          quantity: item.quantity,
+        }));
+        setItems(normalized);
+      } catch (err) {
+        console.error('Failed to sync/fetch backend cart:', err);
+        setItems(getGuestCart());
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadAndSyncCart();
+  }, [token]);
 
   const addToCart = useCallback(async (productId: string, product?: any, quantity = 1) => {
-    const guest = getGuestCart();
-    const existing = guest.find(
-      (item) => (item.product._id || item.product.id) === productId
-    );
-    if (existing) {
-      existing.quantity += quantity;
+    if (token) {
+      try {
+        const res = await cartService.addToCart(productId, quantity);
+        const normalized = (res.data.items || []).map((item: any) => ({
+          _id: item._id,
+          product: normalizeProduct(item.product),
+          quantity: item.quantity,
+        }));
+        setItems(normalized);
+      } catch (err) {
+        console.error('Failed to add to cart on server:', err);
+        throw err;
+      }
     } else {
-      guest.push({
-        _id: `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-        product: normalizeProduct(product || { _id: productId }),
-        quantity,
-      });
-    }
-    setGuestCart(guest);
-    setItems([...guest]);
-  }, []);
-
-  const updateQuantity = useCallback(async (itemId: string, quantity: number) => {
-    const guest = getGuestCart();
-    const item = guest.find((i) => i._id === itemId);
-    if (item) {
-      item.quantity = Math.max(1, quantity);
+      const guest = getGuestCart();
+      const existing = guest.find(
+        (item) => (item.product._id || item.product.id) === productId
+      );
+      if (existing) {
+        existing.quantity += quantity;
+      } else {
+        guest.push({
+          _id: `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+          product: normalizeProduct(product || { _id: productId }),
+          quantity,
+        });
+      }
       setGuestCart(guest);
       setItems([...guest]);
     }
-  }, []);
+  }, [token]);
+
+  const updateQuantity = useCallback(async (itemId: string, quantity: number) => {
+    if (token) {
+      try {
+        const res = await cartService.updateCartItem(itemId, quantity);
+        const normalized = (res.data.items || []).map((item: any) => ({
+          _id: item._id,
+          product: normalizeProduct(item.product),
+          quantity: item.quantity,
+        }));
+        setItems(normalized);
+      } catch (err) {
+        console.error('Failed to update cart item on server:', err);
+        throw err;
+      }
+    } else {
+      const guest = getGuestCart();
+      const item = guest.find((i) => i._id === itemId);
+      if (item) {
+        item.quantity = Math.max(1, quantity);
+        setGuestCart(guest);
+        setItems([...guest]);
+      }
+    }
+  }, [token]);
 
   const removeItem = useCallback(async (itemId: string) => {
-    const guest = getGuestCart().filter((i) => i._id !== itemId);
-    setGuestCart(guest);
-    setItems(guest);
-  }, []);
+    if (token) {
+      try {
+        const res = await cartService.removeFromCart(itemId);
+        const normalized = (res.data.items || []).map((item: any) => ({
+          _id: item._id,
+          product: normalizeProduct(item.product),
+          quantity: item.quantity,
+        }));
+        setItems(normalized);
+      } catch (err) {
+        console.error('Failed to remove cart item from server:', err);
+        throw err;
+      }
+    } else {
+      const guest = getGuestCart().filter((i) => i._id !== itemId);
+      setGuestCart(guest);
+      setItems(guest);
+    }
+  }, [token]);
 
   const clearCart = useCallback(async () => {
-    localStorage.removeItem(GUEST_CART_KEY);
-    setItems([]);
-  }, []);
+    if (token) {
+      try {
+        await cartService.clearCart();
+        setItems([]);
+      } catch (err) {
+        console.error('Failed to clear cart on server:', err);
+        throw err;
+      }
+    } else {
+      localStorage.removeItem(GUEST_CART_KEY);
+      setItems([]);
+    }
+  }, [token]);
 
   const itemCount = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
 

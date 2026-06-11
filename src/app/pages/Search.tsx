@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ProductCard } from '../components/ProductCard';
 import { cn } from '../lib/utils';
 import { products as mockProducts, categories as mockCategories } from '../data/mock';
+import { productService } from '../services/productService';
+import { categoryService } from '../services/categoryService';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Relevance' },
@@ -40,7 +42,14 @@ export function Search() {
   const recentSearches = ['Almonds', 'Cashews', 'Dates', 'Walnuts', 'Raisins'];
 
   useEffect(() => {
-    setCategories(mockCategories);
+    categoryService.getCategories()
+      .then((res) => {
+        setCategories(res.data || []);
+      })
+      .catch((err) => {
+        console.error('Failed to load categories in search:', err);
+        setCategories(mockCategories);
+      });
   }, []);
 
   useEffect(() => {
@@ -49,13 +58,28 @@ export function Search() {
       return;
     }
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       setLoading(true);
-      const filtered = mockProducts.filter((p: any) =>
-        p.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setResults(filtered);
-      setLoading(false);
+      try {
+        const params: any = {
+          search: query,
+        };
+        if (sort) params.sort = sort;
+        if (minPrice) params.minPrice = Number(minPrice);
+        if (maxPrice) params.maxPrice = Number(maxPrice);
+        if (categoryFilter) params.category = categoryFilter;
+
+        const res = await productService.getProducts(params);
+        setResults(res.data.products || []);
+      } catch (err) {
+        console.error('Failed to search products in backend:', err);
+        const filtered = mockProducts.filter((p: any) =>
+          p.name.toLowerCase().includes(query.toLowerCase())
+        );
+        setResults(filtered);
+      } finally {
+        setLoading(false);
+      }
     }, 300);
 
     return () => clearTimeout(timer);

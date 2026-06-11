@@ -9,6 +9,8 @@ import { cn } from '../lib/utils';
 import { hapticService } from '../services/hapticService';
 import { Skeleton } from '../components/ui/skeleton';
 import { categories as mockCategories, products as mockProducts } from '../data/mock';
+import { productService } from '../services/productService';
+import { categoryService } from '../services/categoryService';
 
 const bannerIcons: Record<string, any> = {
   LayoutGrid, Apple, Cherry, ShoppingBag, Sprout,
@@ -66,12 +68,23 @@ export function Home() {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
 
-    setCategories(mockCategories);
-    setProducts(mockProducts);
-
-    if (isRefresh) hapticService.impact();
-    setLoading(false);
-    setRefreshing(false);
+    try {
+      const [productsRes, categoriesRes] = await Promise.all([
+        productService.getProducts({ limit: 100 }),
+        categoryService.getCategories(),
+      ]);
+      setProducts(productsRes.data.products || []);
+      const allCategory = { id: 'all', _id: 'all', name: 'All', icon: 'LayoutGrid' };
+      setCategories([allCategory, ...(categoriesRes.data || [])]);
+    } catch (err) {
+      console.error('Failed to fetch backend data on homepage:', err);
+      setCategories(mockCategories);
+      setProducts(mockProducts);
+    } finally {
+      if (isRefresh) hapticService.impact();
+      setLoading(false);
+      setRefreshing(false);
+    }
   }
 
   useEffect(() => {

@@ -30,10 +30,10 @@ export function Login() {
       let email = localStorage.getItem('bio_email');
       let password = localStorage.getItem('bio_password');
 
-      // Demo fallback: If no credentials saved, use demo ones
+      // Demo fallback: If no credentials saved, use seeded guest credentials
       if (!email || !password) {
-        email = 'demo@example.com';
-        password = 'password123';
+        email = 'guest@dryfruit.com';
+        password = 'guest0000';
       }
 
       const auth = await biometricService.authenticate('Log in to DryFruit Hub');
@@ -42,7 +42,7 @@ export function Login() {
         toast.success('Welcome back!');
         navigate('/home', { replace: true });
       }
-    } catch {
+    } catch (err) {
       toast.error('Biometric login failed');
     } finally {
       setBiometricLoading(false);
@@ -54,10 +54,10 @@ export function Login() {
     try {
       // Mock Google Login
       await new Promise(resolve => setTimeout(resolve, 1500));
-      await login('demo@example.com', 'password123');
+      await login('guest@dryfruit.com', 'guest0000');
       toast.success('Signed in with Google');
       navigate('/home', { replace: true });
-    } catch {
+    } catch (err) {
       toast.error('Google sign in failed');
     } finally {
       setLoading(false);

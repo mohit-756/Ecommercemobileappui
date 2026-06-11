@@ -15,6 +15,8 @@ import { Capacitor } from '@capacitor/core';
 import { Skeleton } from '../components/ui/skeleton';
 import { ProductCard } from '../components/ProductCard';
 import { wishlistService } from '../services/wishlistService';
+import { productService } from '../services/productService';
+import { reviewService } from '../services/reviewService';
 
 export function ProductDetails() {
   const { id } = useParams();
@@ -58,18 +60,56 @@ export function ProductDetails() {
 
   useEffect(() => {
     if (!id) return;
-    const mockProd = mockProducts.find((p: any) => p.id === id);
-    if (mockProd) {
-      const prod = normalizeProduct(mockProd);
-      setProduct(prod);
-      if (prod.sizes?.length > 0) setSelectedSize(prod.sizes[0]);
-      if (prod.colors?.length > 0) setSelectedColor(prod.colors[0]);
-      checkWishlistStatus(prod);
-      recentlyViewedService.add(mockProd);
-      setRelatedProducts(mockProducts.filter((p: any) => p.id !== id).slice(0, 4));
+
+    async function loadProductDetails() {
+      setLoading(true);
+      setReviewsLoading(true);
+      try {
+        const [prodRes, reviewsRes] = await Promise.all([
+          productService.getProductById(id),
+          reviewService.getProductReviews(id).catch(() => ({ data: [] })),
+        ]);
+        const prod = normalizeProduct(prodRes.data);
+        setProduct(prod);
+        if (prod.sizes?.length > 0) setSelectedSize(prod.sizes[0]);
+        if (prod.colors?.length > 0) setSelectedColor(prod.colors[0]);
+        checkWishlistStatus(prod);
+        recentlyViewedService.add(prod);
+        setReviews(reviewsRes.data || []);
+
+        try {
+          const catId = prodRes.data.category?._id || prodRes.data.category;
+          const relatedRes = await productService.getProducts({ category: catId, limit: 5 });
+          const normalizedRelated = (relatedRes.data.products || [])
+            .filter((p: any) => (p._id || p.id) !== id)
+            .map(normalizeProduct)
+            .slice(0, 4);
+          setRelatedProducts(normalizedRelated);
+        } catch {
+          setRelatedProducts([]);
+        }
+      } catch (err) {
+        console.warn('Product not found in backend or backend down, trying mock data:', err);
+        const mockProd = mockProducts.find((p: any) => p.id === id);
+        if (mockProd) {
+          const prod = normalizeProduct(mockProd);
+          setProduct(prod);
+          if (prod.sizes?.length > 0) setSelectedSize(prod.sizes[0]);
+          if (prod.colors?.length > 0) setSelectedColor(prod.colors[0]);
+          checkWishlistStatus(prod);
+          recentlyViewedService.add(mockProd);
+          setRelatedProducts(mockProducts.filter((p: any) => p.id !== id).map(normalizeProduct).slice(0, 4));
+        } else {
+          toast.error('Product not found');
+          navigate('/home');
+        }
+      } finally {
+        setLoading(false);
+        setReviewsLoading(false);
+      }
     }
-    setLoading(false);
-    setReviewsLoading(false);
+
+    loadProductDetails();
   }, [id, navigate]);
 
   if (loading) {
@@ -374,7 +414,7 @@ export function ProductDetails() {
                     />
                   </div>
                   <button
-                    onClick={handleReviewSubmit}
+                    onClick={handleSubmitReview}
                     disabled={reviewSubmitting || !reviewComment.trim()}
                     className="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-xl disabled:opacity-50"
                   >

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Settings, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, Shield, Camera, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -7,12 +7,34 @@ import { cameraService } from '../services/cameraService';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
 import { useTranslation } from '../hooks/useTranslation';
+import { orderService } from '../services/orderService';
 
 export function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [avatarLoading, setAvatarLoading] = useState(false);
   const { t } = useTranslation();
+  const [ordersCount, setOrdersCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  useEffect(() => {
+    orderService.getUserOrders({ limit: 1 })
+      .then(res => {
+        setOrdersCount(res.data.total || res.data.orders?.length || 0);
+      })
+      .catch(() => {});
+
+    const saved = localStorage.getItem('user_wishlist');
+    if (saved) {
+      setWishlistCount(JSON.parse(saved).length);
+    }
+    const handleWishlistUpdate = () => {
+      const updated = localStorage.getItem('user_wishlist');
+      setWishlistCount(updated ? JSON.parse(updated).length : 0);
+    };
+    window.addEventListener('wishlist-updated', handleWishlistUpdate);
+    return () => window.removeEventListener('wishlist-updated', handleWishlistUpdate);
+  }, []);
 
   const menuItems = [
     { icon: Heart, label: t('myWishlist'), path: '/wishlist' },
@@ -78,7 +100,7 @@ export function Profile() {
 
         <div className="grid grid-cols-3 gap-4 mt-8">
           <div onClick={() => navigate('/orders')} className="bg-gray-50 rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 transition-colors">
-            <span className="block text-xl font-bold text-gray-900">0</span>
+            <span className="block text-xl font-bold text-gray-900">{ordersCount}</span>
             <span className="text-xs text-gray-500 font-medium">{t('orders')}</span>
           </div>
           <div className="bg-gray-50 rounded-2xl p-3 text-center">
@@ -86,7 +108,7 @@ export function Profile() {
             <span className="text-xs text-gray-500 font-medium">{t('reviews')}</span>
           </div>
           <div onClick={() => navigate('/wishlist')} className="bg-gray-50 rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 transition-colors">
-            <span className="block text-xl font-bold text-gray-900">{user?.wishlist?.length || 0}</span>
+            <span className="block text-xl font-bold text-gray-900">{wishlistCount}</span>
             <span className="text-xs text-gray-500 font-medium">{t('saved')}</span>
           </div>
         </div>
