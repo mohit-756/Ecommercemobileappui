@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-      syncWishlistFromServer();
     };
     window.addEventListener('auth:logout', handleLogout);
     window.addEventListener('auth:login', handleLogin as EventListener);

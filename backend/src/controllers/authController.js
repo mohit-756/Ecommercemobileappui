@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
-import validator from 'validator';
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
-import { generateOtp, sendOtpEmail, hasTransporter } from '../services/emailService.js';
+import { generateOtp, sendOtpEmail } from '../services/emailService.js';
 
 function generateToken(userId) {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -42,10 +41,6 @@ export async function sendOtp(req, res, next) {
       return res.status(400).json({ message: 'Email is required' });
     }
 
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
-    }
-
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(409).json({ message: 'Email already registered' });
@@ -60,22 +55,13 @@ export async function sendOtp(req, res, next) {
       expiresAt: new Date(Date.now() + 5 * 60 * 1000),
     });
 
-    // Check if a transporter config exists and actually send the email
-    if (!hasTransporter()) {
-      console.log('========================================');
-      console.log(`[DEV MODE] OTP for ${email}: ${otp}`);
-      console.log('========================================');
+    const emailResult = await sendOtpEmail(email, otp);
+
+    if (emailResult.messageId === 'dev-mode') {
       return res.json({ message: 'OTP sent to your email', otp, dev: true });
     }
 
-    // Try to send email synchronously so client knows if it actually worked
-    try {
-      await sendOtpEmail(email, otp);
-      res.json({ message: 'OTP sent to your email' });
-    } catch (error) {
-      console.error(`Email sending failed for ${email}, falling back to dev mode:`, error);
-      return res.json({ message: 'OTP sent to your email (dev fallback)', otp, dev: true });
-    }
+    res.json({ message: 'OTP sent to your email' });
   } catch (error) {
     next(error);
   }

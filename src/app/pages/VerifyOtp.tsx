@@ -67,7 +67,7 @@ export function VerifyOtp() {
       navigate('/home', { replace: true });
     } catch (err: any) {
       hapticService.impact();
-      const message = err.response?.data?.message || err.message || 'Invalid OTP. Try again.';
+      const message = err.response?.data?.message || 'Invalid OTP. Try again.';
       toast.error(message);
       setOtp(['', '', '', '', '', '']);
       inputs.current[0]?.focus();
@@ -86,7 +86,7 @@ export function VerifyOtp() {
       inputs.current[0]?.focus();
     } catch (err: any) {
       hapticService.impact();
-      toast.error(err.response?.data?.message || err.message || 'Failed to resend OTP');
+      toast.error(err.response?.data?.message || 'Failed to resend OTP');
     } finally {
       setResending(false);
     }
@@ -97,7 +97,7 @@ export function VerifyOtp() {
   return (
     <div className="flex flex-col h-full min-h-screen bg-white dark:bg-background px-6 pt-16 lg:pt-8 pb-8 transition-colors duration-300">
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/login')}
         className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-surface-secondary text-gray-900 dark:text-text-primary mb-8 hover:bg-gray-100 transition-colors"
       >
         <ArrowLeft size={20} />
@@ -114,7 +114,7 @@ export function VerifyOtp() {
         </p>
       </div>
 
-      <div className="flex justify-center gap-2 sm:gap-3 mb-8">
+      <div className="flex justify-center gap-3 mb-8">
         {otp.map((digit, index) => (
           <input
             key={index}
@@ -125,7 +125,7 @@ export function VerifyOtp() {
             value={digit}
             onChange={e => handleChange(index, e.target.value)}
             onKeyDown={e => handleKeyDown(index, e)}
-            className="w-11 h-14 sm:w-14 sm:h-16 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-border-medium bg-gray-50 dark:bg-surface-secondary text-center text-xl sm:text-2xl font-bold text-gray-900 dark:text-text-primary focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all"
+            className="w-14 h-16 rounded-2xl border border-gray-200 dark:border-border-medium bg-gray-50 dark:bg-surface-secondary text-center text-2xl font-bold text-gray-900 dark:text-text-primary focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all"
           />
         ))}
       </div>
