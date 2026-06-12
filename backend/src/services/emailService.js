@@ -1,27 +1,50 @@
 import nodemailer from 'nodemailer';
+import dns from 'dns';
 
 let transporter = null;
 
-function getTransporter() {
+async function getTransporter() {
   if (transporter) return transporter;
 
   if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    let host = 'smtp.gmail.com';
+    try {
+      const lookupResult = await dns.promises.lookup(host, { family: 4 });
+      host = lookupResult.address;
+      console.log(`[EmailService] Resolved smtp.gmail.com manually to IPv4: ${host}`);
+    } catch (err) {
+      console.warn(`[EmailService] DNS resolution failed for smtp.gmail.com, falling back to hostname:`, err.message);
+    }
+
     transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
+      host: host,
       port: 587,
       secure: false,
-      family: 4, // Force IPv4 connection to prevent ENETUNREACH in cloud environments
+      tls: {
+        servername: 'smtp.gmail.com'
+      },
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD,
       },
     });
   } else if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    let host = process.env.EMAIL_HOST;
+    try {
+      const lookupResult = await dns.promises.lookup(host, { family: 4 });
+      host = lookupResult.address;
+      console.log(`[EmailService] Resolved ${process.env.EMAIL_HOST} manually to IPv4: ${host}`);
+    } catch (err) {
+      console.warn(`[EmailService] DNS resolution failed for ${process.env.EMAIL_HOST}, falling back to hostname:`, err.message);
+    }
+
     transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
+      host: host,
       port: parseInt(process.env.EMAIL_PORT || '587'),
       secure: process.env.EMAIL_SECURE === 'true',
-      family: 4, // Force IPv4 connection to prevent ENETUNREACH in cloud environments
+      tls: {
+        servername: process.env.EMAIL_HOST
+      },
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -33,7 +56,10 @@ function getTransporter() {
 }
 
 export function hasTransporter() {
-  return !!getTransporter();
+  return !!(
+    (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) ||
+    (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS)
+  );
 }
 
 export function generateOtp() {
@@ -41,7 +67,7 @@ export function generateOtp() {
 }
 
 export async function sendOtpEmail(email, otp) {
-  const transport = getTransporter();
+  const transport = await getTransporter();
 
   if (!transport) {
     console.log('========================================');
@@ -82,10 +108,6 @@ export async function sendOtpEmail(email, otp) {
     return info;
   } catch (error) {
     console.error('Failed to send email:', error.message);
-    console.log('========================================');
-    console.log('DEV MODE FALLBACK — Email sending failed.');
-    console.log(`OTP for ${email}: ${otp}`);
-    console.log('========================================');
-    return { messageId: 'dev-mode' };
+    throw error;
   }
 }

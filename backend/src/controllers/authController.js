@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import validator from 'validator';
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
 import { generateOtp, sendOtpEmail, hasTransporter } from '../services/emailService.js';
@@ -41,6 +42,10 @@ export async function sendOtp(req, res, next) {
       return res.status(400).json({ message: 'Email is required' });
     }
 
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(409).json({ message: 'Email already registered' });
@@ -55,22 +60,22 @@ export async function sendOtp(req, res, next) {
       expiresAt: new Date(Date.now() + 5 * 60 * 1000),
     });
 
-    // Check if a transporter config exists
+    // Check if a transporter config exists and actually send the email
     if (!hasTransporter()) {
-      // In dev fallback mode, print to console and return OTP in response instantly
       console.log('========================================');
       console.log(`[DEV MODE] OTP for ${email}: ${otp}`);
       console.log('========================================');
       return res.json({ message: 'OTP sent to your email', otp, dev: true });
     }
 
-    // In production mode, send the email asynchronously in the background.
-    // This allows responding to the client immediately (~10-20ms) instead of waiting for SMTP delivery (~2000-5000ms).
-    sendOtpEmail(email, otp).catch((error) => {
-      console.error(`Background email sending failed for ${email}:`, error);
-    });
-
-    res.json({ message: 'OTP sent to your email' });
+    // Try to send email synchronously so client knows if it actually worked
+    try {
+      await sendOtpEmail(email, otp);
+      res.json({ message: 'OTP sent to your email' });
+    } catch (error) {
+      console.error(`Email sending failed for ${email}, falling back to dev mode:`, error);
+      return res.json({ message: 'OTP sent to your email (dev fallback)', otp, dev: true });
+    }
   } catch (error) {
     next(error);
   }
