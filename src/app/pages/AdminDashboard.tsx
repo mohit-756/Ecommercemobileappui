@@ -47,7 +47,7 @@ export function AdminDashboard() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {cards.map((card, idx) => (
                 <div key={idx} className="bg-white dark:bg-surface p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-border-light">
                   <div className={`w-10 h-10 rounded-xl ${card.color} flex items-center justify-center mb-3`}>

@@ -25,7 +25,7 @@ export function AdminShell() {
     <div className="min-h-screen bg-gray-50 dark:bg-background font-sans text-gray-900 dark:text-text-primary flex flex-col lg:flex-row transition-colors duration-300">
       
       {/* Desktop Sidebar (Left side) */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white dark:bg-surface border-r border-gray-200 dark:border-border-light min-h-screen sticky top-0 shrink-0">
+      <aside className="hidden lg:flex flex-col w-64 bg-white dark:bg-surface border-r border-gray-200 dark:border-border-light h-screen sticky top-0 shrink-0 self-start overflow-y-auto">
         <div className="h-20 flex items-center gap-3 px-6 border-b border-gray-100 dark:border-border-light">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-100 dark:shadow-blue-900/30">
             <span className="text-white text-lg font-black">👑</span>
@@ -78,19 +78,7 @@ export function AdminShell() {
       {/* Main Content wrapper */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         
-        {/* Mobile Top Header (hidden on large screens) */}
-        <header className="lg:hidden bg-white dark:bg-surface border-b border-gray-200 dark:border-border-light h-16 flex items-center justify-between px-6 sticky top-0 z-40 transition-colors duration-300">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">👑</span>
-            <span className="font-black text-gray-900 dark:text-text-primary text-base">DryFruit Admin</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-full transition-all cursor-pointer"
-          >
-            <LogOut size={20} />
-          </button>
-        </header>
+
 
         {/* Main Content Area */}
         <main className="flex-grow overflow-y-auto">
