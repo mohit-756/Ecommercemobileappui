@@ -6,6 +6,7 @@ import { authService } from '../services/authService';
 import { biometricService } from '../services/biometricService';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
+import { IMAGE_BASE_URL } from '../services/api';
 
 export function Login() {
   const navigate = useNavigate();
@@ -169,7 +170,7 @@ export function Login() {
             
             <div className="relative z-10 flex justify-center py-6">
               <img 
-                src="/images/banners/mixed_nuts.png" 
+                src={`${IMAGE_BASE_URL}/images/promo/mixed_nuts.png`} 
                 alt="Dry Fruits Showcase" 
                 className="w-56 h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-float"
               />

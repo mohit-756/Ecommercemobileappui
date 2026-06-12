@@ -16,6 +16,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import { categories as mockCategories, products as mockProducts } from '../data/mock';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
+import { IMAGE_BASE_URL } from '../services/api';
 
 const bannerIcons: Record<string, any> = {
   LayoutGrid, Apple, Cherry, ShoppingBag, Sprout,
@@ -28,7 +29,7 @@ const banners = [
     subtitle: 'Fresh & Organic',
     description: '100% natural, handpicked walnuts, almonds, and cashews sourced from organic farms.',
     bg: 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400',
-    image: '/images/banners/mixed_nuts.png',
+    image: '/images/promo/mixed_nuts.png',
   },
   {
     id: 2,
@@ -36,7 +37,7 @@ const banners = [
     subtitle: 'Nutrition You Trust',
     description: 'Boost your immunity and energy with our premium selected superfoods and cardamoms.',
     bg: 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400',
-    image: '/images/banners/healthy_lifestyle.png',
+    image: '/images/promo/healthy_lifestyle.png',
   },
   {
     id: 3,
@@ -44,7 +45,7 @@ const banners = [
     subtitle: 'Special Offers',
     description: 'Share health and happiness. Enjoy up to 25% off on our luxury dry fruit gift boxes.',
     bg: 'bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400',
-    image: '/images/banners/gift_box.png',
+    image: '/images/promo/gift_box.png',
   },
 ];
 
@@ -268,7 +269,7 @@ export function Home() {
                       </div>
                       <div className="absolute right-0 bottom-0 top-0 w-[45%] flex items-center justify-end z-10 pointer-events-none p-4">
                         <img 
-                          src={banner.image} 
+                          src={`${IMAGE_BASE_URL}${banner.image}`} 
                           alt={banner.title} 
                           className="h-[85%] md:h-[95%] w-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.3)] animate-float"
                         />

@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from 'react-router';
 import { ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
 import { authService } from '../services/authService';
 import { toast } from 'sonner';
-
 import { hapticService } from '../services/hapticService';
+import { IMAGE_BASE_URL } from '../services/api';
 
 export function VerifyOtp() {
   const navigate = useNavigate();
@@ -120,7 +120,7 @@ export function VerifyOtp() {
             
             <div className="relative z-10 flex justify-center py-6">
               <img 
-                src="/images/banners/healthy_lifestyle.png" 
+                src={`${IMAGE_BASE_URL}/images/promo/healthy_lifestyle.png`} 
                 alt="Security Showcase" 
                 className="w-56 h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-float"
               />

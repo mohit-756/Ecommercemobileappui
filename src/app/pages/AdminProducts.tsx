@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Plus, Edit3, Trash2, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Edit3, Trash2, Search, Upload, Loader2 } from 'lucide-react';
 import { productService } from '../services/productService';
 import { toast } from 'sonner';
 import api from '../services/api';
+import axios from 'axios';
 
 export function AdminProducts() {
   const navigate = useNavigate();
@@ -14,6 +15,30 @@ export function AdminProducts() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({ name: '', description: '', price: '', originalPrice: '', stock: '', category: '', image: '' });
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const apiKey = import.meta.env.VITE_IMGBB_API_KEY || '600a7523f557d34d8efd20a8c2794c77';
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await axios.post(`https://api.imgbb.com/1/upload?key=${apiKey}`, formData);
+      const url = response.data.data.url;
+      setForm(f => ({ ...f, image: url }));
+      toast.success('Image uploaded successfully!');
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      const msg = err.response?.data?.error?.message || 'Failed to upload image. Please try again.';
+      toast.error(msg);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const fetchProducts = () => {
     setLoading(true);
@@ -190,8 +215,48 @@ export function AdminProducts() {
                 </div>
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-500 dark:text-text-secondary">Image URL</label>
-                <input value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} className="w-full bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200" />
+                <label className="text-xs font-medium text-gray-500 dark:text-text-secondary block mb-1">Product Image</label>
+                <div className="flex gap-2">
+                  <input
+                    value={form.image}
+                    onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                    placeholder="Paste image URL here..."
+                    className="flex-1 bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200"
+                  />
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="admin-image-upload"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="admin-image-upload"
+                      className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 dark:border-border-medium bg-white dark:bg-surface-secondary text-gray-700 dark:text-text-primary cursor-pointer hover:bg-gray-50 active:scale-[0.98] transition-all ${uploading ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    >
+                      {uploading ? (
+                        <Loader2 size={16} className="animate-spin text-blue-600" />
+                      ) : (
+                        <Upload size={16} className="text-blue-600" />
+                      )}
+                      <span>Upload</span>
+                    </label>
+                  </div>
+                </div>
+                {form.image && (
+                  <div className="mt-2 w-16 h-16 rounded-xl overflow-hidden border border-gray-150 relative group">
+                    <img src={form.image} alt="Preview" className="w-full h-full object-cover" />
+                    <button 
+                      type="button" 
+                      onClick={() => setForm(f => ({ ...f, image: '' }))} 
+                      className="absolute inset-0 bg-black/40 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex gap-3 mt-6">
