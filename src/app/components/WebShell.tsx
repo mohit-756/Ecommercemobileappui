@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useSearchParams, useLocation } from 'react-router';
-import { ShoppingCart, User, Search, Heart, Leaf, Zap } from 'lucide-react';
+import { ShoppingCart, User, Search, Heart, Leaf, Zap, X } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../contexts/AuthContext';
@@ -69,13 +69,21 @@ export function WebShell() {
                       }
                     }}
                     placeholder="Search products..."
-                    className="w-full bg-gray-100/80 dark:bg-surface-secondary border border-transparent hover:bg-gray-100 dark:hover:bg-surface-tertiary focus:bg-white dark:focus:bg-surface focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-full py-3 pl-12 pr-4 outline-none transition-all text-base text-gray-900 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-tertiary"
+                    className="w-full bg-gray-100/80 dark:bg-surface-secondary border border-transparent hover:bg-gray-100 dark:hover:bg-surface-tertiary focus:bg-white dark:focus:bg-surface focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-full py-3 pl-12 pr-12 outline-none transition-all text-base text-gray-900 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-tertiary"
                     onFocus={() => {
                       if (location.pathname !== '/search') {
                         navigate('/search');
                       }
                     }}
                   />
+                  {query && (
+                    <button
+                      onClick={() => navigate('/search', { replace: location.pathname === '/search' })}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary hover:text-gray-600 dark:hover:text-text-secondary transition-colors"
+                    >
+                      <X size={20} />
+                    </button>
+                  )}
                 </div>
               </div>
             )}
