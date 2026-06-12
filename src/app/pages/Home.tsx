@@ -63,6 +63,7 @@ export function Home() {
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
 
+
   useEffect(() => {
     const dismissed = sessionStorage.getItem('location-popup-dismissed');
     if (!dismissed) {
@@ -310,6 +311,42 @@ export function Home() {
             </div>
           </div>
 
+          {/* Categories Section (Positioned directly below Banner) */}
+          <div className="z-20 relative animate-fade-in">
+            <div className="flex justify-between items-center mb-4 hidden lg:flex">
+              <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Categories</h3>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
+              {categories.map((cat: any) => {
+                const catId = cat._id || cat.id;
+                const Icon = bannerIcons[cat.icon] || LayoutGrid;
+                const isActive = activeCategory === catId;
+                return (
+                  <button
+                    key={catId}
+                    onClick={() => { hapticService.selection(); setActiveCategory(catId); }}
+                    className="flex flex-col items-center gap-2 min-w-[72px] sm:min-w-[84px] md:min-w-[96px]"
+                  >
+                    <div className={cn(
+                      "w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-2xl flex items-center justify-center transition-all duration-300",
+                      isActive 
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/30 scale-105" 
+                        : "bg-white dark:bg-surface border border-gray-100 dark:border-border-light text-gray-600 dark:text-text-secondary shadow-md shadow-black/5 hover:border-gray-200 dark:hover:border-border-medium"
+                    )}>
+                      <Icon size={24} className="sm:w-7 sm:h-7 md:w-8 md:h-8" strokeWidth={isActive ? 2.5 : 2} />
+                    </div>
+                    <span className={cn(
+                      "text-xs md:text-sm font-medium transition-colors",
+                      isActive ? "text-blue-600" : "text-gray-500 dark:text-text-secondary"
+                    )}>
+                      {cat.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Best Sellers</h3>
@@ -347,38 +384,7 @@ export function Home() {
             </div>
           )}
 
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Categories</h3>
-            </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
-              {categories.map((cat: any) => {
-                const catId = cat._id || cat.id;
-                const Icon = bannerIcons[cat.icon] || LayoutGrid;
-                const isActive = activeCategory === catId;
-                return (
-                  <button
-                    key={catId}
-                    onClick={() => { hapticService.selection(); setActiveCategory(catId); }}
-                    className="flex flex-col items-center gap-2 min-w-[72px] sm:min-w-[84px] md:min-w-[96px]"
-                  >
-                    <div className={cn(
-                      "w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-2xl flex items-center justify-center transition-all duration-300",
-                      isActive ? "bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/30 scale-105" : "bg-white dark:bg-surface border border-gray-100 dark:border-border-light text-gray-600 dark:text-text-secondary hover:border-gray-200 dark:hover:border-border-medium"
-                    )}>
-                      <Icon size={24} className="sm:w-7 sm:h-7 md:w-8 md:h-8" strokeWidth={isActive ? 2.5 : 2} />
-                    </div>
-                    <span className={cn(
-                      "text-xs md:text-sm font-medium transition-colors",
-                      isActive ? "text-blue-600" : "text-gray-500 dark:text-text-secondary"
-                    )}>
-                      {cat.name}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {/* Categories section moved from here */}
 
           <div>
             <div className="flex flex-col gap-3 mb-4">
