@@ -10,6 +10,7 @@ function getTransporter() {
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
+      family: 4, // Force IPv4 connection to prevent ENETUNREACH in cloud environments
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD,
@@ -20,6 +21,7 @@ function getTransporter() {
       host: process.env.EMAIL_HOST,
       port: parseInt(process.env.EMAIL_PORT || '587'),
       secure: process.env.EMAIL_SECURE === 'true',
+      family: 4, // Force IPv4 connection to prevent ENETUNREACH in cloud environments
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
