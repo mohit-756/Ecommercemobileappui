@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
-import { generateOtp, sendOtpEmail } from '../services/emailService.js';
+import { generateOtp, sendOtpEmail, hasTransporter } from '../services/emailService.js';
 
 function generateToken(userId) {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -55,11 +55,20 @@ export async function sendOtp(req, res, next) {
       expiresAt: new Date(Date.now() + 5 * 60 * 1000),
     });
 
-    const emailResult = await sendOtpEmail(email, otp);
-
-    if (emailResult.messageId === 'dev-mode') {
+    // Check if a transporter config exists
+    if (!hasTransporter()) {
+      // In dev fallback mode, print to console and return OTP in response instantly
+      console.log('========================================');
+      console.log(`[DEV MODE] OTP for ${email}: ${otp}`);
+      console.log('========================================');
       return res.json({ message: 'OTP sent to your email', otp, dev: true });
     }
+
+    // In production mode, send the email asynchronously in the background.
+    // This allows responding to the client immediately (~10-20ms) instead of waiting for SMTP delivery (~2000-5000ms).
+    sendOtpEmail(email, otp).catch((error) => {
+      console.error(`Background email sending failed for ${email}:`, error);
+    });
 
     res.json({ message: 'OTP sent to your email' });
   } catch (error) {

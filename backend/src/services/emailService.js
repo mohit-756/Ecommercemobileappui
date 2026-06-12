@@ -30,6 +30,10 @@ function getTransporter() {
   return transporter;
 }
 
+export function hasTransporter() {
+  return !!getTransporter();
+}
+
 export function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
