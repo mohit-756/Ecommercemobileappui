@@ -79,11 +79,20 @@ export function AdminProducts() {
       return;
     }
     try {
+      const priceVal = Number(form.price);
+      const originalPriceVal = form.originalPrice ? Number(form.originalPrice) : undefined;
+      let discount: string | null = null;
+      if (originalPriceVal && originalPriceVal > priceVal) {
+        const pct = Math.round(((originalPriceVal - priceVal) / originalPriceVal) * 100);
+        discount = `${pct}%`;
+      }
+
       const payload = {
         name: form.name,
         description: form.description,
-        price: Number(form.price),
-        originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined,
+        price: priceVal,
+        originalPrice: originalPriceVal,
+        discount,
         stock: Number(form.stock) || 0,
         category: form.category,
         images: form.image ? [form.image] : [],
@@ -177,36 +186,39 @@ export function AdminProducts() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/40">
-          <div className="bg-white dark:bg-surface w-full md:max-w-md md:rounded-2xl rounded-t-2xl p-6 max-h-[85vh] overflow-y-auto">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-text-primary mb-4">{editing ? 'Edit Product' : 'Add Product'}</h2>
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs font-medium text-gray-500 dark:text-text-secondary">Name *</label>
-                <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="w-full bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200" />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-gray-500 dark:text-text-secondary">Description</label>
-                <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} className="w-full bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 resize-none" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/40 p-4">
+          <div className="bg-white dark:bg-surface w-full md:max-w-2xl md:rounded-2xl rounded-t-2xl p-6 md:p-8 max-h-[90vh] md:max-h-[85vh] overflow-y-auto shadow-2xl transition-all duration-300">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-text-primary mb-6">{editing ? 'Edit Product' : 'Add Product'}</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left Column (Details) */}
+              <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-medium text-gray-500 dark:text-text-secondary">Price *</label>
-                  <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} className="w-full bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200" />
+                  <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Name *</label>
+                  <input 
+                    value={form.name} 
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))} 
+                    placeholder="Enter product name"
+                    className="w-full bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary" 
+                  />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-500 dark:text-text-secondary">Original Price</label>
-                  <input type="number" value={form.originalPrice} onChange={e => setForm(f => ({ ...f, originalPrice: e.target.value }))} className="w-full bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200" />
+                  <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Description *</label>
+                  <textarea 
+                    value={form.description} 
+                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))} 
+                    placeholder="Write product description, health benefits, etc."
+                    rows={4} 
+                    className="w-full bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 resize-none text-gray-900 dark:text-text-primary" 
+                  />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-gray-500 dark:text-text-secondary">Stock</label>
-                  <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))} className="w-full bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200" />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-500 dark:text-text-secondary">Category *</label>
-                  <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} className="w-full bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200">
+                  <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Category *</label>
+                  <select 
+                    value={form.category} 
+                    onChange={e => setForm(f => ({ ...f, category: e.target.value }))} 
+                    className="w-full bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary"
+                  >
                     <option value="">Select category</option>
                     {categories.map(c => (
                       <option key={c._id} value={c._id}>{c.name}</option>
@@ -214,54 +226,100 @@ export function AdminProducts() {
                   </select>
                 </div>
               </div>
-              <div>
-                <label className="text-xs font-medium text-gray-500 dark:text-text-secondary block mb-1">Product Image</label>
-                <div className="flex gap-2">
-                  <input
-                    value={form.image}
-                    onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
-                    placeholder="Paste image URL here..."
-                    className="flex-1 bg-gray-50 dark:bg-background rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200"
-                  />
+
+              {/* Right Column (Price & Media) */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      id="admin-image-upload"
-                      onChange={handleImageUpload}
-                      disabled={uploading}
-                      className="hidden"
+                    <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Price *</label>
+                    <input 
+                      type="number" 
+                      value={form.price} 
+                      onChange={e => setForm(f => ({ ...f, price: e.target.value }))} 
+                      placeholder="₹"
+                      className="w-full bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary" 
                     />
-                    <label
-                      htmlFor="admin-image-upload"
-                      className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 dark:border-border-medium bg-white dark:bg-surface-secondary text-gray-700 dark:text-text-primary cursor-pointer hover:bg-gray-50 active:scale-[0.98] transition-all ${uploading ? 'opacity-60 cursor-not-allowed' : ''}`}
-                    >
-                      {uploading ? (
-                        <Loader2 size={16} className="animate-spin text-blue-600" />
-                      ) : (
-                        <Upload size={16} className="text-blue-600" />
-                      )}
-                      <span>Upload</span>
-                    </label>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Original Price</label>
+                    <input 
+                      type="number" 
+                      value={form.originalPrice} 
+                      onChange={e => setForm(f => ({ ...f, originalPrice: e.target.value }))} 
+                      placeholder="₹"
+                      className="w-full bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary" 
+                    />
                   </div>
                 </div>
-                {form.image && (
-                  <div className="mt-2 w-16 h-16 rounded-xl overflow-hidden border border-gray-150 relative group">
-                    <img src={form.image} alt="Preview" className="w-full h-full object-cover" />
-                    <button 
-                      type="button" 
-                      onClick={() => setForm(f => ({ ...f, image: '' }))} 
-                      className="absolute inset-0 bg-black/40 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      Remove
-                    </button>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Stock</label>
+                  <input 
+                    type="number" 
+                    value={form.stock} 
+                    onChange={e => setForm(f => ({ ...f, stock: e.target.value }))} 
+                    className="w-full bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary" 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Product Image</label>
+                  <div className="flex gap-2">
+                    <input
+                      value={form.image}
+                      onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                      placeholder="Paste image URL here..."
+                      className="flex-1 bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary"
+                    />
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="admin-image-upload"
+                        onChange={handleImageUpload}
+                        disabled={uploading}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="admin-image-upload"
+                        className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 dark:border-border-medium bg-white dark:bg-surface-secondary text-gray-700 dark:text-text-primary cursor-pointer hover:bg-gray-50 active:scale-[0.98] transition-all ${uploading ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      >
+                        {uploading ? (
+                          <Loader2 size={16} className="animate-spin text-blue-600" />
+                        ) : (
+                          <Upload size={16} className="text-blue-600" />
+                        )}
+                        <span>Upload</span>
+                      </label>
+                    </div>
                   </div>
-                )}
+                  {form.image && (
+                    <div className="mt-3 w-24 h-24 rounded-2xl overflow-hidden border border-gray-200 relative group shadow-sm">
+                      <img src={form.image} alt="Preview" className="w-full h-full object-cover" />
+                      <button 
+                        type="button" 
+                        onClick={() => setForm(f => ({ ...f, image: '' }))} 
+                        className="absolute inset-0 bg-black/45 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowForm(false)} className="flex-1 bg-gray-100 dark:bg-surface-tertiary text-gray-700 dark:text-text-primary font-semibold rounded-xl py-3">Cancel</button>
-              <button onClick={handleSave} className="flex-1 bg-blue-600 text-white font-semibold rounded-xl py-3">Save</button>
+
+            <div className="flex gap-3 mt-8 justify-end">
+              <button 
+                onClick={() => setShowForm(false)} 
+                className="px-6 py-3 rounded-xl bg-gray-100 dark:bg-surface-tertiary text-gray-700 dark:text-text-primary font-semibold text-sm hover:bg-gray-200 active:scale-95 transition-all"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSave} 
+                className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-200 dark:shadow-blue-900/30 active:scale-95 transition-all"
+              >
+                Save Product
+              </button>
             </div>
           </div>
         </div>

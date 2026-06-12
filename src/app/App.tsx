@@ -5,6 +5,7 @@ import { CartProvider } from './contexts/CartContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { PlatformShell } from './components/PlatformShell';
+import { AdminShell } from './components/AdminShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LocationProvider } from './contexts/LocationContext';
 import { LocationSelectorModal } from './components/LocationSelectorModal';
@@ -81,10 +82,13 @@ export default function App() {
                     <Route path="support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
                     <Route path="privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
                     <Route path="terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
+                    <Route path="*" element={<Navigate to="/home" replace />} />
+                  </Route>
+
+                  <Route element={<AdminShell />}>
                     <Route path="admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                     <Route path="admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
                     <Route path="admin/orders" element={<ProtectedRoute><AdminOrders /></ProtectedRoute>} />
-                    <Route path="*" element={<Navigate to="/home" replace />} />
                   </Route>
                 </Routes>
                 <LocationSelectorModal />
