@@ -6,6 +6,7 @@ const orderItemSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   quantity: { type: Number, required: true, min: 1 },
   image: String,
+  weight: String,
 });
 
 const trackingEventSchema = new mongoose.Schema({

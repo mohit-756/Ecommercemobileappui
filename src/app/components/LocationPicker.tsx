@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Search, Crosshair, Loader2, ChevronLeft } from 'lucide-react';
 import { Geolocation } from '@capacitor/geolocation';
+import { Capacitor } from '@capacitor/core';
 import { geocodingService } from '../services/geocodingService';
 import { toast } from 'sonner';
 
@@ -61,8 +62,10 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
     }).addTo(map);
 
     // Force Leaflet to recalculate container size once animations/mounting completes
-    setTimeout(() => {
-      map.invalidateSize();
+    const timer = setTimeout(() => {
+      if (mapRef.current) {
+        map.invalidateSize();
+      }
     }, 250);
 
     const marker = L.marker(center, { draggable: true }).addTo(map);
@@ -85,6 +88,7 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
     }
 
     return () => {
+      clearTimeout(timer);
       map.remove();
       mapRef.current = null;
     };
@@ -162,12 +166,14 @@ export function LocationPicker({ onConfirm, onClose, initialLat, initialLng }: L
 
   async function handleLocateMe() {
     try {
-      const permission = await Geolocation.checkPermissions();
-      if (permission.location !== 'granted') {
-        const reqStatus = await Geolocation.requestPermissions();
-        if (reqStatus.location !== 'granted') {
-          toast.error('Location permission denied. Please enable it in Android app settings.');
-          return;
+      if (Capacitor.isNativePlatform()) {
+        const permission = await Geolocation.checkPermissions();
+        if (permission.location !== 'granted') {
+          const reqStatus = await Geolocation.requestPermissions();
+          if (reqStatus.location !== 'granted') {
+            toast.error('Location permission denied. Please enable it in Android app settings.');
+            return;
+          }
         }
       }
 

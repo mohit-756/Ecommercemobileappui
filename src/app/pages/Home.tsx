@@ -9,6 +9,7 @@ import { localNotificationService } from '../services/localNotificationService';
 import { recentlyViewedService } from '../services/recentlyViewedService';
 import { ProductCard } from '../components/ProductCard';
 import { LocationPermissionPopup } from '../components/LocationPermissionPopup';
+import { useDeliveryLocation } from '../contexts/LocationContext';
 import { cn } from '../lib/utils';
 import { hapticService } from '../services/hapticService';
 import { Skeleton } from '../components/ui/skeleton';
@@ -21,14 +22,36 @@ const bannerIcons: Record<string, any> = {
 };
 
 const banners = [
-  { id: 1, title: 'Premium Dry Fruits', subtitle: 'Fresh & Organic', bg: 'bg-gradient-to-r from-amber-500 to-yellow-600' },
-  { id: 2, title: 'Healthy Living', subtitle: 'Nutrition You Trust', bg: 'bg-gradient-to-r from-green-500 to-emerald-600' },
-  { id: 3, title: 'Special Offers', subtitle: 'Up to 26% Off', bg: 'bg-gradient-to-r from-orange-500 to-red-600' },
+  {
+    id: 1,
+    title: 'Premium Dry Fruits',
+    subtitle: 'Fresh & Organic',
+    description: '100% natural, handpicked walnuts, almonds, and cashews sourced from organic farms.',
+    bg: 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400',
+    image: '/images/banners/mixed_nuts.png',
+  },
+  {
+    id: 2,
+    title: 'Healthy Living',
+    subtitle: 'Nutrition You Trust',
+    description: 'Boost your immunity and energy with our premium selected superfoods and cardamoms.',
+    bg: 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400',
+    image: '/images/banners/healthy_lifestyle.png',
+  },
+  {
+    id: 3,
+    title: 'Exclusive Gifting',
+    subtitle: 'Special Offers',
+    description: 'Share health and happiness. Enjoy up to 25% off on our luxury dry fruit gift boxes.',
+    bg: 'bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400',
+    image: '/images/banners/gift_box.png',
+  },
 ];
 
 export function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { deliveryLocation, setShowSelector, detectLocation } = useDeliveryLocation();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -51,15 +74,7 @@ export function Home() {
   async function handleAllowLocation() {
     setShowLocationPopup(false);
     sessionStorage.setItem('location-popup-dismissed', 'true');
-    try {
-      await Geolocation.getCurrentPosition({
-        enableHighAccuracy: false,
-        timeout: 5000
-      });
-      // Success: maybe we could refresh product list based on location here
-    } catch (err) {
-      console.warn('Home location error:', err);
-    }
+    detectLocation();
   }
 
   function handleDismissLocation() {
@@ -179,9 +194,9 @@ export function Home() {
             <span className="text-[10px] font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-0.5 leading-none">
               {user ? `Hi, ${user.name.split(' ')[0]} 👋` : 'Welcome to Dry Fruit Hub 🍎'}
             </span>
-            <div onClick={() => navigate('/addresses')} className="cursor-pointer active:opacity-70 transition-opacity mt-1">
-              <h2 className="text-gray-900 dark:text-text-primary font-black text-sm flex items-center gap-1 leading-none">
-                Home — Mumbai, India <span className="text-blue-600 text-[10px] mt-0.5">▾</span>
+            <div onClick={() => setShowSelector(true)} className="cursor-pointer active:opacity-70 transition-opacity mt-1.5">
+              <h2 className="text-gray-955 dark:text-text-primary font-black text-sm sm:text-base flex items-center gap-1 leading-none">
+                Home — {deliveryLocation} <span className="text-blue-600 text-[10px] mt-0.5">▾</span>
               </h2>
             </div>
           </div>
@@ -240,17 +255,26 @@ export function Home() {
             <div className="overflow-hidden lg:rounded-2xl" ref={emblaRef}>
               <div className="flex">
                 {banners.map((banner) => (
-                  <div key={banner.id} className="flex-[0_0_100%] min-w-0">
-                    <div className={cn("h-40 sm:h-52 md:h-64 lg:h-72 xl:h-80 p-6 md:p-10 lg:p-12 flex flex-col justify-center relative overflow-hidden rounded-none lg:rounded-2xl", banner.bg)}>
-                      <div className="relative z-10">
-                        <p className="text-white/80 text-sm sm:text-base md:text-lg font-medium mb-1">{banner.subtitle}</p>
-                        <h3 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-5">{banner.title}</h3>
-                        <button className="bg-white/20 backdrop-blur-sm text-white text-xs md:text-sm font-semibold px-4 py-2 md:px-6 md:py-3 rounded-full hover:bg-white/30 transition-colors w-fit">
+                  <div key={banner.id} className="w-full shrink-0">
+                    <div className={cn("h-48 sm:h-60 md:h-72 lg:h-80 p-6 md:p-10 lg:p-12 flex items-center justify-between relative overflow-hidden rounded-none lg:rounded-2xl", banner.bg)}>
+                      <div className="relative z-10 max-w-[60%] flex flex-col justify-center h-full">
+                        <p className="text-white/80 text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-widest mb-1.5">{banner.subtitle}</p>
+                        <h3 className="text-white text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-2 sm:mb-3 leading-tight">{banner.title}</h3>
+                        <p className="text-white/90 text-xs sm:text-sm md:text-base mb-4 sm:mb-6 line-clamp-2 hidden sm:block font-medium max-w-md">{banner.description}</p>
+                        <button className="bg-white text-gray-900 shadow-lg shadow-black/10 text-xs md:text-sm font-bold px-5 py-2.5 md:px-7 md:py-3 rounded-full hover:bg-gray-50 active:scale-95 transition-all w-fit cursor-pointer">
                           Shop Now
                         </button>
                       </div>
-                      <div className="absolute -right-8 -bottom-8 w-32 h-32 md:w-48 md:h-48 bg-white/10 rounded-full blur-2xl"></div>
-                      <div className="absolute right-12 -top-12 w-24 h-24 md:w-36 md:h-36 bg-white/10 rounded-full blur-xl"></div>
+                      <div className="absolute right-0 bottom-0 top-0 w-[45%] flex items-center justify-end z-10 pointer-events-none p-4">
+                        <img 
+                          src={banner.image} 
+                          alt={banner.title} 
+                          className="h-[85%] md:h-[95%] w-auto object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.3)] animate-float"
+                        />
+                      </div>
+                      {/* Decorative background blurs */}
+                      <div className="absolute -right-8 -bottom-8 w-40 h-40 md:w-60 md:h-60 bg-white/10 rounded-full blur-3xl"></div>
+                      <div className="absolute right-24 -top-12 w-32 h-32 md:w-48 md:h-48 bg-white/10 rounded-full blur-2xl"></div>
                     </div>
                   </div>
                 ))}

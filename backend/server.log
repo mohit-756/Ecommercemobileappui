@@ -1,0 +1,9 @@
+Starting server...
+MONGODB_URI set: true
+JWT_SECRET set: true
+GMAIL_USER set: true
+GMAIL_APP_PASSWORD set: true
+PORT: 5000
+Connecting to MongoDB...
+MongoDB connected successfully
+Server running on port 5000

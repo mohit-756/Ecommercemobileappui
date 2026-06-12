@@ -7,6 +7,9 @@ export const authService = {
   login: (data: { email: string; password: string }) =>
     api.post('/auth/login', data),
 
+  loginWithGoogle: (idToken: string) =>
+    api.post('/auth/google', { idToken }),
+
   sendOtp: (data: { email: string }) =>
     api.post('/auth/send-otp', data),
 

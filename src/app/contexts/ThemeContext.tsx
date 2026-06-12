@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useAuth } from './AuthContext';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -63,21 +64,37 @@ function syncDocumentTheme(dark: boolean) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const { token } = useAuth();
+
   const [isDark, setIsDark] = useState(() => {
+    // Determine initial theme: force light mode if there is no auth token
+    const tokenExists = typeof window !== 'undefined' ? !!window.localStorage.getItem('token') : false;
+    if (!tokenExists) {
+      syncDocumentTheme(false);
+      return false;
+    }
     const stored = readStoredTheme();
     syncDocumentTheme(stored);
     return stored;
   });
-
-  useEffect(() => {
-    syncDocumentTheme(isDark);
-  }, []);
 
   const applyTheme = (dark: boolean) => {
     syncDocumentTheme(dark);
     localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(dark));
     setIsDark(dark);
   };
+
+  // Sync theme when the auth token state changes (login / logout)
+  useEffect(() => {
+    if (!token) {
+      // Force Light Mode and save it
+      applyTheme(false);
+    } else {
+      // Restore the user preference when logged in
+      const stored = readStoredTheme();
+      applyTheme(stored);
+    }
+  }, [token]);
 
   const toggleTheme = () => applyTheme(!isDark);
   const setTheme = (dark: boolean) => applyTheme(dark);

@@ -17,6 +17,7 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
@@ -89,6 +90,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     syncWishlistFromServer();
   }, [syncWishlistFromServer]);
 
+  const loginWithGoogle = useCallback(async (idToken: string) => {
+    const res = await authService.loginWithGoogle(idToken);
+    const { token: newToken, user: userData } = res.data;
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    setUser(userData);
+    syncWishlistFromServer();
+  }, [syncWishlistFromServer]);
+
   const register = useCallback(async (name: string, email: string, password: string, phone?: string) => {
     const res = await authService.register({ name, email, password, phone });
     const { token: newToken, user: userData } = res.data;
@@ -110,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, loginWithGoogle, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

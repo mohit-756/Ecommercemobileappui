@@ -34,6 +34,7 @@ export async function createOrder(req, res, next) {
       price: item.price,
       quantity: item.quantity,
       image: item.image || '',
+      weight: item.weight || null,
     }));
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);

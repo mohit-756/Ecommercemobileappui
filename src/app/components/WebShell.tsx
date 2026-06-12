@@ -3,6 +3,7 @@ import { ShoppingCart, User, Search, Heart, Leaf, Zap } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../contexts/AuthContext';
+import { useDeliveryLocation } from '../contexts/LocationContext';
 
 export function WebShell() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export function WebShell() {
   const query = searchParams.get('q') || '';
   const { itemCount } = useCart();
   const { user } = useAuth();
+  const { deliveryLocation, setShowSelector } = useDeliveryLocation();
 
   if (Capacitor.isNativePlatform()) {
     return null;
@@ -34,16 +36,16 @@ export function WebShell() {
 
               {user && (
                 <div
-                  onClick={() => navigate('/addresses')}
+                  onClick={() => setShowSelector(true)}
                   className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 dark:hover:bg-surface-secondary cursor-pointer transition-colors text-left border border-transparent hover:border-gray-100 dark:hover:border-border-light"
                 >
                   <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-500/20 flex items-center justify-center text-amber-500 flex-shrink-0">
                     <Zap size={15} className="fill-amber-500" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-[10px] font-extrabold text-gray-400 dark:text-text-tertiary uppercase tracking-wider leading-none">Deliver to</div>
-                    <div className="text-xs font-extrabold text-gray-800 dark:text-text-secondary flex items-center gap-0.5 leading-tight mt-0.5">
-                      <span className="truncate max-w-[120px]">Mumbai, India</span>
+                    <div className="text-[10px] font-black text-gray-400 dark:text-text-tertiary uppercase tracking-widest leading-none">Deliver to</div>
+                    <div className="text-sm font-black text-gray-800 dark:text-text-secondary flex items-center gap-0.5 leading-tight mt-1">
+                      <span className="truncate max-w-[150px]">{deliveryLocation}</span>
                       <span className="text-blue-600 text-[10px] flex-shrink-0">▾</span>
                     </div>
                   </div>

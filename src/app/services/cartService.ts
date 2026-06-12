@@ -2,8 +2,8 @@ import api from './api';
 
 export const cartService = {
   getCart: () => api.get('/cart'),
-  addToCart: (productId: string, quantity?: number) =>
-    api.post('/cart/add', { productId, quantity }),
+  addToCart: (productId: string, quantity?: number, selectedWeight?: string) =>
+    api.post('/cart/add', { productId, quantity, selectedWeight }),
   updateCartItem: (itemId: string, quantity: number) =>
     api.put(`/cart/${itemId}`, { quantity }),
   removeFromCart: (itemId: string) =>

@@ -1,4 +1,6 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
 import { generateOtp, sendOtpEmail } from '../services/emailService.js';
@@ -146,5 +148,50 @@ export async function updateProfile(req, res, next) {
     res.json(user);
   } catch (error) {
     next(error);
+  }
+}
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export async function googleLogin(req, res, next) {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ message: 'Google ID Token is required' });
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, picture } = payload;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Google account does not have an email' });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      const randomPassword = crypto.randomBytes(16).toString('hex');
+      user = await User.create({
+        name: name || email.split('@')[0],
+        email,
+        password: randomPassword,
+        avatar: picture || '',
+      });
+    } else if (picture && !user.avatar) {
+      user.avatar = picture;
+      await user.save();
+    }
+
+    const token = generateToken(user._id);
+    res.json({ token, user });
+  } catch (error) {
+    console.error('Google verification error:', error);
+    res.status(401).json({ message: 'Google authentication failed' });
   }
 }

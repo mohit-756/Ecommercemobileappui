@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ChevronLeft, MapPin, CreditCard, Wallet, ShieldCheck, Banknote, Star, ExternalLink, Loader2, Zap } from 'lucide-react';
+import { ChevronLeft, MapPin, CreditCard, Wallet, ShieldCheck, Banknote, Star, ExternalLink, Loader2, Zap, X, Home, Briefcase } from 'lucide-react';
 import { cn, formatPrice } from '../lib/utils';
 import { addressService } from '../services/addressService';
 import { shippingService } from '../services/shippingService';
 import { orderService } from '../services/orderService';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useDeliveryLocation } from '../contexts/LocationContext';
 import { loadRazorpayScript, openRazorpayCheckout } from '../lib/razorpay';
 import { toast } from 'sonner';
 import { hapticService } from '../services/hapticService';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface Address {
   _id: string;
@@ -29,6 +31,7 @@ export function Checkout() {
   const navigate = useNavigate();
   const { items, subtotal, clearCart } = useCart();
   const { user } = useAuth();
+  const { addressDetails } = useDeliveryLocation();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -36,6 +39,86 @@ export function Checkout() {
   const [checkingPincode, setCheckingPincode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
+
+  // New states for inline address creation
+  const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+  const [addressForm, setAddressForm] = useState({
+    fullName: '',
+    phone: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    pincode: '',
+    landmark: '',
+    label: 'home' as 'home' | 'work' | 'other',
+    isDefault: true,
+  });
+  const [savingAddress, setSavingAddress] = useState(false);
+
+  const handleOpenAddAddress = () => {
+    let prefilledCity = addressDetails?.city || '';
+    let prefilledState = addressDetails?.state || '';
+    let prefilledPincode = addressDetails?.pincode || '';
+    let prefilledLine1 = addressDetails?.addressLine1 || '';
+    let prefilledLine2 = addressDetails?.addressLine2 || '';
+
+    // Fallback if addressDetails is not available but we have deliveryLocation
+    if (!prefilledCity && localStorage.getItem('delivery_location')) {
+      const locStr = localStorage.getItem('delivery_location') || '';
+      if (locStr === 'Mumbai, India') {
+        prefilledCity = 'Mumbai';
+        prefilledState = 'Maharashtra';
+        prefilledPincode = '400001';
+      } else {
+        const parts = locStr.split(',');
+        prefilledCity = parts[0]?.trim() || '';
+        prefilledState = parts[1]?.trim() || '';
+      }
+    }
+
+    setAddressForm({
+      fullName: user?.name || '',
+      phone: user?.phone || '',
+      addressLine1: prefilledLine1,
+      addressLine2: prefilledLine2,
+      city: prefilledCity,
+      state: prefilledState,
+      pincode: prefilledPincode,
+      landmark: '',
+      label: 'home',
+      isDefault: true,
+    });
+    setShowAddAddressModal(true);
+  };
+
+  const handleSaveAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!addressForm.fullName.trim() || !addressForm.phone.trim() || !addressForm.addressLine1.trim() || !addressForm.pincode.trim() || !addressForm.city.trim() || !addressForm.state.trim()) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    setSavingAddress(true);
+    try {
+      const res = await addressService.createAddress(addressForm);
+      toast.success('Address saved successfully!');
+      
+      // Re-fetch addresses
+      const addrsRes = await addressService.getAddresses();
+      const addrs = addrsRes.data;
+      setAddresses(addrs);
+      
+      // Select the new address
+      const newAddr = addrs.find((a: any) => a._id === res.data._id) || res.data;
+      setSelectedAddress(newAddr);
+      
+      setShowAddAddressModal(false);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to save address');
+    } finally {
+      setSavingAddress(false);
+    }
+  };
 
   useEffect(() => {
     addressService.getAddresses()
@@ -94,20 +177,22 @@ export function Checkout() {
       const cartItems = items.map(item => ({
         product: item.product._id || item.product.id,
         name: item.product.name,
-        price: item.product.price,
+        price: item.selectedPrice !== undefined && item.selectedPrice !== null ? item.selectedPrice : item.product.price,
         quantity: item.quantity,
         image: item.product.image || item.product.images?.[0] || '',
+        weight: item.selectedWeight || null,
       }));
 
+      const backendPaymentMethod = paymentMethod === 'cod' ? 'cod' : 'razorpay';
       const res = await orderService.createOrder({
         items: cartItems,
         shippingAddress,
-        paymentMethod,
+        paymentMethod: backendPaymentMethod,
       });
 
       const { order, razorpayOrder, razorpayKeyId } = res.data;
 
-      if (paymentMethod === 'cod') {
+      if (backendPaymentMethod === 'cod') {
         await hapticService.notificationSuccess();
         await clearCart();
         navigate(`/success?orderId=${order._id}`);
@@ -174,8 +259,8 @@ export function Checkout() {
 
   const paymentMethods = [
     { id: 'upi', name: 'UPI (GPay / PhonePe / Paytm)', icon: ShieldCheck, popular: true },
-    { id: 'razorpay', name: 'Credit / Debit Card', icon: CreditCard },
-    { id: 'razorpay', name: 'Wallet / Net Banking', icon: Wallet },
+    { id: 'card', name: 'Credit / Debit Card', icon: CreditCard },
+    { id: 'wallet', name: 'Wallet / Net Banking', icon: Wallet },
     { id: 'cod', name: 'Cash on Delivery', icon: Banknote },
   ];
 
@@ -198,13 +283,19 @@ export function Checkout() {
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="font-bold text-gray-900 dark:text-text-primary">Shipping Address</h3>
-                  <button onClick={() => navigate('/addresses')} className="text-blue-600 text-sm font-medium flex items-center gap-1 cursor-pointer">
-                    Manage <ExternalLink size={14} />
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button onClick={handleOpenAddAddress} className="text-blue-600 text-sm font-bold flex items-center gap-1 cursor-pointer hover:underline">
+                      + Add New
+                    </button>
+                    <span className="text-gray-300 dark:text-border-light text-xs">|</span>
+                    <button onClick={() => navigate('/addresses')} className="text-gray-550 dark:text-text-secondary text-sm font-medium flex items-center gap-1 cursor-pointer hover:text-blue-600 hover:underline">
+                      Manage <ExternalLink size={14} />
+                    </button>
+                  </div>
                 </div>
 
                 {addresses.length === 0 ? (
-                  <button onClick={() => navigate('/addresses')} className="w-full bg-white dark:bg-surface p-4 rounded-2xl border border-dashed border-gray-300 dark:border-border-medium flex items-center justify-center gap-2 text-gray-500 dark:text-text-secondary hover:bg-gray-50 dark:hover:bg-background transition-colors cursor-pointer">
+                  <button onClick={handleOpenAddAddress} className="w-full bg-white dark:bg-surface p-4 rounded-2xl border border-dashed border-gray-300 dark:border-border-medium flex items-center justify-center gap-2 text-gray-500 dark:text-text-secondary hover:bg-gray-50 dark:hover:bg-background transition-colors cursor-pointer">
                     <MapPin size={20} /> Add Shipping Address
                   </button>
                 ) : (
@@ -240,7 +331,7 @@ export function Checkout() {
                     ) : pincodeStatus ? (
                       pincodeStatus.serviceable ? (
                         <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/20 px-3 py-1.5 rounded-full font-bold">
-                          <Zap size={12} className="fill-emerald-600" /> FREE DELIVERY IN 12 MINS
+                          <Zap size={12} className="fill-emerald-600" /> FREE INSTANT DELIVERY AVAILABLE
                         </div>
                       ) : (
                         <span className="text-sm text-red-600 bg-red-50 px-3 py-1 rounded-full font-medium">✕ Delivery not available</span>
@@ -277,33 +368,32 @@ export function Checkout() {
                 </div>
                 <div className="space-y-2">
                   {paymentMethods.map((method, idx) => {
-                    const methodId = method.id === 'cod' ? 'cod' : 'razorpay';
                     return (
                       <label key={idx} className={cn(
                         "flex items-center p-4 rounded-2xl border cursor-pointer transition-all bg-white dark:bg-surface relative",
-                        paymentMethod === methodId ? "border-blue-600 ring-1 ring-blue-600 shadow-sm" : "border-gray-100 dark:border-border-light"
+                        paymentMethod === method.id ? "border-blue-600 ring-1 ring-blue-600 shadow-sm" : "border-gray-100 dark:border-border-light"
                       )}>
-                        <method.icon size={24} className={cn("mr-4", paymentMethod === methodId ? "text-blue-600" : "text-gray-400 dark:text-text-tertiary")} />
+                        <method.icon size={24} className={cn("mr-4", paymentMethod === method.id ? "text-blue-600" : "text-gray-400 dark:text-text-tertiary")} />
                         <div className="flex-1">
-                          <span className={cn("font-bold block text-sm", paymentMethod === methodId ? "text-blue-900 dark:text-blue-300" : "text-gray-700 dark:text-text-primary")}>{method.name}</span>
+                          <span className={cn("font-bold block text-sm", paymentMethod === method.id ? "text-blue-900 dark:text-blue-300" : "text-gray-700 dark:text-text-primary")}>{method.name}</span>
                           {(method as any).popular && <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-tight">Popular</span>}
                         </div>
-                        <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === methodId ? "border-blue-600" : "border-gray-300 dark:border-border-medium")}>
-                          {paymentMethod === methodId && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
+                        <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === method.id ? "border-blue-600" : "border-gray-300 dark:border-border-medium")}>
+                          {paymentMethod === method.id && <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />}
                         </div>
-                        <input type="radio" name="payment" className="hidden" checked={paymentMethod === methodId} onChange={() => setPaymentMethod(methodId)} />
+                        <input type="radio" name="payment" className="hidden" checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} />
                       </label>
                     );
                   })}
                 </div>
-                {paymentMethod === 'razorpay' && (
+                {paymentMethod !== 'cod' && (
                   <p className="text-xs text-gray-400 dark:text-text-tertiary mt-2">You will be redirected to Razorpay to complete payment</p>
                 )}
               </div>
             </div>
 
             {/* Right Column */}
-            <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
+            <div className="hidden lg:block lg:col-span-1 space-y-6 lg:sticky lg:top-24">
               <div className="bg-white dark:bg-surface rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-border-light space-y-4">
                 <h3 className="font-bold text-gray-900 dark:text-text-primary mb-2">Order Total</h3>
                 <div className="flex justify-between items-end mb-4">
@@ -311,12 +401,14 @@ export function Checkout() {
                   <span className="text-2xl font-bold text-gray-900 dark:text-text-primary">{formatPrice(total)}</span>
                 </div>
                 <button
-                  onClick={handlePlaceOrder}
-                  disabled={!selectedAddress || (pincodeStatus && !pincodeStatus.serviceable) || placing}
-                  className="w-full bg-gray-900 dark:bg-surface text-white font-semibold rounded-xl py-4 flex items-center justify-center gap-2 shadow-lg hover:bg-gray-800 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  onClick={selectedAddress ? handlePlaceOrder : handleOpenAddAddress}
+                  disabled={(selectedAddress && pincodeStatus && !pincodeStatus.serviceable) || placing}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl py-4 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {placing ? (
                     <><Loader2 size={20} className="animate-spin" /> Processing...</>
+                  ) : !selectedAddress ? (
+                    <>Add Delivery Address</>
                   ) : (
                     <>Place Order — {formatPrice(total)}</>
                   )}
@@ -333,17 +425,203 @@ export function Checkout() {
           <span className="text-2xl font-bold text-gray-900 dark:text-text-primary">{formatPrice(total)}</span>
         </div>
         <button
-          onClick={handlePlaceOrder}
-          disabled={!selectedAddress || (pincodeStatus && !pincodeStatus.serviceable) || placing}
-          className="w-full bg-gray-900 dark:bg-surface text-white font-semibold rounded-xl py-4 flex items-center justify-center gap-2 shadow-lg hover:bg-gray-800 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          onClick={selectedAddress ? handlePlaceOrder : handleOpenAddAddress}
+          disabled={(selectedAddress && pincodeStatus && !pincodeStatus.serviceable) || placing}
+          className="w-full bg-blue-600 text-white font-semibold rounded-xl py-4 flex items-center justify-center gap-2 shadow-lg hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           {placing ? (
             <><Loader2 size={20} className="animate-spin" /> Processing...</>
+          ) : !selectedAddress ? (
+            <>Add Delivery Address</>
           ) : (
             <>Place Order — {formatPrice(total)}</>
           )}
         </button>
       </div>
+
+      {/* Modal / Drawer for Adding Address Details */}
+      <AnimatePresence>
+        {showAddAddressModal && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/55 backdrop-blur-sm"
+              onClick={() => setShowAddAddressModal(false)}
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 320, mass: 0.8 }}
+              className="relative w-full sm:max-w-md bg-white dark:bg-surface rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-colors duration-300 z-10 max-h-[85vh] overflow-y-auto"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-black text-gray-900 dark:text-text-primary tracking-tight">
+                    Add Address Details
+                  </h2>
+                  <p className="text-xs text-gray-400 dark:text-text-tertiary mt-0.5">
+                    We will save this address for your order
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowAddAddressModal(false)}
+                  className="w-8 h-8 rounded-full bg-gray-50 dark:bg-surface-secondary flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-text-secondary transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSaveAddress} className="space-y-4 text-left">
+                {/* Label Selector */}
+                <div className="flex gap-3">
+                  {(['home', 'work', 'other'] as const).map((lbl) => {
+                    const isActive = addressForm.label === lbl;
+                    const Icon = lbl === 'home' ? Home : lbl === 'work' ? Briefcase : MapPin;
+                    return (
+                      <button
+                        key={lbl}
+                        type="button"
+                        onClick={() => setAddressForm({ ...addressForm, label: lbl })}
+                        className={cn(
+                          "flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border-2 transition-all cursor-pointer",
+                          isActive
+                            ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400'
+                            : 'border-gray-150 dark:border-border-light text-gray-550 dark:text-text-secondary hover:border-gray-250 dark:hover:border-border-medium'
+                        )}
+                      >
+                        <Icon size={18} />
+                        <span className="text-[10px] font-bold capitalize tracking-wide">{lbl}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Full Name & Phone */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-1">Receiver's Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressForm.fullName}
+                      onChange={e => setAddressForm({ ...addressForm, fullName: e.target.value })}
+                      placeholder="Receiver's Name"
+                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-255 dark:border-border-light text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none text-sm transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-1">Phone Number *</label>
+                    <input
+                      type="tel"
+                      required
+                      value={addressForm.phone}
+                      onChange={e => setAddressForm({ ...addressForm, phone: e.target.value })}
+                      placeholder="10-digit mobile number"
+                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-255 dark:border-border-light text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none text-sm transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Flat / House No / Road */}
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-1">House / Flat No., Floor, Building *</label>
+                  <input
+                    type="text"
+                    required
+                    value={addressForm.addressLine1}
+                    onChange={e => setAddressForm({ ...addressForm, addressLine1: e.target.value })}
+                    placeholder="e.g. Flat 402, Royal Palms"
+                    className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-255 dark:border-border-light text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none text-sm transition-all"
+                  />
+                </div>
+
+                {/* Area / Road Name */}
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-1">Area / Sector / Road Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={addressForm.addressLine2}
+                    onChange={e => setAddressForm({ ...addressForm, addressLine2: e.target.value })}
+                    placeholder="e.g. Bandra West, Linking Road"
+                    className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-255 dark:border-border-light text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none text-sm transition-all"
+                  />
+                </div>
+
+                {/* City, State, Pincode */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-1">City *</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressForm.city}
+                      onChange={e => setAddressForm({ ...addressForm, city: e.target.value })}
+                      placeholder="City"
+                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-255 dark:border-border-light text-gray-900 dark:text-text-primary rounded-xl py-3 px-3 focus:ring-2 focus:ring-blue-600 outline-none text-xs transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-1">State *</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressForm.state}
+                      onChange={e => setAddressForm({ ...addressForm, state: e.target.value })}
+                      placeholder="State"
+                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-255 dark:border-border-light text-gray-900 dark:text-text-primary rounded-xl py-3 px-3 focus:ring-2 focus:ring-blue-600 outline-none text-xs transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-1">Pincode *</label>
+                    <input
+                      type="text"
+                      required
+                      value={addressForm.pincode}
+                      onChange={e => setAddressForm({ ...addressForm, pincode: e.target.value })}
+                      placeholder="Pincode"
+                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-255 dark:border-border-light text-gray-900 dark:text-text-primary rounded-xl py-3 px-3 focus:ring-2 focus:ring-blue-600 outline-none text-xs transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Landmark */}
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-1">Landmark (Optional)</label>
+                  <input
+                    type="text"
+                    value={addressForm.landmark}
+                    onChange={e => setAddressForm({ ...addressForm, landmark: e.target.value })}
+                    placeholder="e.g. Near HDFC Bank"
+                    className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-255 dark:border-border-light text-gray-900 dark:text-text-primary rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-600 outline-none text-sm transition-all"
+                  />
+                </div>
+
+                {/* Submit button */}
+                <button
+                  type="submit"
+                  disabled={savingAddress}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200/50 dark:shadow-blue-900/30 hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-2"
+                >
+                  {savingAddress ? (
+                    <><Loader2 size={16} className="animate-spin" /> Saving Address...</>
+                  ) : (
+                    'Save Address & Deliver Here'
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

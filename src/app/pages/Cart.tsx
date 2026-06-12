@@ -76,7 +76,15 @@ export function Cart() {
                           </button>
                         </div>
 
-                        <span className="font-bold text-blue-600 mt-1">{formatPrice(item.product.price || 0)}</span>
+                        {item.selectedWeight && (
+                          <span className="text-xs bg-gray-100 dark:bg-surface-tertiary text-gray-600 dark:text-text-secondary px-2 py-0.5 rounded-md font-semibold mt-1 w-fit">
+                            {item.selectedWeight}
+                          </span>
+                        )}
+
+                        <span className="font-bold text-blue-600 mt-1">
+                          {formatPrice(item.selectedPrice !== undefined && item.selectedPrice !== null ? item.selectedPrice : (item.product.price || 0))}
+                        </span>
 
                         <div className="mt-auto flex items-center justify-between">
                           <div className="flex items-center bg-gray-100 dark:bg-surface-tertiary rounded-full px-1">

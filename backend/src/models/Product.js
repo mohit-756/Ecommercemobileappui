@@ -14,6 +14,12 @@ const productSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   colors: [{ name: String, hex: String }],
   sizes: [String],
+  variants: [{
+    weight: { type: String, required: true },
+    price: { type: Number, required: true, min: 0 },
+    originalPrice: { type: Number, min: 0 },
+    stock: { type: Number, default: 0, min: 0 }
+  }],
   tags: [String],
 }, { timestamps: true });
 

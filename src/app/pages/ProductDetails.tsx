@@ -31,6 +31,7 @@ export function ProductDetails() {
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<any>(null);
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
 
   const [reviews, setReviews] = useState<any[]>([]);
   const [reviewStats, setReviewStats] = useState<any>(null);
@@ -71,7 +72,12 @@ export function ProductDetails() {
         ]);
         const prod = normalizeProduct(prodRes.data);
         setProduct(prod);
-        if (prod.sizes?.length > 0) setSelectedSize(prod.sizes[0]);
+        if (prod.variants?.length > 0) {
+          const defaultVar = prod.variants.find((v: any) => v.weight === '500g') || prod.variants[0];
+          setSelectedVariant(defaultVar);
+        } else if (prod.sizes?.length > 0) {
+          setSelectedSize(prod.sizes[0]);
+        }
         if (prod.colors?.length > 0) setSelectedColor(prod.colors[0]);
         checkWishlistStatus(prod);
         recentlyViewedService.add(prod);
@@ -94,7 +100,12 @@ export function ProductDetails() {
         if (mockProd) {
           const prod = normalizeProduct(mockProd);
           setProduct(prod);
-          if (prod.sizes?.length > 0) setSelectedSize(prod.sizes[0]);
+          if (prod.variants?.length > 0) {
+            const defaultVar = prod.variants.find((v: any) => v.weight === '500g') || prod.variants[0];
+            setSelectedVariant(defaultVar);
+          } else if (prod.sizes?.length > 0) {
+            setSelectedSize(prod.sizes[0]);
+          }
           if (prod.colors?.length > 0) setSelectedColor(prod.colors[0]);
           checkWishlistStatus(prod);
           recentlyViewedService.add(mockProd);
@@ -142,7 +153,8 @@ export function ProductDetails() {
   const handleAddToCart = async () => {
     try {
       await hapticService.impact();
-      await addToCart(product.id, product, quantity);
+      const weight = selectedVariant ? selectedVariant.weight : (selectedSize || null);
+      await addToCart(product.id, product, quantity, weight);
       toast.success(`Added ${quantity} to cart`);
     } catch {
       toast.error('Failed to add to cart');
@@ -283,7 +295,7 @@ export function ProductDetails() {
               </button>
             </div>
 
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4 mb-4">
               <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-500/20 px-2 py-1 rounded-lg">
                 <Star size={16} className="text-amber-500 fill-amber-500" />
                 <span className="font-bold text-amber-700 dark:text-amber-400">{product.rating}</span>
@@ -291,6 +303,25 @@ export function ProductDetails() {
               <span className="text-gray-500 dark:text-text-secondary text-sm underline cursor-pointer" onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })}>
                 {product.reviews} review{product.reviews !== 1 ? 's' : ''}
               </span>
+            </div>
+
+            {/* Premium Price Display */}
+            <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-surface-secondary/30 p-3 rounded-2xl border border-gray-100 dark:border-border-light max-w-fit">
+              <span className="text-3xl font-extrabold text-blue-600 dark:text-blue-400">
+                {formatPrice(selectedVariant ? selectedVariant.price : product.price)}
+              </span>
+              {((selectedVariant ? selectedVariant.originalPrice : product.originalPrice) || 0) > (selectedVariant ? selectedVariant.price : product.price) && (
+                <>
+                  <span className="text-lg text-gray-400 dark:text-text-tertiary line-through">
+                    {formatPrice(selectedVariant ? selectedVariant.originalPrice : product.originalPrice)}
+                  </span>
+                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-lg animate-pulse">
+                    {selectedVariant && selectedVariant.originalPrice && selectedVariant.originalPrice > selectedVariant.price
+                      ? Math.round((1 - selectedVariant.price / selectedVariant.originalPrice) * 100)
+                      : Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                  </span>
+                </>
+              )}
             </div>
 
             <div className="mb-6">
@@ -318,7 +349,52 @@ export function ProductDetails() {
               </div>
             )}
 
-            {product.sizes && product.sizes.length > 0 && (
+            {/* Pack Size / Variant Pills */}
+            {product.variants && product.variants.length > 0 ? (
+              <div className="mb-8">
+                <h3 className="font-bold text-gray-900 dark:text-text-primary mb-3">Select Pack Size</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {product.variants.map((v: any, idx: number) => {
+                    const discountVal = v.originalPrice && v.originalPrice > v.price
+                      ? Math.round((1 - v.price / v.originalPrice) * 100)
+                      : 0;
+                    const isSelected = selectedVariant?.weight === v.weight;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setSelectedVariant(v);
+                          hapticService.impact();
+                        }}
+                        className={cn(
+                          "p-3 rounded-2xl border flex flex-col items-center justify-center transition-all cursor-pointer relative overflow-hidden",
+                          isSelected
+                            ? "bg-blue-50 dark:bg-blue-950/30 border-blue-600 dark:border-blue-500 ring-2 ring-blue-600/20"
+                            : "border-gray-200 dark:border-border-medium bg-white dark:bg-surface-secondary hover:border-gray-300 dark:hover:border-border-light text-gray-600 dark:text-text-secondary"
+                        )}
+                      >
+                        {discountVal > 0 && (
+                          <span className="absolute top-0 right-0 bg-red-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">
+                            {discountVal}% OFF
+                          </span>
+                        )}
+                        <span className={cn("font-bold text-sm", isSelected ? "text-blue-600 dark:text-blue-400" : "text-gray-800 dark:text-text-primary")}>
+                          {v.weight}
+                        </span>
+                        <span className="text-xs font-semibold mt-1">
+                          {formatPrice(v.price)}
+                        </span>
+                        {v.originalPrice && v.originalPrice > v.price && (
+                          <span className="text-[10px] text-gray-400 dark:text-text-tertiary line-through mt-0.5">
+                            {formatPrice(v.originalPrice)}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : product.sizes && product.sizes.length > 0 ? (
               <div className="mb-8">
                 <h3 className="font-bold text-gray-900 dark:text-text-primary mb-3">Size</h3>
                 <div className="flex gap-3">
@@ -338,13 +414,13 @@ export function ProductDetails() {
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
 
             {/* Desktop Add to Cart Section */}
             <div className="hidden lg:flex items-center gap-4 p-4 border border-gray-100 dark:border-border-light rounded-2xl bg-gray-50/50 dark:bg-surface-secondary/50 mb-8">
               <div className="flex flex-col">
                 <p className="text-xs text-gray-500 dark:text-text-secondary font-medium">Total Price</p>
-                <span className="text-xl font-bold text-gray-900 dark:text-text-primary">{formatPrice(product.price * quantity)}</span>
+                <span className="text-xl font-bold text-gray-900 dark:text-text-primary">{formatPrice((selectedVariant ? selectedVariant.price : product.price) * quantity)}</span>
               </div>
 
               <div className="flex items-center bg-gray-100 dark:bg-surface-tertiary rounded-full px-1 ml-auto">
@@ -482,7 +558,7 @@ export function ProductDetails() {
         <div className="flex flex-col">
           <p className="text-xs text-gray-500 dark:text-text-secondary font-medium">Total Price</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-gray-900 dark:text-text-primary">{formatPrice(product.price * quantity)}</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-text-primary">{formatPrice((selectedVariant ? selectedVariant.price : product.price) * quantity)}</span>
           </div>
         </div>
 

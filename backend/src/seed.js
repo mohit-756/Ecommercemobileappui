@@ -24,7 +24,13 @@ const products = [
     stock: 50,
     discount: '13%',
     tags: ['walnuts', 'nuts', 'omega-3', 'premium'],
-    categoryName: 'Nuts'
+    categoryName: 'Nuts',
+    variants: [
+      { weight: '100g', price: 149, originalPrice: 179, stock: 50 },
+      { weight: '250g', price: 349, originalPrice: 399, stock: 50 },
+      { weight: '500g', price: 649, originalPrice: 749, stock: 50 },
+      { weight: '1kg', price: 1199, originalPrice: 1399, stock: 30 }
+    ]
   },
   {
     name: 'Golden Raisins',
@@ -37,7 +43,13 @@ const products = [
     stock: 75,
     discount: '14%',
     tags: ['raisins', 'dried fruits', 'golden', 'kishmish'],
-    categoryName: 'Dried Fruits'
+    categoryName: 'Dried Fruits',
+    variants: [
+      { weight: '100g', price: 79, originalPrice: 99, stock: 75 },
+      { weight: '250g', price: 169, originalPrice: 199, stock: 75 },
+      { weight: '500g', price: 299, originalPrice: 349, stock: 75 },
+      { weight: '1kg', price: 549, originalPrice: 649, stock: 40 }
+    ]
   },
   {
     name: 'Premium Pistachios',
@@ -50,7 +62,13 @@ const products = [
     stock: 40,
     discount: '11%',
     tags: ['pistachio', 'nuts', 'premium', 'roasted'],
-    categoryName: 'Nuts'
+    categoryName: 'Nuts',
+    variants: [
+      { weight: '100g', price: 179, originalPrice: 199, stock: 40 },
+      { weight: '250g', price: 419, originalPrice: 469, stock: 40 },
+      { weight: '500g', price: 799, originalPrice: 899, stock: 40 },
+      { weight: '1kg', price: 1499, originalPrice: 1699, stock: 20 }
+    ]
   },
   {
     name: 'Green Cardamom (Elaichi)',
@@ -63,7 +81,13 @@ const products = [
     stock: 60,
     discount: '20%',
     tags: ['cardamom', 'elaichi', 'spices', 'aromatic'],
-    categoryName: 'Spices'
+    categoryName: 'Spices',
+    variants: [
+      { weight: '50g', price: 109, originalPrice: 129, stock: 60 },
+      { weight: '100g', price: 199, originalPrice: 249, stock: 60 },
+      { weight: '250g', price: 479, originalPrice: 599, stock: 40 },
+      { weight: '500g', price: 899, originalPrice: 1099, stock: 20 }
+    ]
   },
   {
     name: 'Premium Apricots',
@@ -76,7 +100,13 @@ const products = [
     stock: 45,
     discount: '18%',
     tags: ['apricots', 'dried fruits', 'premium', 'khumani'],
-    categoryName: 'Dried Fruits'
+    categoryName: 'Dried Fruits',
+    variants: [
+      { weight: '100g', price: 109, originalPrice: 129, stock: 45 },
+      { weight: '250g', price: 249, originalPrice: 299, stock: 45 },
+      { weight: '500g', price: 449, originalPrice: 549, stock: 45 },
+      { weight: '1kg', price: 849, originalPrice: 999, stock: 25 }
+    ]
   },
   {
     name: 'Whole Cashews',
@@ -89,7 +119,13 @@ const products = [
     stock: 70,
     discount: '14%',
     tags: ['cashews', 'nuts', 'kaju', 'premium'],
-    categoryName: 'Nuts'
+    categoryName: 'Nuts',
+    variants: [
+      { weight: '100g', price: 139, originalPrice: 159, stock: 70 },
+      { weight: '250g', price: 319, originalPrice: 369, stock: 70 },
+      { weight: '500g', price: 599, originalPrice: 699, stock: 70 },
+      { weight: '1kg', price: 1099, originalPrice: 1299, stock: 35 }
+    ]
   },
   {
     name: 'Premium Anjeer',
@@ -102,7 +138,13 @@ const products = [
     stock: 35,
     discount: '12%',
     tags: ['anjeer', 'figs', 'dried fruits', 'premium'],
-    categoryName: 'Dried Fruits'
+    categoryName: 'Dried Fruits',
+    variants: [
+      { weight: '100g', price: 169, originalPrice: 199, stock: 35 },
+      { weight: '250g', price: 379, originalPrice: 429, stock: 35 },
+      { weight: '500g', price: 699, originalPrice: 799, stock: 35 },
+      { weight: '1kg', price: 1299, originalPrice: 1499, stock: 15 }
+    ]
   },
 ];
 

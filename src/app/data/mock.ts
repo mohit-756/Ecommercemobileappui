@@ -9,7 +9,13 @@ export const products = [
     image: "https://res.cloudinary.com/dcdpve12g/image/upload/v1781063664/walnuts_ux9wue.webp",
     category: "Nuts",
     description: "Fresh and crunchy premium walnuts rich in omega-3.",
-    discount: "13%"
+    discount: "13%",
+    variants: [
+      { weight: '100g', price: 149, originalPrice: 179, stock: 50 },
+      { weight: '250g', price: 349, originalPrice: 399, stock: 50 },
+      { weight: '500g', price: 649, originalPrice: 749, stock: 50 },
+      { weight: '1kg', price: 1199, originalPrice: 1399, stock: 30 }
+    ]
   },
   {
     id: "2",
@@ -21,7 +27,13 @@ export const products = [
     image: "https://res.cloudinary.com/dcdpve12g/image/upload/v1781063663/raisins_itpnbe.webp",
     category: "Dried Fruits",
     description: "Naturally sweet golden raisins packed with nutrients.",
-    discount: "14%"
+    discount: "14%",
+    variants: [
+      { weight: '100g', price: 79, originalPrice: 99, stock: 75 },
+      { weight: '250g', price: 169, originalPrice: 199, stock: 75 },
+      { weight: '500g', price: 299, originalPrice: 349, stock: 75 },
+      { weight: '1kg', price: 549, originalPrice: 649, stock: 40 }
+    ]
   },
   {
     id: "3",
@@ -33,7 +45,13 @@ export const products = [
     image: "https://res.cloudinary.com/dcdpve12g/image/upload/v1781063663/pistachio_hr6ujc.png",
     category: "Nuts",
     description: "Roasted premium pistachios with rich flavor and crunch.",
-    discount: "11%"
+    discount: "11%",
+    variants: [
+      { weight: '100g', price: 179, originalPrice: 199, stock: 40 },
+      { weight: '250g', price: 419, originalPrice: 469, stock: 40 },
+      { weight: '500g', price: 799, originalPrice: 899, stock: 40 },
+      { weight: '1kg', price: 1499, originalPrice: 1699, stock: 20 }
+    ]
   },
   {
     id: "4",
@@ -45,7 +63,13 @@ export const products = [
     image: "https://res.cloudinary.com/dcdpve12g/image/upload/v1781063663/elachi_ddsbpr.webp",
     category: "Spices",
     description: "Aromatic green cardamom perfect for sweets and tea.",
-    discount: "20%"
+    discount: "20%",
+    variants: [
+      { weight: '50g', price: 109, originalPrice: 129, stock: 60 },
+      { weight: '100g', price: 199, originalPrice: 249, stock: 60 },
+      { weight: '250g', price: 479, originalPrice: 599, stock: 40 },
+      { weight: '500g', price: 899, originalPrice: 1099, stock: 20 }
+    ]
   },
   {
     id: "5",
@@ -57,7 +81,13 @@ export const products = [
     image: "https://res.cloudinary.com/dcdpve12g/image/upload/v1781063662/apricots_bhzj9y.webp",
     category: "Dried Fruits",
     description: "Soft and naturally sweet dried apricots.",
-    discount: "18%"
+    discount: "18%",
+    variants: [
+      { weight: '100g', price: 109, originalPrice: 129, stock: 45 },
+      { weight: '250g', price: 249, originalPrice: 299, stock: 45 },
+      { weight: '500g', price: 449, originalPrice: 549, stock: 45 },
+      { weight: '1kg', price: 849, originalPrice: 999, stock: 25 }
+    ]
   },
   {
     id: "6",
@@ -69,7 +99,13 @@ export const products = [
     image: "https://res.cloudinary.com/dcdpve12g/image/upload/v1781063662/cashews_nfiqri.webp",
     category: "Nuts",
     description: "Premium quality whole cashews, rich and creamy.",
-    discount: "14%"
+    discount: "14%",
+    variants: [
+      { weight: '100g', price: 139, originalPrice: 159, stock: 70 },
+      { weight: '250g', price: 319, originalPrice: 369, stock: 70 },
+      { weight: '500g', price: 599, originalPrice: 699, stock: 70 },
+      { weight: '1kg', price: 1099, originalPrice: 1299, stock: 35 }
+    ]
   },
   {
     id: "7",
@@ -81,7 +117,13 @@ export const products = [
     image: "https://res.cloudinary.com/dcdpve12g/image/upload/v1781063662/anjeer_bdboi8.webp",
     category: "Dried Fruits",
     description: "Naturally dried figs loaded with fiber and minerals.",
-    discount: "12%"
+    discount: "12%",
+    variants: [
+      { weight: '100g', price: 169, originalPrice: 199, stock: 35 },
+      { weight: '250g', price: 379, originalPrice: 429, stock: 35 },
+      { weight: '500g', price: 699, originalPrice: 799, stock: 35 },
+      { weight: '1kg', price: 1299, originalPrice: 1499, stock: 15 }
+    ]
   }
 ];
 

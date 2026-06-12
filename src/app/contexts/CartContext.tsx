@@ -7,13 +7,15 @@ interface CartItem {
   _id: string;
   product: any;
   quantity: number;
+  selectedWeight?: string;
+  selectedPrice?: number;
 }
 
 interface CartContextType {
   items: CartItem[];
   itemCount: number;
   loading: boolean;
-  addToCart: (productId: string, product?: any, quantity?: number) => Promise<void>;
+  addToCart: (productId: string, product?: any, quantity?: number, selectedWeight?: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -55,7 +57,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (guestItems.length > 0) {
           for (const item of guestItems) {
             const prodId = item.product._id || item.product.id;
-            await cartService.addToCart(prodId, item.quantity);
+            await cartService.addToCart(prodId, item.quantity, item.selectedWeight);
           }
           localStorage.removeItem(GUEST_CART_KEY);
         }
@@ -66,6 +68,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           _id: item._id,
           product: normalizeProduct(item.product),
           quantity: item.quantity,
+          selectedWeight: item.selectedWeight,
+          selectedPrice: item.selectedPrice,
         }));
         setItems(normalized);
       } catch (err) {
@@ -79,14 +83,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     loadAndSyncCart();
   }, [token]);
 
-  const addToCart = useCallback(async (productId: string, product?: any, quantity = 1) => {
+  const addToCart = useCallback(async (productId: string, product?: any, quantity = 1, selectedWeight?: string) => {
     if (token) {
       try {
-        const res = await cartService.addToCart(productId, quantity);
+        const res = await cartService.addToCart(productId, quantity, selectedWeight);
         const normalized = (res.data.items || []).map((item: any) => ({
           _id: item._id,
           product: normalizeProduct(item.product),
           quantity: item.quantity,
+          selectedWeight: item.selectedWeight,
+          selectedPrice: item.selectedPrice,
         }));
         setItems(normalized);
       } catch (err) {
@@ -96,15 +102,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } else {
       const guest = getGuestCart();
       const existing = guest.find(
-        (item) => (item.product._id || item.product.id) === productId
+        (item) => (item.product._id || item.product.id) === productId && item.selectedWeight === selectedWeight
       );
       if (existing) {
         existing.quantity += quantity;
       } else {
+        let guestPrice = product?.price || 0;
+        if (selectedWeight && product?.variants?.length > 0) {
+          const variant = product.variants.find((v: any) => v.weight === selectedWeight);
+          if (variant) {
+            guestPrice = variant.price;
+          }
+        } else if (product?.variants?.length > 0) {
+          guestPrice = product.variants[0].price;
+        }
+
         guest.push({
           _id: `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
           product: normalizeProduct(product || { _id: productId }),
           quantity,
+          selectedWeight: selectedWeight || (product?.variants?.[0]?.weight || null),
+          selectedPrice: guestPrice,
         });
       }
       setGuestCart(guest);
@@ -120,6 +138,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           _id: item._id,
           product: normalizeProduct(item.product),
           quantity: item.quantity,
+          selectedWeight: item.selectedWeight,
+          selectedPrice: item.selectedPrice,
         }));
         setItems(normalized);
       } catch (err) {
@@ -145,6 +165,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           _id: item._id,
           product: normalizeProduct(item.product),
           quantity: item.quantity,
+          selectedWeight: item.selectedWeight,
+          selectedPrice: item.selectedPrice,
         }));
         setItems(normalized);
       } catch (err) {
@@ -176,7 +198,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const itemCount = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
 
   const subtotal = useMemo(
-    () => items.reduce((sum, i) => sum + (i.product.price || 0) * i.quantity, 0),
+    () => items.reduce((sum, i) => sum + (i.selectedPrice !== undefined && i.selectedPrice !== null ? i.selectedPrice : (i.product.price || 0)) * i.quantity, 0),
     [items]
   );
 
