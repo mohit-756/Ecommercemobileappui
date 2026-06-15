@@ -41,9 +41,9 @@ export function Onboarding() {
   const SlideIcon = slides[currentSlide].icon;
 
   return (
-    <div className="w-full min-h-[100dvh] lg:min-h-[75vh] flex items-center justify-center bg-white dark:bg-background lg:bg-transparent py-4 lg:py-10 transition-colors duration-300">
-      <div className="w-full max-w-5xl mx-auto bg-white dark:bg-surface-secondary lg:rounded-3xl lg:shadow-2xl lg:border lg:border-border-medium/60 overflow-hidden transition-all duration-300">
-        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[500px] lg:min-h-[600px]">
+    <div className="w-full min-h-screen lg:min-h-[75vh] flex items-stretch lg:items-center justify-center bg-white dark:bg-background lg:bg-transparent transition-colors duration-300">
+      <div className="w-full max-w-5xl mx-auto bg-white dark:bg-surface-secondary lg:rounded-3xl lg:shadow-2xl lg:border lg:border-border-medium/60 overflow-hidden transition-all duration-300 flex flex-col">
+        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 min-h-full lg:min-h-[600px]">
           
           {/* Left panel - Visual Showcase (desktop only) */}
           <div className={cn(
@@ -109,7 +109,7 @@ export function Onboarding() {
           </div>
 
           {/* Right panel - Content (always visible) */}
-          <div className="col-span-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-white dark:bg-surface-secondary">
+          <div className="col-span-1 lg:col-span-7 flex flex-col justify-between p-6 pt-safe pb-safe sm:p-10 lg:p-12 bg-white dark:bg-surface-secondary">
             <div className="flex justify-end">
               <button 
                 onClick={() => navigate('/login')}

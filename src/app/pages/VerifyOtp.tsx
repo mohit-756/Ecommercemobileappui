@@ -95,9 +95,9 @@ export function VerifyOtp() {
   const allFilled = otp.every(d => d !== '');
 
   return (
-    <div className="w-full min-h-[85vh] lg:min-h-[75vh] flex items-center justify-center bg-white dark:bg-background lg:bg-transparent py-4 lg:py-10 transition-colors duration-300">
-      <div className="w-full max-w-5xl mx-auto bg-white dark:bg-surface-secondary lg:rounded-3xl lg:shadow-2xl lg:border lg:border-border-medium/60 overflow-hidden transition-all duration-300">
-        <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[500px] lg:min-h-[600px]">
+    <div className="w-full min-h-screen lg:min-h-[75vh] flex items-stretch lg:items-center justify-center bg-white dark:bg-background lg:bg-transparent transition-colors duration-300">
+      <div className="w-full max-w-5xl mx-auto bg-white dark:bg-surface-secondary lg:rounded-3xl lg:shadow-2xl lg:border lg:border-border-medium/60 overflow-hidden transition-all duration-300 flex flex-col">
+        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 min-h-full lg:min-h-[600px]">
           
           {/* Left panel - Visual Showcase (desktop only) */}
           <div className="hidden lg:flex lg:col-span-5 bg-gradient-to-br from-amber-600 via-amber-800 to-amber-950 p-12 flex-col justify-between relative overflow-hidden text-white">
@@ -137,7 +137,7 @@ export function VerifyOtp() {
           </div>
 
           {/* Right panel - Form (always visible) */}
-          <div className="col-span-1 lg:col-span-7 flex flex-col justify-center px-6 py-10 lg:p-12 bg-white dark:bg-surface-secondary">
+          <div className="col-span-1 lg:col-span-7 flex flex-col justify-center px-6 py-10 pt-safe pb-safe lg:p-12 bg-white dark:bg-surface-secondary">
             <div className="w-full max-w-md mx-auto">
               <button
                 onClick={() => navigate('/login')}

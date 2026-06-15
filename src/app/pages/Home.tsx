@@ -266,7 +266,16 @@ export function Home() {
                         <p className="text-white/80 text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-widest mb-1.5">{banner.subtitle}</p>
                         <h3 className="text-white text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-2 sm:mb-3 leading-tight">{banner.title}</h3>
                         <p className="text-white/90 text-xs sm:text-sm md:text-base mb-4 sm:mb-6 line-clamp-2 hidden sm:block font-medium max-w-md">{banner.description}</p>
-                        <button className="bg-white text-gray-900 shadow-lg shadow-black/10 text-xs md:text-sm font-bold px-5 py-2.5 md:px-7 md:py-3 rounded-full hover:bg-gray-50 active:scale-95 transition-all w-fit cursor-pointer">
+                        <button 
+                          onClick={() => {
+                            hapticService.impact();
+                            if (banner.id === 1) navigate('/search?q=Dried Fruits');
+                            else if (banner.id === 2) navigate('/search?q=Nuts');
+                            else if (banner.id === 3) navigate('/search?q=Mixed');
+                            else navigate('/search');
+                          }}
+                          className="bg-white text-gray-900 shadow-lg shadow-black/10 text-xs md:text-sm font-bold px-5 py-2.5 md:px-7 md:py-3 rounded-full hover:bg-gray-50 active:scale-95 transition-all w-fit cursor-pointer"
+                        >
                           Shop Now
                         </button>
                       </div>
@@ -353,18 +362,37 @@ export function Home() {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">Best Sellers</h3>
-              <button className="text-blue-600 text-sm font-semibold flex items-center gap-1">
+              <h3 className="font-bold text-gray-900 dark:text-text-primary text-lg">
+                {activeCategory === 'all' ? 'Best Sellers' : `Best Sellers in ${categories.find(c => (c._id || c.id) === activeCategory)?.name || ''}`}
+              </h3>
+              <button 
+                onClick={() => {
+                  hapticService.impact();
+                  const catName = categories.find((c: any) => (c._id || c.id) === activeCategory)?.name;
+                  if (activeCategory !== 'all' && catName) {
+                    navigate(`/search?q=${encodeURIComponent(catName)}`);
+                  } else {
+                    navigate('/search');
+                  }
+                }}
+                className="text-blue-600 text-sm font-semibold flex items-center gap-1 cursor-pointer hover:underline"
+              >
                 See all <ArrowRight size={14} />
               </button>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
-              {products.slice(0, 10).map((product: any) => (
-                <div key={product.id || product._id} className="flex-none w-[140px] sm:w-[150px] md:w-[160px] lg:w-[180px]">
-                  <ProductCard product={product} />
-                </div>
-              ))}
-            </div>
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-8 bg-gray-55/50 dark:bg-surface-secondary/50 rounded-2xl border border-dashed border-gray-200 dark:border-border-medium/60 w-full">
+                <p className="text-sm text-gray-500 dark:text-text-secondary">No products found in this category.</p>
+              </div>
+            ) : (
+              <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
+                {filteredProducts.slice(0, 10).map((product: any) => (
+                  <div key={product.id || product._id} className="flex-none w-[140px] sm:w-[150px] md:w-[160px] lg:w-[180px]">
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {recentlyViewed.length > 0 && (
@@ -415,11 +443,17 @@ export function Home() {
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6">
-              {finalFilteredProducts.slice(0, 16).map((product: any) => (
-                <ProductCard key={product._id || product.id} product={product} />
-              ))}
-            </div>
+            {finalFilteredProducts.length === 0 ? (
+              <div className="text-center py-12 bg-gray-55/50 dark:bg-surface-secondary/50 rounded-2xl border border-dashed border-gray-200 dark:border-border-medium/60">
+                <p className="text-sm text-gray-500 dark:text-text-secondary">No products match the selected criteria.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 sm:gap-6">
+                {finalFilteredProducts.slice(0, 16).map((product: any) => (
+                  <ProductCard key={product._id || product.id} product={product} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
