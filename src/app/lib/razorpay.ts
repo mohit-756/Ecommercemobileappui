@@ -37,22 +37,26 @@ export interface RazorpayOptions {
 }
 
 export function openRazorpayCheckout(options: RazorpayOptions) {
-  const rzp = new (window as any).Razorpay({
-    key: options.key,
-    amount: options.amount,
-    currency: options.currency || 'INR',
-    name: options.name || 'DryFruit Hub',
-    description: options.description || '',
-    image: options.image || '',
-    order_id: options.order_id,
-    prefill: options.prefill || {},
-    notes: options.notes || {},
-    theme: { color: options.theme?.color || '#2563eb', ...options.theme },
-    handler: options.handler,
-    modal: {
-      ondismiss: options.modal?.ondismiss || (() => {}),
-    },
-  });
-
-  rzp.open();
+  try {
+    const rzp = new (window as any).Razorpay({
+      key: options.key,
+      amount: options.amount,
+      currency: options.currency || 'INR',
+      name: options.name || 'DryFruit Hub',
+      description: options.description || '',
+      image: options.image || '',
+      order_id: options.order_id,
+      prefill: options.prefill || {},
+      notes: options.notes || {},
+      theme: { color: options.theme?.color || '#2563eb', ...options.theme },
+      handler: options.handler,
+      modal: {
+        ondismiss: options.modal?.ondismiss || (() => {}),
+      },
+    });
+    rzp.open();
+  } catch (e) {
+    console.error('Razorpay checkout error:', e);
+    throw e;
+  }
 }

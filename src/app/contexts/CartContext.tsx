@@ -135,6 +135,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [token]);
 
   const updateQuantity = useCallback(async (itemId: string, quantity: number) => {
+    if (quantity < 1) return;
     if (token) {
       try {
         const res = await cartService.updateCartItem(itemId, quantity);

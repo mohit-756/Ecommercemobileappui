@@ -30,11 +30,12 @@ interface Address {
 export function Checkout() {
   const navigate = useNavigate();
   const { items, subtotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { addressDetails } = useDeliveryLocation();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [authError, setAuthError] = useState(false);
   const [pincodeStatus, setPincodeStatus] = useState<{ serviceable: boolean; estimatedDays: number | null } | null>(null);
   const [checkingPincode, setCheckingPincode] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -114,13 +115,23 @@ export function Checkout() {
       
       setShowAddAddressModal(false);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to save address');
+      if (err.response?.status === 401) {
+        setAuthError(true);
+        toast.error('Session expired. Please login again.');
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to save address');
+      }
     } finally {
       setSavingAddress(false);
     }
   };
 
   useEffect(() => {
+    if (!token) {
+      setAuthError(true);
+      setLoading(false);
+      return;
+    }
     addressService.getAddresses()
       .then(res => {
         const addrs = res.data;
@@ -128,9 +139,16 @@ export function Checkout() {
         const defaultAddr = addrs.find((a: Address) => a.isDefault) || addrs[0] || null;
         setSelectedAddress(defaultAddr);
       })
-      .catch(() => toast.error('Failed to load addresses'))
+      .catch((err) => {
+        if (err.response?.status === 401) {
+          setAuthError(true);
+          toast.error('Session expired. Please login again.');
+        } else {
+          toast.error('Failed to load addresses');
+        }
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     if (!selectedAddress) return;
@@ -147,6 +165,11 @@ export function Checkout() {
   const total = subtotal + shipping + tax;
 
   async function handlePlaceOrder() {
+    if (!user || !token) {
+      toast.error('Please login to place an order');
+      navigate('/login');
+      return;
+    }
     if (!selectedAddress) {
       toast.error('Please select a shipping address');
       return;
@@ -220,39 +243,49 @@ export function Checkout() {
         return;
       }
 
-      openRazorpayCheckout({
-        key: razorpayKeyId,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        order_id: razorpayOrder.id,
-        name: 'DryFruit Hub',
-        description: `Order #${order._id.slice(-6).toUpperCase()}`,
-        prefill: {
-          name: user?.name || '',
-          email: user?.email || '',
-          contact: selectedAddress.phone,
-        },
-        theme: { color: '#2563eb' },
-        handler: async (response) => {
-          try {
-            await orderService.verifyPayment({
-              orderId: order._id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            });
-            await clearCart();
-            navigate(`/success?orderId=${order._id}`);
-          } catch {
-            toast.error('Payment verification failed');
-            setPlacing(false);
-          }
-        },
-        modal: {
-          ondismiss: () => setPlacing(false),
-        },
-      });
+      try {
+        openRazorpayCheckout({
+          key: razorpayKeyId,
+          amount: razorpayOrder.amount,
+          currency: razorpayOrder.currency,
+          order_id: razorpayOrder.id,
+          name: 'DryFruit Hub',
+          description: `Order #${order._id.slice(-6).toUpperCase()}`,
+          prefill: {
+            name: user?.name || '',
+            email: user?.email || '',
+            contact: selectedAddress.phone,
+          },
+          theme: { color: '#2563eb' },
+          handler: async (response) => {
+            try {
+              await orderService.verifyPayment({
+                orderId: order._id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              });
+              await clearCart();
+              navigate(`/success?orderId=${order._id}`);
+            } catch {
+              toast.error('Payment verification failed');
+              setPlacing(false);
+            }
+          },
+          modal: {
+            ondismiss: () => setPlacing(false),
+          },
+        });
+      } catch {
+        toast.error('Failed to open payment gateway');
+        setPlacing(false);
+      }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to place order');
+      if (err.response?.status === 401) {
+        setAuthError(true);
+        toast.error('Session expired. Please login again.');
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to place order');
+      }
       setPlacing(false);
     }
   }
@@ -274,7 +307,16 @@ export function Checkout() {
       </div>
 
       <div className="flex-1 px-6 py-6 pb-32 lg:pb-6 space-y-6 overflow-y-auto">
-        {loading ? (
+        {authError ? (
+          <div className="flex flex-col items-center justify-center py-16 px-6">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+              <ShieldCheck size={32} className="text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-text-primary mb-2">Session Expired</h3>
+            <p className="text-sm text-gray-500 dark:text-text-secondary text-center mb-6">Your session has expired. Please login again to continue.</p>
+            <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); navigate('/login'); }} className="bg-blue-600 text-white font-semibold rounded-xl py-3 px-8 hover:bg-blue-700 transition-colors cursor-pointer">Go to Login</button>
+          </div>
+        ) : loading ? (
           <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
         ) : (
           <div className="lg:grid lg:grid-cols-3 lg:gap-8 items-start">
