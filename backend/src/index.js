@@ -27,6 +27,27 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// Request logging middleware to diagnose performance/endpoints
+import fs from 'fs';
+app.use((req, res, next) => {
+  const start = Date.now();
+  const logFile = path.join(__dirname, '../requests.log');
+  const logMsg = `[${new Date().toISOString()}] ${req.method} ${req.url} started\n`;
+  try {
+    fs.appendFileSync(logFile, logMsg);
+  } catch (e) {}
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const finishMsg = `[${new Date().toISOString()}] ${req.method} ${req.url} finished in ${duration}ms with status ${res.statusCode}\n`;
+    try {
+      fs.appendFileSync(logFile, finishMsg);
+    } catch (e) {}
+  });
+  next();
+});
+
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
 app.get('/api/health', (req, res) => {
