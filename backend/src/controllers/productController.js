@@ -1,4 +1,6 @@
 import Product from '../models/Product.js';
+import Category from '../models/Category.js';
+import * as XLSX from 'xlsx';
 
 export async function getProducts(req, res, next) {
   try {
@@ -89,6 +91,112 @@ export async function deleteProduct(req, res, next) {
       return res.status(404).json({ message: 'Product not found' });
     }
     res.json({ message: 'Product deleted' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function bulkUploadProducts(req, res, next) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: 'Uploaded sheet is empty' });
+    }
+
+    let productsCreated = 0;
+    let categoriesCreated = 0;
+
+    const categoryCache = {};
+    const dbCategories = await Category.find({});
+    dbCategories.forEach(cat => {
+      categoryCache[cat.name.toLowerCase()] = cat._id;
+    });
+
+    const productsToInsert = [];
+
+    for (const row of rows) {
+      const name = row.Name || row.name;
+      const description = row.Description || row.description;
+      const price = Number(row.Price || row.price);
+      
+      if (!name || !description || isNaN(price)) {
+        continue;
+      }
+
+      const originalPrice = Number(row.OriginalPrice || row.originalPrice || row.Original_Price);
+      const stock = Number(row.Stock || row.stock || 0);
+      const categoryName = (row.Category || row.category || 'Mixed').toString().trim();
+      const imageVal = row.Image || row.image || row.ImageUrl || row.image_url;
+
+      let categoryId = categoryCache[categoryName.toLowerCase()];
+      if (!categoryId) {
+        let categoryDoc = await Category.findOne({ name: { $regex: new RegExp('^' + categoryName + '$', 'i') } });
+        if (!categoryDoc) {
+          categoryDoc = await Category.create({ name: categoryName, icon: 'LayoutGrid' });
+          categoriesCreated++;
+        }
+        categoryId = categoryDoc._id;
+        categoryCache[categoryName.toLowerCase()] = categoryId;
+      }
+
+      const variants = [];
+      const variantsVal = row.Variants || row.variants || row.weight_variants;
+      if (variantsVal) {
+        const parts = variantsVal.toString().split(',');
+        for (const part of parts) {
+          const splitPart = part.split(':');
+          const weight = splitPart[0]?.trim();
+          const vPrice = Number(splitPart[1]?.trim());
+          if (weight && !isNaN(vPrice)) {
+            variants.push({
+              weight,
+              price: vPrice,
+              originalPrice: vPrice,
+              stock: 50
+            });
+          }
+        }
+      }
+
+      let discount = null;
+      if (originalPrice && originalPrice > price) {
+        discount = `${Math.round(((originalPrice - price) / originalPrice) * 100)}%`;
+      }
+
+      productsToInsert.push({
+        name,
+        description,
+        price,
+        originalPrice: isNaN(originalPrice) ? undefined : originalPrice,
+        discount,
+        stock,
+        category: categoryId,
+        images: imageVal ? [imageVal.toString().trim()] : [],
+        variants,
+        isActive: true
+      });
+      productsCreated++;
+    }
+
+    if (productsToInsert.length === 0) {
+      return res.status(400).json({ message: 'No valid products found in the sheet. Please ensure Name, Description, and Price columns are present.' });
+    }
+
+    await Product.insertMany(productsToInsert);
+
+    res.status(201).json({
+      message: 'Products imported successfully',
+      productsCreated,
+      categoriesCreated
+    });
   } catch (error) {
     next(error);
   }

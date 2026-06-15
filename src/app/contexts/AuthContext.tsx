@@ -70,15 +70,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await wishlistService.getWishlist();
       const serverList = res.data || [];
       const localList = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
-      const merged = [...serverList];
-      for (const item of localList) {
-        if (!merged.some((m: any) => (m._id || m.id) === (item._id || item.id))) {
-          merged.push(item);
+      
+      // Sync items added locally to the server database
+      for (const localItem of localList) {
+        const localId = localItem._id || localItem.id;
+        const existsOnServer = serverList.some((m: any) => (m._id || m.id) === localId);
+        if (!existsOnServer && localId) {
+          try {
+            await wishlistService.addToWishlist(localId);
+          } catch (err) {
+            console.error('Failed to sync item to server wishlist:', localId, err);
+          }
         }
       }
-      localStorage.setItem('user_wishlist', JSON.stringify(merged));
+
+      // Re-fetch the final synchronized wishlist from the server
+      const finalRes = await wishlistService.getWishlist();
+      localStorage.setItem('user_wishlist', JSON.stringify(finalRes.data || []));
       window.dispatchEvent(new Event('wishlist-updated'));
-    } catch {}
+    } catch (err) {
+      console.error('Failed to sync wishlist:', err);
+    }
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -88,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(newToken);
     setUser(userData);
     syncWishlistFromServer();
+    return userData;
   }, [syncWishlistFromServer]);
 
   const loginWithGoogle = useCallback(async (idToken: string) => {
@@ -97,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(newToken);
     setUser(userData);
     syncWishlistFromServer();
+    return userData;
   }, [syncWishlistFromServer]);
 
   const register = useCallback(async (name: string, email: string, password: string, phone?: string) => {
@@ -106,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(newToken);
     setUser(userData);
     syncWishlistFromServer();
+    return userData;
   }, [syncWishlistFromServer]);
 
   const logout = useCallback(() => {

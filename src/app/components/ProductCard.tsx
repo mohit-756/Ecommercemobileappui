@@ -1,4 +1,5 @@
 import { Star, Heart } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import { cn, normalizeProduct, formatPrice } from '../lib/utils';
@@ -32,6 +33,10 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (product.stock <= 0) {
+      toast.error('Item is out of stock');
+      return;
+    }
     try {
       await hapticService.impact();
       const weight = product.variants && product.variants.length > 0 ? product.variants[0].weight : null;
@@ -184,6 +189,8 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
                 <span className="leading-none">ADD</span>
                 <span className="text-[7px] font-semibold leading-none mt-0.5">options</span>
               </button>
+            ) : product.stock <= 0 ? (
+              <span className="text-[10px] text-red-500 font-bold uppercase">Sold Out</span>
             ) : (
               <button
                 onClick={handleAddToCart}
@@ -197,13 +204,13 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
       </motion.div>
 
       {/* Responsive Variant Selector Drawer/Modal */}
-      {isSelectorOpen && (
+      {isSelectorOpen && createPortal(
         <div
           onClick={(e) => {
             e.stopPropagation();
             setIsSelectorOpen(false);
           }}
-          className="fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm z-[999] flex items-end sm:items-center sm:justify-center p-0 sm:p-4"
+          className="fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm z-[999] flex items-end justify-center sm:items-center p-4 sm:p-4"
         >
           <motion.div
             initial={{ y: "100%", opacity: 0.5 }}
@@ -211,7 +218,7 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 250 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full sm:max-w-md bg-white dark:bg-surface rounded-t-3xl sm:rounded-3xl shadow-2xl p-6 border-t sm:border border-gray-100 dark:border-border-light max-h-[80vh] overflow-y-auto flex flex-col"
+            className="w-full sm:max-w-md bg-white dark:bg-surface rounded-3xl shadow-2xl p-6 border-t sm:border border-gray-100 dark:border-border-light max-h-[80vh] overflow-y-auto flex flex-col"
           >
             <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 dark:border-border-light">
               <div>
@@ -250,58 +257,53 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                          {formatPrice(v.price)}
-                        </span>
+                      <div className="flex items-baseline gap-1.5 mt-0.5">
+                        <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{formatPrice(v.price)}</span>
                         {v.originalPrice && v.originalPrice > v.price && (
-                          <span className="text-xs text-gray-400 dark:text-text-tertiary line-through">
-                            {formatPrice(v.originalPrice)}
-                          </span>
+                          <span className="text-[10px] text-gray-400 dark:text-text-tertiary line-through">{formatPrice(v.originalPrice)}</span>
                         )}
                       </div>
                     </div>
 
                     <div className="flex items-center">
-                      {cartItem ? (
-                        <div className="flex items-center bg-blue-600 text-white rounded-full p-0.5 shadow-sm">
+                      {v.stock <= 0 ? (
+                        <span className="text-xs text-red-500 font-bold uppercase py-1.5 px-2">Sold Out</span>
+                      ) : cartItem ? (
+                        <div className="flex items-center bg-blue-50 dark:bg-blue-950/30 rounded-full p-0.5 border border-blue-100 dark:border-blue-900/50">
                           <button
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              await hapticService.impact();
-                              await updateQuantity(cartItem._id, cartItem.quantity - 1);
+                            onClick={() => {
+                              hapticService.selection();
                               if (cartItem.quantity === 1) {
-                                await removeItem(cartItem._id);
-                                toast.success(`Removed ${v.weight} variant`);
+                                removeItem(cartItem._id);
+                              } else {
+                                updateQuantity(cartItem._id, cartItem.quantity - 1);
                               }
                             }}
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:bg-blue-700 font-bold"
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
                           >
                             -
                           </button>
-                          <span className="w-8 text-center text-xs font-bold">{cartItem.quantity}</span>
+                          <span className="w-8 text-center text-xs font-bold text-blue-900 dark:text-blue-200">{cartItem.quantity}</span>
                           <button
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              await hapticService.impact();
-                              await updateQuantity(cartItem._id, cartItem.quantity + 1);
+                            onClick={() => {
+                              hapticService.selection();
+                              if (cartItem.quantity >= v.stock) {
+                                toast.error(`Only ${v.stock} items available in stock`);
+                                return;
+                              }
+                              updateQuantity(cartItem._id, cartItem.quantity + 1);
                             }}
-                            className="w-7 h-7 bg-white text-blue-600 rounded-full flex items-center justify-center hover:bg-gray-100 font-bold shadow-sm"
+                            className="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors shadow-sm"
                           >
                             +
                           </button>
                         </div>
                       ) : (
                         <button
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            try {
-                              await hapticService.impact();
-                              await addToCart(product.id, raw, 1, v.weight);
-                              toast.success(`Added ${v.weight} to cart`);
-                            } catch {
-                              toast.error('Failed to add');
-                            }
+                          onClick={() => {
+                            hapticService.notificationSuccess();
+                            addToCart(product.id, raw, 1, v.weight);
+                            toast.success(`Added ${product.name} (${v.weight}) to cart`);
                           }}
                           className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full hover:bg-blue-700 transition-colors shadow-sm cursor-pointer"
                         >
@@ -314,7 +316,8 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
               })}
             </div>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

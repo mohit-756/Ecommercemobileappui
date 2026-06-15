@@ -10,6 +10,7 @@ export function formatPrice(price: number) {
 }
 
 export function normalizeProduct(p: any) {
+  if (!p) return null;
   return {
     ...p,
     id: p._id || p.id,

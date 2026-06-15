@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
 import { Pencil, Loader2, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, Shield, Camera, Heart, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -185,15 +186,15 @@ export function Profile() {
       </div>
 
       <AnimatePresence>
-        {showEditDialog && (
-          <div className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center">
+        {showEditDialog && createPortal(
+          <div className="fixed inset-0 z-[100] flex items-end justify-center md:items-center p-4 md:p-0">
             <div className="fixed inset-0 bg-black/40" onClick={() => setShowEditDialog(false)} />
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="relative bg-white dark:bg-surface w-full md:max-w-[393px] rounded-t-3xl md:rounded-3xl max-h-[85vh] overflow-y-auto p-6 pb-10 z-10 shadow-2xl transition-colors duration-300"
+              className="relative bg-white dark:bg-surface w-full md:max-w-[393px] rounded-3xl max-h-[85vh] overflow-y-auto p-6 pb-10 z-10 shadow-2xl transition-colors duration-300"
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-text-primary">Edit Profile</h2>
@@ -252,7 +253,8 @@ export function Profile() {
                 </button>
               </form>
             </motion.div>
-          </div>
+          </div>,
+          document.body
         )}
       </AnimatePresence>
     </div>

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Home, Search, ShoppingCart, User } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -10,6 +11,14 @@ export function MobileShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const { itemCount } = useCart();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const showBottomNav = BOTTOM_NAV_ROUTES.includes(location.pathname);
 
@@ -24,10 +33,13 @@ export function MobileShell() {
     <div className="min-h-screen bg-white dark:bg-background font-sans text-gray-900 dark:text-text-primary overflow-hidden transition-colors duration-300">
       <div className="w-full h-screen bg-white dark:bg-background overflow-hidden relative flex flex-col transition-colors duration-300">
         
-        <div className={cn(
-          "flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth bg-gray-50 dark:bg-background transition-colors duration-300",
-          showBottomNav ? "pb-24" : "pb-0"
-        )}>
+        <div
+          ref={scrollRef}
+          className={cn(
+            "flex-1 overflow-y-auto overflow-x-hidden relative scroll-smooth bg-gray-50 dark:bg-background transition-colors duration-300",
+            showBottomNav ? "pb-24" : "pb-0"
+          )}
+        >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={location.pathname}

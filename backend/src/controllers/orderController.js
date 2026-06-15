@@ -64,6 +64,43 @@ export async function createOrder(req, res, next) {
       }
     }
 
+    // Decrement stock atomically
+    const decrementedItems = [];
+    for (const item of items) {
+      try {
+        const updatedProduct = await Product.findOneAndUpdate(
+          { _id: item.product, stock: { $gte: item.quantity } },
+          { $inc: { stock: -item.quantity } },
+          { new: true }
+        );
+
+        if (!updatedProduct) {
+          // Rollback already decremented products
+          for (const decItem of decrementedItems) {
+            await Product.findByIdAndUpdate(decItem.product, {
+              $inc: { stock: decItem.quantity },
+            });
+          }
+          return res.status(400).json({
+            message: `Product "${item.name}" is out of stock or has insufficient inventory.`,
+          });
+        }
+        decrementedItems.push(item);
+      } catch (err) {
+        if (err.name === 'CastError') {
+          // Skip stock update for non-ObjectId product IDs (e.g. mock data)
+          continue;
+        }
+        // Rollback on other DB errors
+        for (const decItem of decrementedItems) {
+          await Product.findByIdAndUpdate(decItem.product, {
+            $inc: { stock: decItem.quantity },
+          });
+        }
+        throw err;
+      }
+    }
+
     const order = await Order.create({
       user: req.user._id,
       items,
@@ -88,16 +125,6 @@ export async function createOrder(req, res, next) {
     });
 
     await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
-
-    for (const item of items) {
-      try {
-        await Product.findByIdAndUpdate(item.product, {
-          $inc: { stock: -item.quantity },
-        });
-      } catch {
-        // Skip stock update for non-ObjectId product IDs (e.g. mock data)
-      }
-    }
 
     if (order.status !== 'cancelled') {
       try {
@@ -230,6 +257,27 @@ export async function updateOrderStatus(req, res, next) {
   try {
     const { status, description } = req.body;
 
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const previousStatus = order.status;
+
+    // If order is transitioning to cancelled, restore product stock
+    if (status === 'cancelled' && previousStatus !== 'cancelled') {
+      for (const item of order.items) {
+        try {
+          await Product.findByIdAndUpdate(item.product, {
+            $inc: { stock: item.quantity },
+          });
+        } catch {
+          // Skip stock restoration for non-ObjectId product IDs (e.g. mock data)
+        }
+      }
+    }
+
+    order.status = status;
     const statusLabels = {
       confirmed: 'Order Confirmed',
       processing: 'Processing',
@@ -240,26 +288,14 @@ export async function updateOrderStatus(req, res, next) {
       cancelled: 'Cancelled',
     };
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      {
-        status,
-        $push: {
-          tracking: {
-            status,
-            label: statusLabels[status] || status,
-            description: description || `Order status updated to ${statusLabels[status] || status}`,
-            timestamp: new Date(),
-          },
-        },
-      },
-      { new: true }
-    );
+    order.tracking.push({
+      status,
+      label: statusLabels[status] || status,
+      description: description || `Order status updated to ${statusLabels[status] || status}`,
+      timestamp: new Date(),
+    });
 
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
+    await order.save();
     res.json(order);
   } catch (error) {
     next(error);

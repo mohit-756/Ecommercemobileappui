@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/authService';
 import { biometricService } from '../services/biometricService';
 import { Capacitor } from '@capacitor/core';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { toast } from 'sonner';
 import { IMAGE_BASE_URL } from '../services/api';
 
@@ -26,6 +27,15 @@ export function Login() {
   }, []);
 
   useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        GoogleAuth.initialize();
+      } catch (err) {
+        console.warn('GoogleAuth initialize warning:', err);
+      }
+      return;
+    }
+
     const checkGoogle = setInterval(() => {
       if ((window as any).google?.accounts?.id) {
         clearInterval(checkGoogle);
@@ -43,12 +53,13 @@ export function Login() {
         callback: async (response: any) => {
           setLoading(true);
           try {
-            await loginWithGoogle(response.credential);
+            const loggedUser = await loginWithGoogle(response.credential);
             toast.success('Welcome back!');
-            navigate('/home', { replace: true });
-          } catch (err) {
+            navigate(loggedUser?.role === 'admin' ? '/admin' : '/home', { replace: true });
+          } catch (err: any) {
             console.error('Google sign in error:', err);
-            toast.error('Google sign in failed');
+            const errMsg = err.response?.data?.message || err.message || err;
+            toast.error(`Google sign in failed: ${errMsg}`);
           } finally {
             setLoading(false);
           }
@@ -75,6 +86,58 @@ export function Login() {
     }
   };
 
+  const handleNativeGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      console.log('Starting Native Google Sign-In...');
+      const googleUser = await GoogleAuth.signIn().catch(e => {
+        throw { source: 'plugin', inner: e };
+      });
+
+      const idToken = googleUser.authentication.idToken;
+      if (!idToken) {
+        throw { source: 'plugin', message: 'No ID Token returned from Google Auth' };
+      }
+
+      console.log('ID Token received, calling backend...');
+      const loggedUser = await loginWithGoogle(idToken).catch(e => {
+        throw { source: 'backend', inner: e };
+      });
+
+      toast.success('Welcome back!');
+      navigate(loggedUser?.role === 'admin' ? '/admin' : '/home', { replace: true });
+    } catch (err: any) {
+      console.error('Native Google Sign-In Error:', err);
+
+      let errorDetail = '';
+      const source = err.source || 'unknown';
+      const actualErr = err.inner || err;
+
+      if (actualErr.response) {
+        // Backend error (Axios)
+        const errMsg = actualErr.response?.data?.message || actualErr.message;
+        const errStatus = actualErr.response?.status ? ` [Status ${actualErr.response.status}]` : '';
+        const errData = actualErr.response?.data ? ` - ${JSON.stringify(actualErr.response.data)}` : '';
+        errorDetail = `${errMsg}${errStatus}${errData}`;
+      } else {
+        // Native Plugin or Network error
+        errorDetail = actualErr.message || JSON.stringify(actualErr) || 'Unknown error';
+      }
+      
+      // Don't show error if user cancelled
+      const isCancelled = errorDetail.includes('userCancelled') ||
+                         errorDetail.includes('12501') ||
+                         actualErr.code === '12501' ||
+                         (typeof actualErr === 'string' && actualErr.includes('cancel'));
+
+      if (!isCancelled) {
+        toast.error(`Google sign in failed (${source}): ${errorDetail}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleBiometricLogin = async () => {
     setBiometricLoading(true);
     try {
@@ -89,9 +152,9 @@ export function Login() {
 
       const auth = await biometricService.authenticate('Log in to DryFruit Hub');
       if (auth.success) {
-        await login(email, password);
+        const loggedUser = await login(email, password);
         toast.success('Welcome back!');
-        navigate('/home', { replace: true });
+        navigate(loggedUser?.role === 'admin' ? '/admin' : '/home', { replace: true });
       }
     } catch (err) {
       toast.error('Biometric login failed');
@@ -102,8 +165,8 @@ export function Login() {
 
   // Google sign in is handled programmatically by Google's SDK callback
 
-  const from = '/home';
-
+  const from = user?.role === 'admin' ? '/admin' : '/home';
+  
   if (user) {
     return <Navigate to={from} replace />;
   }
@@ -118,13 +181,13 @@ export function Login() {
 
     try {
       if (isLogin) {
-        await login(email, password);
+        const loggedUser = await login(email, password);
         if (biometricAvailable) {
           localStorage.setItem('bio_email', email);
           localStorage.setItem('bio_password', password);
         }
         toast.success('Welcome back!');
-        navigate('/home', { replace: true });
+        navigate(loggedUser?.role === 'admin' ? '/admin' : '/home', { replace: true });
       } else {
         const name = (form.elements.namedItem('name') as HTMLInputElement).value;
         const res = await authService.sendOtp({ email });
@@ -286,14 +349,42 @@ export function Login() {
                   </div>
                 </div>
 
-                <div className="w-full flex justify-center">
-                  <div 
-                    id="google-signin-btn" 
-                    className="w-full max-w-sm min-h-[46px] flex items-center justify-center overflow-hidden"
+                {Capacitor.isNativePlatform() ? (
+                  <button
+                    type="button"
+                    onClick={handleNativeGoogleSignIn}
+                    className="w-full max-w-sm mx-auto flex items-center justify-center gap-3 bg-white dark:bg-surface border border-gray-200 dark:border-border-medium hover:bg-gray-50 dark:hover:bg-surface-secondary text-gray-700 dark:text-text-primary font-semibold rounded-xl py-3 px-4 active:scale-[0.98] transition-all cursor-pointer shadow-sm min-h-[46px]"
                   >
-                    {/* Google Sign-in iframe renders here */}
+                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                      <path
+                        fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                      />
+                    </svg>
+                    <span className="text-sm font-semibold">Continue with Google</span>
+                  </button>
+                ) : (
+                  <div className="w-full flex justify-center">
+                    <div 
+                      id="google-signin-btn" 
+                      className="w-full max-w-sm min-h-[46px] flex items-center justify-center overflow-hidden"
+                    >
+                      {/* Google Sign-in iframe renders here */}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {biometricAvailable && isLogin && (
                   <button

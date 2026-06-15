@@ -15,7 +15,7 @@ export function Splash() {
 
     const timer = setTimeout(() => {
       if (user) {
-        navigate('/home', { replace: true });
+        navigate(user.role === 'admin' ? '/admin' : '/home', { replace: true });
       } else {
         navigate('/onboarding', { replace: true });
       }

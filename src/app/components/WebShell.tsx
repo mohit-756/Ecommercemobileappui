@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Outlet, useNavigate, useSearchParams, useLocation } from 'react-router';
 import { ShoppingCart, User, Search, Heart, Leaf, Zap, X } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
@@ -14,8 +15,16 @@ export function WebShell() {
   const { user } = useAuth();
   const { deliveryLocation, setShowSelector } = useDeliveryLocation();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   if (Capacitor.isNativePlatform()) {
     return null;
+  }
+
+  if (location.pathname === '/') {
+    return <Outlet />;
   }
 
   return (
@@ -90,6 +99,15 @@ export function WebShell() {
 
             {user && (
               <div className="flex items-center gap-1.5">
+                {user.role === 'admin' && (
+                  <button
+                    onClick={() => navigate('/admin')}
+                    className="flex items-center gap-1.5 px-4 py-2 text-xs font-black bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-full border border-blue-100 dark:border-blue-900/20 active:scale-95 transition-all mr-2 cursor-pointer"
+                  >
+                    <span>Admin Panel</span>
+                    <span>👑</span>
+                  </button>
+                )}
                 <button
                   onClick={() => navigate('/wishlist')}
                   className="p-2.5 text-gray-600 dark:text-text-secondary hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-surface-secondary rounded-full transition-all relative"

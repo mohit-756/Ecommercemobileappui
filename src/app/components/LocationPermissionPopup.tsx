@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
+import { createPortal } from 'react-dom';
 import { MapPin, X } from 'lucide-react';
 
 interface LocationPermissionPopupProps {
@@ -10,8 +11,8 @@ interface LocationPermissionPopupProps {
 export function LocationPermissionPopup({ open, onAllow, onDismiss }: LocationPermissionPopupProps) {
   return (
     <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center">
+      {open && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-4 sm:p-0">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -25,7 +26,7 @@ export function LocationPermissionPopup({ open, onAllow, onDismiss }: LocationPe
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.8 }}
-            className="relative w-full sm:max-w-sm bg-white dark:bg-surface rounded-t-3xl sm:rounded-3xl px-6 pt-8 pb-10 shadow-2xl transition-colors duration-300"
+            className="relative w-full sm:max-w-sm bg-white dark:bg-surface rounded-3xl px-6 pt-8 pb-10 shadow-2xl transition-colors duration-300"
           >
             <button
               onClick={onDismiss}
@@ -62,7 +63,8 @@ export function LocationPermissionPopup({ open, onAllow, onDismiss }: LocationPe
               </button>
             </div>
           </motion.div>
-        </div>
+        </div>,
+        document.body
       )}
     </AnimatePresence>
   );

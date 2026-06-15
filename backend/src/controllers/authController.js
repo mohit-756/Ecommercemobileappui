@@ -60,7 +60,11 @@ export async function sendOtp(req, res, next) {
     const emailResult = await sendOtpEmail(email, otp);
 
     if (emailResult.messageId === 'dev-mode') {
-      return res.json({ message: 'OTP sent to your email', otp, dev: true });
+      const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+      return res.json({ 
+        message: 'OTP sent to your email', 
+        ...(isDev && { otp, dev: true }) 
+      });
     }
 
     res.json({ message: 'OTP sent to your email' });

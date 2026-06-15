@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">DryFruit Hub</string>
     <string name="title_activity_main">DryFruit Hub</string>
-    <string name="package_name">com.retailshop</string>
-    <string name="custom_url_scheme">com.retailshop</string>
+    <string name="package_name">com.dryfruitshub</string>
+    <string name="custom_url_scheme">com.dryfruitshub</string>
+    <string name="server_client_id">171573382390-j5p022cdvras61gsjv3l5k6r4e9in6ib.apps.googleusercontent.com</string>
 </resources>

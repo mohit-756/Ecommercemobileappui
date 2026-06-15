@@ -64,7 +64,7 @@ export function VerifyOtp() {
       window.dispatchEvent(new CustomEvent('auth:login', { detail: { token, user } }));
       hapticService.notificationSuccess();
       toast.success('Account created successfully!');
-      navigate('/home', { replace: true });
+      navigate(user?.role === 'admin' ? '/admin' : '/home', { replace: true });
     } catch (err: any) {
       hapticService.impact();
       const message = err.response?.data?.message || 'Invalid OTP. Try again.';

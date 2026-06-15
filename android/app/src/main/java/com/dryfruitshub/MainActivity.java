@@ -1,4 +1,4 @@
-package com.retailshop;
+package com.dryfruitshub;
 
 import com.getcapacitor.BridgeActivity;
 

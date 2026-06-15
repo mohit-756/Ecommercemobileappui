@@ -123,6 +123,10 @@ export function ProductDetails() {
     loadProductDetails();
   }, [id, navigate]);
 
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedVariant, selectedSize]);
+
   if (loading) {
     return (
       <div className="min-h-full bg-white dark:bg-surface transition-colors duration-300 flex flex-col pb-24 relative">
@@ -150,7 +154,21 @@ export function ProductDetails() {
 
   if (!product) return null;
 
+  const currentStock = selectedVariant ? (selectedVariant.stock ?? 0) : (product.stock ?? 0);
+
+  const handleIncreaseQuantity = () => {
+    if (quantity >= currentStock) {
+      toast.error(`Only ${currentStock} items available in stock`);
+      return;
+    }
+    setQuantity(quantity + 1);
+  };
+
   const handleAddToCart = async () => {
+    if (currentStock <= 0) {
+      toast.error('Item is out of stock');
+      return;
+    }
     try {
       await hapticService.impact();
       const weight = selectedVariant ? selectedVariant.weight : (selectedSize || null);
@@ -428,14 +446,24 @@ export function ProductDetails() {
                   <Minus size={16} />
                 </button>
                 <span className="w-8 text-center font-semibold text-gray-900 dark:text-text-primary">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 bg-white dark:bg-surface rounded-full shadow-sm flex items-center justify-center text-gray-900 dark:text-text-primary my-1 mr-1 cursor-pointer">
+                <button onClick={handleIncreaseQuantity} className="w-8 h-8 bg-white dark:bg-surface rounded-full shadow-sm flex items-center justify-center text-gray-900 dark:text-text-primary my-1 mr-1 cursor-pointer">
                   <Plus size={16} />
                 </button>
               </div>
 
-              <button onClick={handleAddToCart} className="flex-1 bg-blue-600 text-white font-semibold rounded-xl py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-blue-200 dark:shadow-blue-900/30 hover:bg-blue-700 transition-colors cursor-pointer">
-                <ShoppingBag size={20} />
-                <span>Add to Cart</span>
+              <button 
+                onClick={handleAddToCart} 
+                disabled={currentStock <= 0}
+                className="flex-1 bg-blue-600 disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-blue-200 dark:shadow-blue-900/30 hover:bg-blue-700 transition-colors cursor-pointer"
+              >
+                {currentStock <= 0 ? (
+                  <span>Out of Stock</span>
+                ) : (
+                  <>
+                    <ShoppingBag size={20} />
+                    <span>Add to Cart</span>
+                  </>
+                )}
               </button>
             </div>
 
@@ -567,14 +595,25 @@ export function ProductDetails() {
             <Minus size={16} />
           </button>
           <span className="w-8 text-center font-semibold text-gray-900 dark:text-text-primary">{quantity}</span>
-          <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 bg-white dark:bg-surface rounded-full shadow-sm flex items-center justify-center text-gray-900 dark:text-text-primary my-1 mr-1">
+          <button onClick={handleIncreaseQuantity} className="w-8 h-8 bg-white dark:bg-surface rounded-full shadow-sm flex items-center justify-center text-gray-900 dark:text-text-primary my-1 mr-1">
             <Plus size={16} />
           </button>
         </div>
 
-        <motion.button whileTap={{ scale: 0.95 }} onClick={handleAddToCart} className="flex-1 bg-blue-600 text-white font-semibold rounded-full py-4 flex items-center justify-center gap-2 shadow-lg shadow-blue-200 dark:shadow-blue-900/30">
-          <ShoppingBag size={20} />
-          <span>Add</span>
+        <motion.button 
+          whileTap={{ scale: 0.95 }} 
+          onClick={handleAddToCart} 
+          disabled={currentStock <= 0}
+          className="flex-1 bg-blue-600 disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed text-white font-semibold rounded-full py-4 flex items-center justify-center gap-2 shadow-lg shadow-blue-200 dark:shadow-blue-900/30"
+        >
+          {currentStock <= 0 ? (
+            <span>Out of Stock</span>
+          ) : (
+            <>
+              <ShoppingBag size={20} />
+              <span>Add</span>
+            </>
+          )}
         </motion.button>
       </div>
     </div>

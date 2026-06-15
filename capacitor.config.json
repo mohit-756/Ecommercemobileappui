@@ -10,6 +10,11 @@
     ]
   },
   "plugins": {
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "171573382390-j5p022cdvras61gsjv3l5k6r4e9in6ib.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    },
     "SplashScreen": {
       "launchAutoHide": true,
       "backgroundColor": "#ffffff",

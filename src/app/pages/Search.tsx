@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router';
 import { ChevronLeft, Search as SearchIcon, X, SlidersHorizontal, ChevronDown, Star, RotateCcw, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -211,8 +212,8 @@ export function Search() {
       </div>
 
       <AnimatePresence>
-        {showFilters && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center">
+        {showFilters && createPortal(
+          <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-4 sm:p-0">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -226,13 +227,13 @@ export function Search() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.9 }}
-              className="relative bg-white dark:bg-surface w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh] transition-colors duration-300"
+              className="relative bg-white dark:bg-surface w-full sm:max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh] transition-colors duration-300"
             >
               <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 dark:border-border-light">
                 <h3 className="text-xl font-extrabold text-gray-900 dark:text-text-primary tracking-tight">Filters</h3>
                 <button
                   onClick={clearFilters}
-                  className="flex items-center gap-1.5 text-blue-600 text-sm font-semibold hover:text-blue-700 active:scale-95 transition-all"
+                  className="flex-1 max-w-fit flex items-center justify-end gap-1.5 text-blue-600 text-sm font-semibold hover:text-blue-700 active:scale-95 transition-all"
                 >
                   <RotateCcw size={14} />
                   Reset
@@ -299,8 +300,8 @@ export function Search() {
                       <div
                         className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
                         style={{
-                          left: `${minPrice ? Math.min(Number(minPrice) / 50, 100) : 0}%`,
-                          right: `${maxPrice ? 100 - Math.min(Number(maxPrice) / 50, 100) : 0}%`,
+                           left: `${minPrice ? Math.min(Number(minPrice) / 50, 100) : 0}%`,
+                           right: `${maxPrice ? 100 - Math.min(Number(maxPrice) / 50, 100) : 0}%`,
                         }}
                       />
                     </div>
@@ -363,7 +364,8 @@ export function Search() {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </div>,
+          document.body
         )}
       </AnimatePresence>
     </div>

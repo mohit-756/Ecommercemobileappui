@@ -1,3 +1,5 @@
+import Pincode from '../models/Pincode.js';
+
 export async function checkPincode(req, res, next) {
   try {
     const { pincode } = req.params;
@@ -6,13 +8,34 @@ export async function checkPincode(req, res, next) {
       return res.status(400).json({ message: 'Invalid pincode format' });
     }
 
-    const serviceablePincodes = ['110001', '110002', '400001', '400002', '700001', '600001', '756922'];
-    const isServiceable = serviceablePincodes.includes(pincode);
+    let record = await Pincode.findOne({ code: pincode });
+
+    const defaultPincodes = ['110001', '110002', '400001', '400002', '700001', '600001', '756922'];
+    let isServiceable = false;
+    let estimatedDays = null;
+
+    if (record) {
+      isServiceable = record.serviceable;
+      estimatedDays = record.estimatedDays;
+    } else {
+      isServiceable = defaultPincodes.includes(pincode);
+      estimatedDays = isServiceable ? Math.floor(Math.random() * 4) + 2 : null;
+
+      try {
+        await Pincode.create({
+          code: pincode,
+          serviceable: isServiceable,
+          estimatedDays: estimatedDays || 3,
+        });
+      } catch {
+        // Ignore parallel insertion conflicts
+      }
+    }
 
     res.json({
       pincode,
       serviceable: isServiceable,
-      estimatedDays: isServiceable ? Math.floor(Math.random() * 4) + 2 : null,
+      estimatedDays,
       message: isServiceable ? 'Delivery available' : 'Sorry, we do not deliver to this pincode yet',
     });
   } catch (error) {

@@ -64,13 +64,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         const res = await cartService.getCart();
         const serverCart = res.data;
-        const normalized = (serverCart.items || []).map((item: any) => ({
-          _id: item._id,
-          product: normalizeProduct(item.product),
-          quantity: item.quantity,
-          selectedWeight: item.selectedWeight,
-          selectedPrice: item.selectedPrice,
-        }));
+        const normalized = (serverCart.items || [])
+          .map((item: any) => ({
+            _id: item._id,
+            product: normalizeProduct(item.product),
+            quantity: item.quantity,
+            selectedWeight: item.selectedWeight,
+            selectedPrice: item.selectedPrice,
+          }))
+          .filter((item: any) => item.product !== null);
         setItems(normalized);
       } catch (err) {
         console.error('Failed to sync/fetch backend cart:', err);
@@ -87,13 +89,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (token) {
       try {
         const res = await cartService.addToCart(productId, quantity, selectedWeight);
-        const normalized = (res.data.items || []).map((item: any) => ({
-          _id: item._id,
-          product: normalizeProduct(item.product),
-          quantity: item.quantity,
-          selectedWeight: item.selectedWeight,
-          selectedPrice: item.selectedPrice,
-        }));
+        const normalized = (res.data.items || [])
+          .map((item: any) => ({
+            _id: item._id,
+            product: normalizeProduct(item.product),
+            quantity: item.quantity,
+            selectedWeight: item.selectedWeight,
+            selectedPrice: item.selectedPrice,
+          }))
+          .filter((item: any) => item.product !== null);
         setItems(normalized);
       } catch (err) {
         console.error('Failed to add to cart on server:', err);
@@ -134,13 +138,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (token) {
       try {
         const res = await cartService.updateCartItem(itemId, quantity);
-        const normalized = (res.data.items || []).map((item: any) => ({
-          _id: item._id,
-          product: normalizeProduct(item.product),
-          quantity: item.quantity,
-          selectedWeight: item.selectedWeight,
-          selectedPrice: item.selectedPrice,
-        }));
+        const normalized = (res.data.items || [])
+          .map((item: any) => ({
+            _id: item._id,
+            product: normalizeProduct(item.product),
+            quantity: item.quantity,
+            selectedWeight: item.selectedWeight,
+            selectedPrice: item.selectedPrice,
+          }))
+          .filter((item: any) => item.product !== null);
         setItems(normalized);
       } catch (err) {
         console.error('Failed to update cart item on server:', err);
@@ -161,13 +167,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (token) {
       try {
         const res = await cartService.removeFromCart(itemId);
-        const normalized = (res.data.items || []).map((item: any) => ({
-          _id: item._id,
-          product: normalizeProduct(item.product),
-          quantity: item.quantity,
-          selectedWeight: item.selectedWeight,
-          selectedPrice: item.selectedPrice,
-        }));
+        const normalized = (res.data.items || [])
+          .map((item: any) => ({
+            _id: item._id,
+            product: normalizeProduct(item.product),
+            quantity: item.quantity,
+            selectedWeight: item.selectedWeight,
+            selectedPrice: item.selectedPrice,
+          }))
+          .filter((item: any) => item.product !== null);
         setItems(normalized);
       } catch (err) {
         console.error('Failed to remove cart item from server:', err);
