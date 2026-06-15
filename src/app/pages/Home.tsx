@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Search, Bell, LayoutGrid, Apple, Cherry, ShoppingBag, Sprout, Clock, Zap, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Bell, LayoutGrid, Apple, Cherry, ShoppingBag, Sprout, Clock, Zap, ArrowRight, ChevronLeft, ChevronRight, Leaf, Cookie } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Geolocation } from '@capacitor/geolocation';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -19,7 +19,7 @@ import { categoryService } from '../services/categoryService';
 import { IMAGE_BASE_URL } from '../services/api';
 
 const bannerIcons: Record<string, any> = {
-  LayoutGrid, Apple, Cherry, ShoppingBag, Sprout,
+  LayoutGrid, Apple, Cherry, ShoppingBag, Sprout, Leaf, Cookie,
 };
 
 const banners = [
@@ -126,7 +126,10 @@ export function Home() {
       ]);
       setProducts(productsRes.data.products || []);
       const allCategory = { id: 'all', _id: 'all', name: 'All', icon: 'LayoutGrid' };
-      setCategories([allCategory, ...(categoriesRes.data || [])]);
+      const sortedCats = (categoriesRes.data || []).sort((a: any, b: any) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true })
+      );
+      setCategories([allCategory, ...sortedCats]);
     } catch (err) {
       console.error('Failed to fetch backend data on homepage:', err);
       setCategories(mockCategories);

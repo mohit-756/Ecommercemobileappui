@@ -45,7 +45,10 @@ export function Search() {
   useEffect(() => {
     categoryService.getCategories()
       .then((res) => {
-        setCategories(res.data || []);
+        const sorted = (res.data || []).sort((a: any, b: any) =>
+          a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true })
+        );
+        setCategories(sorted);
       })
       .catch((err) => {
         console.error('Failed to load categories in search:', err);

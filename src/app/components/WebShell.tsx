@@ -35,11 +35,9 @@ export function WebShell() {
             <div className="flex items-center gap-6">
               <div
                 onClick={() => navigate('/home')}
-                className="flex-shrink-0 cursor-pointer flex items-center gap-3"
+                className="flex-shrink-0 cursor-pointer flex items-center gap-2.5"
               >
-                <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center shadow-md shadow-amber-100 dark:shadow-amber-500/20">
-                  <Leaf size={22} className="text-white" />
-                </div>
+                <img src="/logo.png" alt="DryFruit Hub" className="h-12 w-auto object-contain drop-shadow-sm" />
                 <span className="text-2xl font-black text-gray-900 dark:text-text-primary tracking-tight transition-colors">DryFruit Hub</span>
               </div>
 

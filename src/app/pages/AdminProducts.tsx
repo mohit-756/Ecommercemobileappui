@@ -107,7 +107,12 @@ export function AdminProducts() {
 
   useEffect(() => {
     fetchProducts();
-    api.get('/categories').then(res => setCategories(res.data)).catch(() => {});
+    api.get('/categories').then(res => {
+      const sorted = (res.data || []).sort((a: any, b: any) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true })
+      );
+      setCategories(sorted);
+    }).catch(() => {});
   }, [search]);
 
   const openEdit = (product: any) => {
@@ -139,7 +144,12 @@ export function AdminProducts() {
     try {
       const res = await api.post('/categories', { name: name.trim(), icon: 'LayoutGrid' });
       const newCat = res.data;
-      setCategories(prev => [...prev, newCat]);
+      setCategories(prev => {
+        const updated = [...prev, newCat];
+        return updated.sort((a: any, b: any) =>
+          a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true })
+        );
+      });
       setForm(f => ({ ...f, category: newCat._id }));
       toast.success(`Category "${name}" created!`);
     } catch {

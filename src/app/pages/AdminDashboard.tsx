@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Package, Users, IndianRupee, ShoppingBag, AlertTriangle, Zap, Clock, Activity } from 'lucide-react';
+import { ArrowLeft, Package, Users, IndianRupee, ShoppingBag, AlertTriangle, Zap, Clock, Activity, LayoutGrid } from 'lucide-react';
 import { adminService } from '../services/adminService';
 import { cn } from '../lib/utils';
 
@@ -117,16 +117,21 @@ export function AdminDashboard() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => navigate('/admin/products')} className="bg-blue-600 p-4 rounded-2xl shadow-lg shadow-blue-100 dark:shadow-blue-900/30 text-left">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <button onClick={() => navigate('/admin/products')} className="bg-blue-600 p-4 rounded-2xl shadow-lg shadow-blue-100 dark:shadow-blue-900/30 text-left cursor-pointer transition-transform active:scale-[0.98]">
                 <ShoppingBag size={20} className="text-white mb-2" />
                 <p className="font-bold text-white text-sm">Inventory</p>
                 <p className="text-white/60 text-[10px]">Manage Products</p>
               </button>
-              <button onClick={() => navigate('/admin/orders')} className="bg-gray-900 p-4 rounded-2xl shadow-lg shadow-gray-100 text-left">
+              <button onClick={() => navigate('/admin/orders')} className="bg-gray-900 p-4 rounded-2xl shadow-lg shadow-gray-100/10 text-left cursor-pointer transition-transform active:scale-[0.98]">
                 <Package size={20} className="text-white mb-2" />
                 <p className="font-bold text-white text-sm">Live Queue</p>
                 <p className="text-white/60 text-[10px]">Manage Orders</p>
+              </button>
+              <button onClick={() => navigate('/admin/categories')} className="bg-emerald-600 p-4 rounded-2xl shadow-lg shadow-emerald-100 dark:shadow-emerald-900/30 text-left cursor-pointer transition-transform active:scale-[0.98]">
+                <LayoutGrid size={20} className="text-white mb-2" />
+                <p className="font-bold text-white text-sm">Categories</p>
+                <p className="text-white/60 text-[10px]">Manage Categories</p>
               </button>
             </div>
           </>

@@ -34,9 +34,9 @@ export function Splash() {
           stiffness: 260,
           damping: 20
         }}
-        className="bg-white dark:bg-surface p-6 rounded-[28px] shadow-2xl mb-6"
+        className="bg-white p-5 rounded-[32px] shadow-2xl mb-6 flex items-center justify-center border border-gray-100"
       >
-        <Leaf size={64} className="text-amber-600" strokeWidth={1.5} />
+        <img src="/logo.png" alt="DryFruit Hub Logo" className="w-24 h-24 object-contain" />
       </motion.div>
       <motion.h1
         initial={{ y: 20, opacity: 0 }}

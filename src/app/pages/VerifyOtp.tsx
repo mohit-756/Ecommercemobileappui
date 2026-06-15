@@ -107,8 +107,8 @@ export function VerifyOtp() {
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-yellow-500/10 rounded-full blur-2xl"></div>
             
             <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-8">
-                <span className="text-2xl">🍂</span>
+              <div className="flex items-center gap-3 mb-8">
+                <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain drop-shadow-md" />
                 <span className="font-black tracking-tight text-xl">DryFruit Hub</span>
               </div>
               
