@@ -8,6 +8,7 @@ import { PlatformShell } from './components/PlatformShell';
 import { AdminShell } from './components/AdminShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LocationProvider } from './contexts/LocationContext';
+import { AddToCartPopupProvider } from './contexts/AddToCartPopupContext';
 import { LocationSelectorModal } from './components/LocationSelectorModal';
 import { Splash } from './pages/Splash';
 import { Onboarding } from './pages/Onboarding';
@@ -60,39 +61,41 @@ export default function App() {
           <LocationProvider>
             <ThemeProvider>
               <CartProvider>
-                <Routes>
-                  <Route element={<PlatformShell />}>
-                    <Route index element={<Splash />} />
-                    <Route path="onboarding" element={<Onboarding />} />
-                    <Route path="login" element={<Login />} />
-                    <Route path="verify-otp" element={<VerifyOtp />} />
-                    <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                    <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-                    <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-                    <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                    <Route path="product/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
-                    <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-                    <Route path="success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
-                    <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
-                    <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-                    <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-                    <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
-                    <Route path="payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
-                    <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                    <Route path="support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
-                    <Route path="privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
-                    <Route path="terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
-                    <Route path="*" element={<Navigate to="/home" replace />} />
-                  </Route>
+                <AddToCartPopupProvider>
+                  <Routes>
+                    <Route element={<PlatformShell />}>
+                      <Route index element={<Splash />} />
+                      <Route path="onboarding" element={<Onboarding />} />
+                      <Route path="login" element={<Login />} />
+                      <Route path="verify-otp" element={<VerifyOtp />} />
+                      <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                      <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+                      <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                      <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                      <Route path="product/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
+                      <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                      <Route path="success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+                      <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
+                      <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                      <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                      <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
+                      <Route path="payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
+                      <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                      <Route path="support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+                      <Route path="privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
+                      <Route path="terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
+                      <Route path="*" element={<Navigate to="/home" replace />} />
+                    </Route>
 
-                  <Route element={<AdminShell />}>
-                    <Route path="admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
-                    <Route path="admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
-                    <Route path="admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
-                  </Route>
-                </Routes>
-                <LocationSelectorModal />
-                <ThemeAwareToaster />
+                    <Route element={<AdminShell />}>
+                      <Route path="admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+                      <Route path="admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
+                      <Route path="admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
+                    </Route>
+                  </Routes>
+                  <LocationSelectorModal />
+                  <ThemeAwareToaster />
+                </AddToCartPopupProvider>
               </CartProvider>
             </ThemeProvider>
           </LocationProvider>

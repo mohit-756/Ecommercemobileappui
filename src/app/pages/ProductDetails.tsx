@@ -17,12 +17,14 @@ import { ProductCard } from '../components/ProductCard';
 import { wishlistService } from '../services/wishlistService';
 import { productService } from '../services/productService';
 import { reviewService } from '../services/reviewService';
+import { useAddToCartPopup } from '../contexts/AddToCartPopupContext';
 
 export function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { user } = useAuth();
+  const { showAddToCartPopup } = useAddToCartPopup();
   const [emblaRef] = useEmblaCarousel();
   const [quantity, setQuantity] = useState(1);
   const [isWishlist, setIsWishlist] = useState(false);
@@ -173,7 +175,13 @@ export function ProductDetails() {
       await hapticService.impact();
       const weight = selectedVariant ? selectedVariant.weight : (selectedSize || null);
       await addToCart(product.id, product, quantity, weight);
-      toast.success(`Added ${quantity} to cart`);
+      showAddToCartPopup({
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        price: selectedVariant ? selectedVariant.price : product.price,
+        selectedWeight: weight || undefined,
+      });
     } catch {
       toast.error('Failed to add to cart');
     }

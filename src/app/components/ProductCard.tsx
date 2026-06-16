@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { hapticService } from '../services/hapticService';
 import { wishlistService } from '../services/wishlistService';
 import { useState, useEffect } from 'react';
+import { useAddToCartPopup } from '../contexts/AddToCartPopupContext';
 
 interface ProductCardProps {
   product: any;
@@ -19,6 +20,7 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
   const navigate = useNavigate();
   const { addToCart, items, updateQuantity, removeItem } = useCart();
   const { user } = useAuth();
+  const { showAddToCartPopup } = useAddToCartPopup();
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
   const product = normalizeProduct(raw);
   const [isWishlist, setIsWishlist] = useState(false);
@@ -41,7 +43,13 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
       await hapticService.impact();
       const weight = product.variants && product.variants.length > 0 ? product.variants[0].weight : null;
       await addToCart(product.id, raw, 1, weight);
-      toast.success('Added to cart');
+      showAddToCartPopup({
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        price: product.variants?.length > 0 ? product.variants[0].price : product.price,
+        selectedWeight: weight || undefined,
+      });
     } catch {
       toast.error('Failed to add to cart');
     }
@@ -303,7 +311,13 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
                           onClick={() => {
                             hapticService.notificationSuccess();
                             addToCart(product.id, raw, 1, v.weight);
-                            toast.success(`Added ${product.name} (${v.weight}) to cart`);
+                            showAddToCartPopup({
+                              id: product.id,
+                              name: product.name,
+                              image: product.image,
+                              price: v.price,
+                              selectedWeight: v.weight,
+                            });
                           }}
                           className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full hover:bg-blue-700 transition-colors shadow-sm cursor-pointer"
                         >
