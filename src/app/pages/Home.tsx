@@ -199,29 +199,34 @@ export function Home() {
             <span className="text-[10px] font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-0.5 leading-none">
               {user ? `Hi, ${user.name.split(' ')[0]} 👋` : 'Welcome to Dry Fruit Hub 🍎'}
             </span>
-            <div onClick={() => setShowSelector(true)} className="cursor-pointer active:opacity-70 transition-opacity mt-1.5">
-              <h2 className="text-gray-955 dark:text-text-primary font-black text-sm sm:text-base flex items-center gap-1 leading-none">
-                Home — {deliveryLocation} <span className="text-blue-600 text-[10px] mt-0.5">▾</span>
+            <div 
+              onClick={() => setShowSelector(true)} 
+              className="cursor-pointer mt-1.5 group"
+            >
+              <h2 className="text-gray-900 dark:text-text-primary font-black text-sm sm:text-base flex items-center gap-1 leading-none group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                Home — {deliveryLocation} <span className="text-blue-600 text-[10px] mt-0.5 group-hover:translate-y-0.5 transition-transform">▾</span>
               </h2>
             </div>
           </div>
           <div className="flex gap-3">
-            <button
+            <motion.button
+              whileHover={{ rotate: [0, -12, 12, -12, 12, 0], scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => { hapticService.impact(); localNotificationService.sendWelcomeNotification(); }}
-              className="w-10 h-10 rounded-full border border-gray-100 dark:border-border-light flex items-center justify-center relative active:scale-95 transition-transform"
+              className="w-10 h-10 rounded-full border border-gray-100 dark:border-border-light flex items-center justify-center relative transition-colors bg-white dark:bg-surface cursor-pointer"
             >
               <Bell size={20} className="text-gray-700 dark:text-text-secondary" />
               <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-surface"></span>
-            </button>
+            </motion.button>
           </div>
         </div>
 
         <div
           onClick={() => navigate('/search')}
-          className="bg-gray-100/60 hover:bg-gray-100/80 dark:bg-surface-secondary flex items-center px-4 py-3 rounded-2xl border border-gray-100/50 dark:border-border-light cursor-text active:scale-[0.99] transition-all duration-200 group shadow-sm"
+          className="bg-gray-100/60 hover:bg-gray-100/80 dark:bg-surface-secondary/70 flex items-center px-4 py-2.5 rounded-xl border border-gray-100/50 dark:border-border-light/50 cursor-text active:scale-[0.99] hover:border-blue-500/20 dark:hover:border-blue-500/30 transition-all duration-200 group shadow-sm"
         >
-          <Search size={20} className="text-gray-400 dark:text-text-tertiary mr-2 group-focus-within:text-blue-600 transition-colors" />
-          <span className="text-gray-400 dark:text-text-tertiary text-sm">Search almonds, dates, walnuts...</span>
+          <Search size={18} className="text-gray-400 dark:text-text-tertiary mr-2 group-hover:text-blue-500 transition-colors" />
+          <span className="text-gray-400 dark:text-text-tertiary text-xs sm:text-sm">Search almonds, dates, walnuts...</span>
         </div>
       </div>
 
@@ -335,26 +340,28 @@ export function Home() {
                 const Icon = bannerIcons[cat.icon] || LayoutGrid;
                 const isActive = activeCategory === catId;
                 return (
-                  <button
+                  <motion.button
                     key={catId}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
                     onClick={() => { hapticService.selection(); setActiveCategory(catId); }}
-                    className="flex flex-col items-center gap-2 min-w-[72px] sm:min-w-[84px] md:min-w-[96px]"
+                    className="flex flex-col items-center gap-2 min-w-[72px] sm:min-w-[84px] md:min-w-[96px] cursor-pointer"
                   >
                     <div className={cn(
                       "w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-2xl flex items-center justify-center transition-all duration-300",
                       isActive 
-                        ? "bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/30 scale-105" 
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/30" 
                         : "bg-white dark:bg-surface border border-gray-100 dark:border-border-light text-gray-600 dark:text-text-secondary shadow-md shadow-black/5 hover:border-gray-200 dark:hover:border-border-medium"
                     )}>
                       <Icon size={24} className="sm:w-7 sm:h-7 md:w-8 md:h-8" strokeWidth={isActive ? 2.5 : 2} />
                     </div>
                     <span className={cn(
-                      "text-xs md:text-sm font-medium transition-colors",
-                      isActive ? "text-blue-600" : "text-gray-500 dark:text-text-secondary"
+                      "text-xs md:text-sm font-semibold transition-colors",
+                      isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-text-secondary"
                     )}>
                       {cat.name}
                     </span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -381,7 +388,7 @@ export function Home() {
               </button>
             </div>
             {filteredProducts.length === 0 ? (
-              <div className="text-center py-8 bg-gray-55/50 dark:bg-surface-secondary/50 rounded-2xl border border-dashed border-gray-200 dark:border-border-medium/60 w-full">
+              <div className="text-center py-8 bg-gray-50/50 dark:bg-surface-secondary/50 rounded-2xl border border-dashed border-gray-200 dark:border-border-medium/60 w-full">
                 <p className="text-sm text-gray-500 dark:text-text-secondary">No products found in this category.</p>
               </div>
             ) : (

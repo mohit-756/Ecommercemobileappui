@@ -386,8 +386,10 @@ export function ProductDetails() {
                       : 0;
                     const isSelected = selectedVariant?.weight === v.weight;
                     return (
-                      <button
+                      <motion.button
                         key={idx}
+                        whileHover={{ scale: 1.02, y: -1 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => {
                           setSelectedVariant(v);
                           hapticService.impact();
@@ -395,8 +397,8 @@ export function ProductDetails() {
                         className={cn(
                           "p-3 rounded-2xl border flex flex-col items-center justify-center transition-all cursor-pointer relative overflow-hidden",
                           isSelected
-                            ? "bg-blue-50 dark:bg-blue-950/30 border-blue-600 dark:border-blue-500 ring-2 ring-blue-600/20"
-                            : "border-gray-200 dark:border-border-medium bg-white dark:bg-surface-secondary hover:border-gray-300 dark:hover:border-border-light text-gray-600 dark:text-text-secondary"
+                            ? "bg-blue-50 dark:bg-blue-950/30 border-blue-600 dark:border-blue-500 ring-2 ring-blue-600/20 shadow-sm shadow-blue-500/5"
+                            : "border-gray-200 dark:border-border-medium bg-white dark:bg-surface-secondary hover:border-gray-300 dark:hover:border-border-light text-gray-600 dark:text-text-secondary hover:shadow-sm"
                         )}
                       >
                         {discountVal > 0 && (
@@ -415,7 +417,7 @@ export function ProductDetails() {
                             {formatPrice(v.originalPrice)}
                           </span>
                         )}
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -425,8 +427,10 @@ export function ProductDetails() {
                 <h3 className="font-bold text-gray-900 dark:text-text-primary mb-3">Size</h3>
                 <div className="flex gap-3">
                   {product.sizes.map((s: string, idx: number) => (
-                    <button
+                    <motion.button
                       key={idx}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
                       onClick={() => setSelectedSize(s)}
                       className={cn(
                         "px-4 py-2 rounded-xl border text-sm font-medium transition-colors cursor-pointer",
@@ -436,7 +440,7 @@ export function ProductDetails() {
                       )}
                     >
                       {s}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
@@ -449,13 +453,19 @@ export function ProductDetails() {
                 <span className="text-xl font-bold text-gray-900 dark:text-text-primary">{formatPrice((selectedVariant ? selectedVariant.price : product.price) * quantity)}</span>
               </div>
 
-              <div className="flex items-center bg-gray-100 dark:bg-surface-tertiary rounded-full px-1 ml-auto">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 dark:text-text-secondary cursor-pointer">
-                  <Minus size={16} />
+              <div className="flex items-center bg-gray-100 dark:bg-surface-tertiary rounded-full p-1 ml-auto border border-gray-200/20 dark:border-border-light/20">
+                <button 
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))} 
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-text-secondary dark:hover:text-text-primary hover:bg-gray-200/50 dark:hover:bg-surface-secondary active:scale-90 transition-all cursor-pointer"
+                >
+                  <Minus size={14} strokeWidth={2.5} />
                 </button>
-                <span className="w-8 text-center font-semibold text-gray-900 dark:text-text-primary">{quantity}</span>
-                <button onClick={handleIncreaseQuantity} className="w-8 h-8 bg-white dark:bg-surface rounded-full shadow-sm flex items-center justify-center text-gray-900 dark:text-text-primary my-1 mr-1 cursor-pointer">
-                  <Plus size={16} />
+                <span className="w-8 text-center font-bold text-gray-900 dark:text-text-primary text-sm select-none">{quantity}</span>
+                <button 
+                  onClick={handleIncreaseQuantity} 
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-text-secondary dark:hover:text-text-primary hover:bg-gray-200/50 dark:hover:bg-surface-secondary active:scale-90 transition-all cursor-pointer"
+                >
+                  <Plus size={14} strokeWidth={2.5} />
                 </button>
               </div>
 
@@ -598,13 +608,19 @@ export function ProductDetails() {
           </div>
         </div>
 
-        <div className="flex items-center bg-gray-100 dark:bg-surface-tertiary rounded-full px-1 ml-auto">
-          <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 dark:text-text-secondary">
-            <Minus size={16} />
+        <div className="flex items-center bg-gray-100 dark:bg-surface-tertiary rounded-full p-1 ml-auto border border-gray-200/20 dark:border-border-light/20">
+          <button 
+            onClick={() => setQuantity(Math.max(1, quantity - 1))} 
+            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-text-secondary dark:hover:text-text-primary hover:bg-gray-200/50 dark:hover:bg-surface-secondary active:scale-90 transition-all cursor-pointer"
+          >
+            <Minus size={14} strokeWidth={2.5} />
           </button>
-          <span className="w-8 text-center font-semibold text-gray-900 dark:text-text-primary">{quantity}</span>
-          <button onClick={handleIncreaseQuantity} className="w-8 h-8 bg-white dark:bg-surface rounded-full shadow-sm flex items-center justify-center text-gray-900 dark:text-text-primary my-1 mr-1">
-            <Plus size={16} />
+          <span className="w-8 text-center font-bold text-gray-900 dark:text-text-primary text-sm select-none">{quantity}</span>
+          <button 
+            onClick={handleIncreaseQuantity} 
+            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-text-secondary dark:hover:text-text-primary hover:bg-gray-200/50 dark:hover:bg-surface-secondary active:scale-90 transition-all cursor-pointer"
+          >
+            <Plus size={14} strokeWidth={2.5} />
           </button>
         </div>
 

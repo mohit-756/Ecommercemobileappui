@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router';
-import { ShoppingCart, X, CheckCircle2 } from 'lucide-react';
+import { ShoppingCart, X } from 'lucide-react';
 import { formatPrice } from '../lib/utils';
 
 interface PopupProduct {
@@ -81,9 +81,9 @@ export function AddToCartPopup({ product, isOpen, onClose, cartSubtotal, cartIte
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className="fixed bottom-24 left-3 right-3 z-[1001] sm:left-auto sm:right-4 sm:w-[360px]"
           >
-            <div className="bg-white dark:bg-surface rounded-2xl shadow-2xl border border-gray-100 dark:border-border-light overflow-hidden">
+            <div className="bg-white/90 dark:bg-surface/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 dark:border-white/10 overflow-hidden">
               {/* Progress bar */}
-              <div className="h-0.5 bg-gray-100 dark:bg-surface-tertiary w-full">
+              <div className="h-0.5 bg-gray-100/50 dark:bg-surface-tertiary/50 w-full">
                 <div
                   ref={progressRef}
                   className="h-full bg-amber-500"
@@ -95,18 +95,21 @@ export function AddToCartPopup({ product, isOpen, onClose, cartSubtotal, cartIte
                 {/* Header */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', damping: 12, stiffness: 300, delay: 0.1 }}
-                    >
-                      <CheckCircle2 size={20} className="text-green-500 fill-green-50" />
-                    </motion.div>
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 flex-shrink-0">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                        <motion.path
+                          d="M20 6L9 17L4 12"
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ duration: 0.35, ease: 'easeOut', delay: 0.1 }}
+                        />
+                      </svg>
+                    </div>
                     <span className="font-bold text-sm text-gray-900 dark:text-text-primary">Added to Cart!</span>
                   </div>
                   <button
                     onClick={onClose}
-                    className="w-7 h-7 rounded-full bg-gray-100 dark:bg-surface-tertiary flex items-center justify-center text-gray-500 dark:text-text-secondary hover:bg-gray-200 dark:hover:bg-surface-secondary transition-colors cursor-pointer"
+                    className="w-7 h-7 rounded-full bg-gray-100/65 dark:bg-surface-tertiary/65 flex items-center justify-center text-gray-500 dark:text-text-secondary hover:bg-gray-200 dark:hover:bg-surface-secondary transition-colors cursor-pointer"
                   >
                     <X size={14} />
                   </button>

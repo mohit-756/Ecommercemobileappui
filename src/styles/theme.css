@@ -155,6 +155,10 @@
   --color-overlay: var(--overlay);
   --color-nav-bg: var(--nav-bg);
   --color-header-bg: var(--header-bg);
+  --color-gray-55: #f6f8fa;
+  --color-gray-150: #eceef1;
+  --color-gray-250: #dadde2;
+  --color-gray-550: #636363;
 }
 
 @layer base {

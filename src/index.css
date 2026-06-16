@@ -4,6 +4,12 @@
   --color-primary-500: #2563EB;
   --color-secondary-500: #10B981;
   --color-accent-500: #F59E0B;
+  
+  /* Custom gray values to support existing layouts and verify aesthetic compliance */
+  --color-gray-55: #f6f8fa;
+  --color-gray-150: #eceef1;
+  --color-gray-250: #dadde2;
+  --color-gray-550: #636363;
 }
 
 @layer utilities {
