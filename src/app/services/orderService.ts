@@ -19,9 +19,51 @@ export const orderService = {
   getOrderById: (id: string) =>
     api.get(`/orders/${id}`),
 
-  getAllOrders: (params?: { page?: number; limit?: number; status?: string }) =>
-    api.get('/orders/all', { params }),
+  getAllOrders: (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    fulfillmentType?: string;
+    timeSlot?: string;
+    startDate?: string;
+    endDate?: string;
+    customer?: string;
+    packingStatus?: string;
+    category?: string;
+    sort?: string;
+  }) => api.get('/orders/all', { params }),
 
   updateOrderStatus: (id: string, status: string, description?: string) =>
     api.put(`/orders/${id}/status`, { status, description }),
+
+  getAdminDashboardStats: () =>
+    api.get('/orders/admin/dashboard-stats'),
+
+  getAdminAnalytics: (params?: {
+    startDate?: string;
+    endDate?: string;
+    customer?: string;
+    fulfillmentType?: string;
+  }) => api.get('/orders/admin/analytics', { params }),
+
+  adminCreateOrder: (data: {
+    customerId: string;
+    items: Array<{ productId: string; quantity: number; specialInstructions?: string }>;
+    fulfillmentType: 'pickup' | 'delivery';
+    timeSlot: string;
+    shippingAddress?: any;
+    paymentMethod: 'razorpay' | 'cod';
+    notes?: string;
+    fees?: number;
+    tips?: number;
+  }) => api.post('/orders/admin/create', data),
+
+  updateItemPackingStatus: (id: string, itemId: string, packingStatus: 'packed' | 'not_packed') =>
+    api.put(`/orders/${id}/items/${itemId}/packing`, { packingStatus }),
+
+  addOrderRefund: (id: string, data: { amount: number; reason?: string }) =>
+    api.put(`/orders/${id}/refund`, data),
+
+  updateOrderNotes: (id: string, data: { notes: string }) =>
+    api.put(`/orders/${id}/notes`, data),
 };

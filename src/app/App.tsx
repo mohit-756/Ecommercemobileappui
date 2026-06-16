@@ -7,6 +7,7 @@ import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { PlatformShell } from './components/PlatformShell';
 import { AdminShell } from './components/AdminShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { PublicRoute } from './components/PublicRoute';
 import { LocationProvider } from './contexts/LocationContext';
 import { LocationSelectorModal } from './components/LocationSelectorModal';
 import { Splash } from './pages/Splash';
@@ -63,9 +64,9 @@ export default function App() {
                 <Routes>
                   <Route element={<PlatformShell />}>
                     <Route index element={<Splash />} />
-                    <Route path="onboarding" element={<Onboarding />} />
-                    <Route path="login" element={<Login />} />
-                    <Route path="verify-otp" element={<VerifyOtp />} />
+                    <Route path="onboarding" element={<PublicRoute><Onboarding /></PublicRoute>} />
+                    <Route path="login" element={<PublicRoute><Login /></PublicRoute>} />
+                    <Route path="verify-otp" element={<PublicRoute><VerifyOtp /></PublicRoute>} />
                     <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
                     <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
                     <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />

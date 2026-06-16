@@ -10,10 +10,10 @@ export const authService = {
   loginWithGoogle: (idToken: string) =>
     api.post('/auth/google', { idToken }),
 
-  sendOtp: (data: { email: string }) =>
+  sendOtp: (data: { email?: string; phone?: string }) =>
     api.post('/auth/send-otp', data),
 
-  verifyOtp: (data: { email: string; otp: string; name?: string; password?: string }) =>
+  verifyOtp: (data: { email?: string; phone?: string; otp: string; name?: string; password?: string }) =>
     api.post('/auth/verify-otp', data),
 
   getProfile: () =>

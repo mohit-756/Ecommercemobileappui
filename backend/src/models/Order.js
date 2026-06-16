@@ -7,10 +7,14 @@ const orderItemSchema = new mongoose.Schema({
   quantity: { type: Number, required: true, min: 1 },
   image: String,
   weight: String,
+  sku: { type: String, default: '' },
+  category: { type: String, default: '' },
+  packingStatus: { type: String, enum: ['not_packed', 'packed'], default: 'not_packed' },
+  specialInstructions: { type: String, default: '' },
 });
 
 const trackingEventSchema = new mongoose.Schema({
-  status: { type: String, enum: ['placed', 'confirmed', 'processing', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'] },
+  status: { type: String, enum: ['placed', 'confirmed', 'processing', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled', 'received', 'not_packed', 'processed', 'completed'] },
   label: String,
   description: String,
   timestamp: { type: Date, default: Date.now },
@@ -42,9 +46,28 @@ const orderSchema = new mongoose.Schema({
   total: { type: Number, required: true, min: 0 },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'processing', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'],
+    enum: [
+      'pending', 'confirmed', 'processing', 'packed', 'shipped', 
+      'out_for_delivery', 'delivered', 'cancelled',
+      'received', 'not_packed', 'processed', 'completed'
+    ],
     default: 'pending',
   },
+  fulfillmentType: { type: String, enum: ['pickup', 'delivery'], default: 'delivery' },
+  timeSlot: { type: String, default: '' },
+  fees: { type: Number, default: 0 },
+  tips: { type: Number, default: 0 },
+  refundHistory: [{
+    amount: { type: Number, required: true },
+    reason: { type: String, default: '' },
+    timestamp: { type: Date, default: Date.now },
+  }],
+  activityLogs: [{
+    action: { type: String, required: true },
+    actor: { type: String, default: 'System' },
+    details: { type: String, default: '' },
+    timestamp: { type: Date, default: Date.now },
+  }],
   tracking: [trackingEventSchema],
   courierDetails: {
     name: String,

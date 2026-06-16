@@ -9,7 +9,7 @@ import { IMAGE_BASE_URL } from '../services/api';
 export function VerifyOtp() {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { name: string; email: string; password: string } | null;
+  const state = location.state as { name?: string; email?: string; password?: string; phone?: string } | null;
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ export function VerifyOtp() {
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (!state?.email) {
+    if (!state?.email && !state?.phone) {
       navigate('/login', { replace: true });
       return;
     }
@@ -32,6 +32,7 @@ export function VerifyOtp() {
   }, [countdown]);
 
   const handleChange = (index: number, value: string) => {
+    if (value && !/^\d$/.test(value)) return;
     if (value.length > 1) return;
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -53,18 +54,21 @@ export function VerifyOtp() {
 
     setLoading(true);
     try {
-      const res = await authService.verifyOtp({
-        email: state!.email,
-        otp: code,
-        name: state!.name,
-        password: state!.password,
-      });
+      const res = await authService.verifyOtp(
+        state?.phone
+          ? { phone: state.phone, otp: code }
+          : {
+              email: state!.email,
+              otp: code,
+              name: state!.name,
+              password: state!.password,
+            }
+      );
       const { token, user } = res.data;
       localStorage.setItem('token', token);
       window.dispatchEvent(new CustomEvent('auth:login', { detail: { token, user } }));
       hapticService.notificationSuccess();
-      toast.success('Account created successfully!');
-      navigate(user?.role === 'admin' ? '/admin' : '/home', { replace: true });
+      toast.success(state?.phone ? 'Logged in successfully!' : 'Account created successfully!');
     } catch (err: any) {
       hapticService.impact();
       const message = err.response?.data?.message || 'Invalid OTP. Try again.';
@@ -79,8 +83,21 @@ export function VerifyOtp() {
   const handleResend = async () => {
     setResending(true);
     try {
-      await authService.sendOtp({ email: state!.email });
-      toast.success('OTP resent to your email');
+      if (state?.phone) {
+        const res = await authService.sendOtp({ phone: state.phone });
+        if (res.data.dev && res.data.otp) {
+          toast.success(`Dev mode — OTP: ${res.data.otp}`, { duration: 10000 });
+        } else {
+          toast.success('OTP resent to your phone');
+        }
+      } else {
+        const res = await authService.sendOtp({ email: state!.email });
+        if (res.data.dev && res.data.otp) {
+          toast.success(`Dev mode — OTP: ${res.data.otp}`, { duration: 10000 });
+        } else {
+          toast.success('OTP resent to your email');
+        }
+      }
       setCountdown(30);
       setOtp(['', '', '', '', '', '']);
       inputs.current[0]?.focus();
@@ -150,10 +167,14 @@ export function VerifyOtp() {
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-6">
                   <CheckCircle2 size={32} className="text-blue-600 dark:text-blue-400" />
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-text-primary mb-2">Verify Email</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-text-primary mb-2">
+                  {state?.phone ? 'Verify Phone' : 'Verify Email'}
+                </h1>
                 <p className="text-gray-500 dark:text-text-secondary">
                   Enter the 6-digit code sent to{' '}
-                  <span className="font-medium text-gray-700 dark:text-text-primary">{state?.email}</span>
+                  <span className="font-medium text-gray-700 dark:text-text-primary">
+                    {state?.phone ? (state.phone.startsWith('+') ? state.phone : `+91 ${state.phone}`) : state?.email}
+                  </span>
                 </p>
               </div>
 
@@ -184,7 +205,7 @@ export function VerifyOtp() {
                     Verifying...
                   </span>
                 ) : (
-                  'Verify & Create Account'
+                  state?.phone ? 'Verify & Continue' : 'Verify & Create Account'
                 )}
               </button>
 

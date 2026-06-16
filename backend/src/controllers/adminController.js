@@ -50,3 +50,12 @@ export async function getDashboardStats(req, res, next) {
     next(error);
   }
 }
+
+export async function getAllUsers(req, res, next) {
+  try {
+    const users = await User.find({ role: 'user' }).select('name email phone');
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+}

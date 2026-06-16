@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
 import { generateOtp, sendOtpEmail } from '../services/emailService.js';
+import { startVerifyVerification, checkVerifyVerification } from '../services/smsService.js';
 
 function generateToken(userId) {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -37,10 +38,22 @@ export async function register(req, res, next) {
 
 export async function sendOtp(req, res, next) {
   try {
-    const { email } = req.body;
+    const { email, phone } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
+    if (!email && !phone) {
+      return res.status(400).json({ message: 'Email or Phone is required' });
+    }
+
+
+
+    if (phone) {
+      if (!/^\d{10}$/.test(phone)) {
+        return res.status(400).json({ success: false, message: 'Invalid phone number format. Must be exactly 10 digits.' });
+      }
+      const formattedPhone = `+91${phone}`;
+      await startVerifyVerification(formattedPhone);
+
+      return res.json({ success: true, message: 'OTP sent successfully' });
     }
 
     const exists = await User.findOne({ email });
@@ -48,9 +61,8 @@ export async function sendOtp(req, res, next) {
       return res.status(409).json({ message: 'Email already registered' });
     }
 
-    await Otp.deleteMany({ email });
-
     const otp = generateOtp();
+    await Otp.deleteMany({ email });
     await Otp.create({
       email,
       otp,
@@ -75,19 +87,53 @@ export async function sendOtp(req, res, next) {
 
 export async function verifyOtp(req, res, next) {
   try {
-    const { email, otp, name, password } = req.body;
+    const { email, phone, otp, name, password } = req.body;
 
-    if (!email || !otp) {
-      return res.status(400).json({ message: 'Email and OTP are required' });
+    if (!email && !phone) {
+      return res.status(400).json({ message: 'Email or Phone is required' });
+    }
+    if (!otp) {
+      return res.status(400).json({ message: 'OTP is required' });
     }
 
-    const otpRecord = await Otp.findOne({ email, verified: false });
+    if (phone) {
+      if (!/^\d{10}$/.test(phone)) {
+        return res.status(400).json({ success: false, message: 'Invalid phone number format. Must be exactly 10 digits.' });
+      }
+      const formattedPhone = `+91${phone}`;
+      const check = await checkVerifyVerification(formattedPhone, otp);
+
+      if (check.status !== 'approved') {
+        return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+      }
+
+      let user = await User.findOne({ phone: formattedPhone });
+      if (!user) {
+        // Automatically create account
+        const dummyEmail = `${formattedPhone}@phone.dryfruithub.local`;
+        const dummyPassword = crypto.randomBytes(16).toString('hex');
+        
+        user = await User.create({
+          name: `User ${formattedPhone.slice(-4)}`,
+          email: dummyEmail,
+          password: dummyPassword,
+          phone: formattedPhone,
+        });
+      }
+
+      const token = generateToken(user._id);
+      return res.json({ success: true, token, user });
+    }
+
+    // Keep email OTP verification logic
+    const query = { email, verified: false };
+    const otpRecord = await Otp.findOne(query);
     if (!otpRecord) {
       return res.status(400).json({ message: 'No OTP found. Request a new one.' });
     }
 
     if (new Date() > otpRecord.expiresAt) {
-      await Otp.deleteMany({ email });
+      await Otp.deleteMany(query);
       return res.status(400).json({ message: 'OTP expired. Request a new one.' });
     }
 
