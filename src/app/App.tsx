@@ -26,6 +26,7 @@ import { OrderSuccess } from './pages/OrderSuccess';
 import { OrderTracking } from './pages/OrderTracking';
 import { Orders } from './pages/Orders';
 import { OrderDetails } from './pages/OrderDetails';
+import { RiderPortal } from './pages/RiderPortal';
 import { Wishlist } from './pages/Wishlist';
 import { Addresses } from './pages/Addresses';
 import { Payments } from './pages/Payments';
@@ -38,6 +39,7 @@ import { ShippingInfo } from './pages/ShippingInfo';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminProducts } from './pages/AdminProducts';
 import { AdminOrders } from './pages/AdminOrders';
+import { AdminCategories } from './pages/AdminCategories';
 
 function ThemeAwareToaster() {
   const { mode } = useTheme();
@@ -84,6 +86,7 @@ export default function App() {
                       <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
                       <Route path="order-details" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
                       <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                      <Route path="rider" element={<ProtectedRoute><RiderPortal /></ProtectedRoute>} />
                       <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
                       <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
                       <Route path="payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
@@ -101,6 +104,7 @@ export default function App() {
                       <Route path="admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
                       <Route path="admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
                       <Route path="admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
+                      <Route path="admin/categories" element={<ProtectedRoute adminOnly><AdminCategories /></ProtectedRoute>} />
                     </Route>
                   </Routes>
                   <LocationSelectorModal />

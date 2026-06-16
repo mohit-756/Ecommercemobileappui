@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Plus, Edit3, Trash2, Search, Upload, Loader2, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Edit3, Trash2, Search, Upload, Loader2, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { productService } from '../services/productService';
 import { toast } from 'sonner';
 import api from '../services/api';
 import axios from 'axios';
-import { cn } from '../lib/utils';
+import { cn, handleImageError } from '../lib/utils';
 
 export function AdminProducts() {
   const navigate = useNavigate();
@@ -15,26 +15,35 @@ export function AdminProducts() {
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({ name: '', description: '', price: '', offerPercentage: '', originalPrice: '', stock: '', category: '', image: '', variants: [] as any[] });
+  const [form, setForm] = useState({ name: '', description: '', price: '', offerPercentage: '', originalPrice: '', stock: '', category: '', images: [] as string[], variants: [] as any[] });
+  const [imageUrlInput, setImageUrlInput] = useState('');
   const [uploading, setUploading] = useState(false);
   const [bulkUploading, setBulkUploading] = useState(false);
   const [showBulkHelp, setShowBulkHelp] = useState(false);
   const [activeFormTab, setActiveFormTab] = useState<'general' | 'variants'>('general');
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    const apiKey = import.meta.env.VITE_IMGBB_API_KEY || '600a7523f557d34d8efd20a8c2794c77';
+    const apiKey = import.meta.env.VITE_IMGBB_API_KEY;
+    if (!apiKey) {
+      toast.error('Image upload key is not configured. Set VITE_IMGBB_API_KEY in .env');
+      return;
+    }
     setUploading(true);
-    const formData = new FormData();
-    formData.append('image', file);
+    const uploadedUrls: string[] = [];
 
     try {
-      const response = await axios.post(`https://api.imgbb.com/1/upload?key=${apiKey}`, formData);
-      const url = response.data.data.url;
-      setForm(f => ({ ...f, image: url }));
-      toast.success('Image uploaded successfully!');
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('image', file);
+        const response = await axios.post(`https://api.imgbb.com/1/upload?key=${apiKey}`, formData);
+        uploadedUrls.push(response.data.data.url);
+      }
+      setForm(f => ({ ...f, images: [...(f.images || []), ...uploadedUrls] }));
+      toast.success(`Uploaded ${uploadedUrls.length} image(s) successfully!`);
     } catch (err: any) {
       console.error('Upload error:', err);
       const msg = err.response?.data?.error?.message || 'Failed to upload image. Please try again.';
@@ -144,16 +153,18 @@ export function AdminProducts() {
       originalPrice: product.originalPrice ? String(product.originalPrice) : '',
       stock: String(product.stock),
       category: product.category?._id || product.category || '',
-      image: product.images?.[0] || '',
+      images: product.images || (product.image ? [product.image] : []),
       variants: loadedVariants,
     });
+    setImageUrlInput('');
     setEditing(product);
     setShowForm(true);
   };
 
   const openCreate = () => {
     setActiveFormTab('general');
-    setForm({ name: '', description: '', price: '', offerPercentage: '', originalPrice: '', stock: '0', category: '', image: '', variants: [] });
+    setForm({ name: '', description: '', price: '', offerPercentage: '', originalPrice: '', stock: '0', category: '', images: [], variants: [] });
+    setImageUrlInput('');
     setEditing(null);
     setShowForm(true);
   };
@@ -256,7 +267,7 @@ export function AdminProducts() {
         discount,
         stock: Number(form.stock) || 0,
         category: form.category,
-        images: form.image ? [form.image] : [],
+        images: form.images || [],
         variants: mappedVariants,
       };
       if (editing) {
@@ -355,7 +366,7 @@ export function AdminProducts() {
               <div key={product._id} className="bg-white dark:bg-surface rounded-2xl shadow-sm border border-gray-100 dark:border-border-light p-4 flex gap-4">
                 <div className="w-16 h-16 bg-gray-50 dark:bg-background rounded-xl overflow-hidden shrink-0">
                   {product.images?.[0] ? (
-                    <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
+                    <img src={product.images[0]} alt="" className="w-full h-full object-cover" onError={handleImageError} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-text-tertiary text-xs">No img</div>
                   )}
@@ -548,18 +559,40 @@ export function AdminProducts() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Product Image</label>
-                    <div className="flex gap-2">
+                    <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Product Images</label>
+                    <div className="flex gap-2 mb-3">
                       <input
-                        value={form.image}
-                        onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
+                        value={imageUrlInput}
+                        onChange={e => setImageUrlInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (imageUrlInput.trim()) {
+                              setForm(f => ({ ...f, images: [...(f.images || []), imageUrlInput.trim()] }));
+                              setImageUrlInput('');
+                            }
+                          }
+                        }}
                         placeholder="Paste image URL here..."
                         className="flex-1 bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary"
                       />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (imageUrlInput.trim()) {
+                            setForm(f => ({ ...f, images: [...(f.images || []), imageUrlInput.trim()] }));
+                            setImageUrlInput('');
+                          }
+                        }}
+                        className="px-4 py-2.5 text-sm font-semibold rounded-xl bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/30 transition-all active:scale-[0.98]"
+                      >
+                        Add URL
+                      </button>
                       <div>
                         <input
                           type="file"
                           accept="image/*"
+                          multiple
                           id="admin-image-upload"
                           onChange={handleImageUpload}
                           disabled={uploading}
@@ -578,16 +611,88 @@ export function AdminProducts() {
                         </label>
                       </div>
                     </div>
-                    {form.image && (
-                      <div className="mt-3 w-24 h-24 rounded-2xl overflow-hidden border border-gray-200 relative group shadow-sm">
-                        <img src={form.image} alt="Preview" className="w-full h-full object-cover" />
-                        <button 
-                          type="button" 
-                          onClick={() => setForm(f => ({ ...f, image: '' }))} 
-                          className="absolute inset-0 bg-black/45 text-white text-[10px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                        >
-                          Remove
-                        </button>
+
+                    {form.images && form.images.length > 0 ? (
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-3">
+                        {form.images.map((imgUrl, idx) => (
+                          <div key={idx} className="relative group aspect-square rounded-2xl overflow-hidden border border-gray-200 dark:border-border-medium shadow-sm bg-gray-50 dark:bg-background">
+                            <img src={imgUrl} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" onError={handleImageError} />
+                            
+                            {/* Overlay control buttons */}
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col justify-between p-2">
+                              {/* Label badge */}
+                              <div className="flex justify-between items-center w-full">
+                                <span className={cn(
+                                  "text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm",
+                                  idx === 0 
+                                    ? "bg-blue-600 text-white" 
+                                    : "bg-black/60 text-gray-200"
+                                )}>
+                                  {idx === 0 ? 'Cover' : `#${idx + 1}`}
+                                </span>
+                              </div>
+
+                              {/* Reorder and Delete buttons */}
+                              <div className="flex justify-between items-center gap-1 mt-auto w-full">
+                                <div className="flex gap-1">
+                                  {idx > 0 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setForm(f => {
+                                          const nextImages = [...f.images];
+                                          const temp = nextImages[idx];
+                                          nextImages[idx] = nextImages[idx - 1];
+                                          nextImages[idx - 1] = temp;
+                                          return { ...f, images: nextImages };
+                                        });
+                                      }}
+                                      className="p-1 bg-white/20 text-white rounded-lg hover:bg-white/40 active:scale-90 transition-transform"
+                                      title="Move Left"
+                                    >
+                                      <ChevronLeft size={14} />
+                                    </button>
+                                  )}
+                                  {idx < form.images.length - 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setForm(f => {
+                                          const nextImages = [...f.images];
+                                          const temp = nextImages[idx];
+                                          nextImages[idx] = nextImages[idx + 1];
+                                          nextImages[idx + 1] = temp;
+                                          return { ...f, images: nextImages };
+                                        });
+                                      }}
+                                      className="p-1 bg-white/20 text-white rounded-lg hover:bg-white/40 active:scale-90 transition-transform"
+                                      title="Move Right"
+                                    >
+                                      <ChevronRight size={14} />
+                                    </button>
+                                  )}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setForm(f => ({
+                                      ...f,
+                                      images: f.images.filter((_, i) => i !== idx)
+                                    }));
+                                  }}
+                                  className="p-1 bg-red-600/90 text-white rounded-lg hover:bg-red-600 active:scale-90 transition-transform ml-auto"
+                                  title="Remove"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="border border-dashed border-gray-250 dark:border-border-medium rounded-2xl p-6 text-center text-gray-400 dark:text-text-tertiary text-xs">
+                        No images added yet. Paste a URL or upload images.
                       </div>
                     )}
                   </div>

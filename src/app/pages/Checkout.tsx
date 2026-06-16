@@ -161,8 +161,9 @@ export function Checkout() {
   }, [selectedAddress]);
 
   const shipping = subtotal >= 500 ? 0 : 40;
+  const handlingCharge = 2;
   const tax = Math.round(subtotal * 0.08 * 100) / 100;
-  const total = subtotal + shipping + tax;
+  const total = subtotal + shipping + handlingCharge + tax;
 
   async function handlePlaceOrder() {
     if (!user || !token) {
@@ -392,12 +393,22 @@ export function Checkout() {
                   </div>
                   <div className="flex justify-between text-sm text-gray-500 dark:text-text-secondary">
                     <span>Delivery Fee</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase text-[10px]">Free</span>
+                    {shipping === 0 ? (
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold uppercase text-[10px]">Free</span>
+                    ) : (
+                      <span className="text-gray-900 dark:text-text-primary font-medium">{formatPrice(shipping)}</span>
+                    )}
                   </div>
                   <div className="flex justify-between text-sm text-gray-500 dark:text-text-secondary">
                     <span>Handling Charge</span>
-                    <span className="text-gray-900 dark:text-text-primary font-medium">₹2.00</span>
+                    <span className="text-gray-900 dark:text-text-primary font-medium">{formatPrice(handlingCharge)}</span>
                   </div>
+                  {tax > 0 && (
+                    <div className="flex justify-between text-sm text-gray-500 dark:text-text-secondary">
+                      <span>GST (8%)</span>
+                      <span className="text-gray-900 dark:text-text-primary font-medium">{formatPrice(tax)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

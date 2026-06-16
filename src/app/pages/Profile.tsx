@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Pencil, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, Shield, Camera, Heart, Settings } from 'lucide-react';
+import { Pencil, Package, MapPin, CreditCard, HelpCircle, LogOut, ChevronRight, Shield, Camera, Heart, Settings, Truck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { cameraService } from '../services/cameraService';
@@ -42,6 +42,7 @@ export function Profile() {
   const menuItems = [
     { icon: Heart, label: t('myWishlist'), path: '/wishlist' },
     { icon: Package, label: t('myOrders'), path: '/orders' },
+    { icon: Truck, label: 'Rider Partner Portal 🚚', path: '/rider' },
     { icon: MapPin, label: t('shippingAddresses'), path: '/addresses' },
     { icon: CreditCard, label: t('paymentMethods'), path: '/payments' },
     { icon: Settings, label: t('settings'), path: '/settings' },

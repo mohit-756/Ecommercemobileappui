@@ -6,6 +6,7 @@ import {
   updateProduct,
   deleteProduct,
   bulkUploadProducts,
+  getSearchSuggestions,
 } from '../controllers/productController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import multer from 'multer';
@@ -17,6 +18,7 @@ const upload = multer({
 const router = Router();
 
 router.get('/', getProducts);
+router.get('/search-suggestions', getSearchSuggestions);
 router.get('/:id', getProductById);
 router.post('/', protect, adminOnly, createProduct);
 router.post('/bulk-upload', protect, adminOnly, upload.single('file'), bulkUploadProducts);

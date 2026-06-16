@@ -22,4 +22,7 @@ export const productService = {
 
   deleteProduct: (id: string) =>
     api.delete(`/products/${id}`),
+
+  getSearchSuggestions: (q: string) =>
+    api.get('/products/search-suggestions', { params: { q } }),
 };

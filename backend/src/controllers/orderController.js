@@ -42,8 +42,9 @@ export async function createOrder(req, res, next) {
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = Math.round(subtotal * 0.08 * 100) / 100;
-    const shippingCost = subtotal > 500 ? 0 : 40;
-    const total = Math.round((subtotal + tax + shippingCost) * 100) / 100;
+    const shippingCost = subtotal >= 500 ? 0 : 40;
+    const handlingCharge = 2;
+    const total = Math.round((subtotal + tax + shippingCost + handlingCharge) * 100) / 100;
 
     let razorpayOrder = null;
     if (paymentMethod === 'razorpay') {
@@ -124,6 +125,7 @@ export async function createOrder(req, res, next) {
       subtotal,
       tax,
       shippingCost,
+      fees: handlingCharge,
       total,
       status: paymentMethod === 'cod' ? 'confirmed' : 'pending',
       tracking: [{
@@ -688,7 +690,7 @@ export async function adminCreateOrder(req, res, next) {
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = Math.round(subtotal * 0.08 * 100) / 100;
-    const shippingCost = fulfillmentType === 'pickup' ? 0 : (subtotal > 500 ? 0 : 40);
+    const shippingCost = fulfillmentType === 'pickup' ? 0 : (subtotal >= 500 ? 0 : 40);
     const total = Math.round((subtotal + tax + shippingCost + Number(fees) + Number(tips)) * 100) / 100;
 
     const order = await Order.create({
@@ -750,6 +752,100 @@ export async function rateOrder(req, res, next) {
       return res.status(403).json({ message: 'Not authorized' });
     }
     order.rating = rating;
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function cancelOrder(req, res, next) {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized to cancel this order' });
+    }
+    if (order.status !== 'pending' && order.status !== 'confirmed') {
+      return res.status(400).json({ 
+        message: `Order cannot be cancelled because its status is already "${order.status}"` 
+      });
+    }
+
+    // Restore stock inventory
+    for (const item of order.items) {
+      try {
+        await Product.findByIdAndUpdate(item.product, {
+          $inc: { stock: item.quantity },
+        });
+      } catch (err) {
+        console.error(`Failed to restore stock for product ${item.product}:`, err);
+      }
+    }
+
+    order.status = 'cancelled';
+    order.tracking.push({
+      status: 'cancelled',
+      label: 'Cancelled',
+      description: req.body.reason || 'Order cancelled by customer',
+      timestamp: new Date(),
+    });
+
+    if (!order.activityLogs) order.activityLogs = [];
+    order.activityLogs.push({
+      action: 'Order Cancelled by Customer',
+      actor: req.user.name,
+      details: req.body.reason || 'N/A',
+      timestamp: new Date(),
+    });
+
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateRiderOrderStatus(req, res, next) {
+  try {
+    const { status, description } = req.body;
+    const allowedStatuses = ['shipped', 'out_for_delivery', 'delivered', 'completed'];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status for delivery rider updates' });
+    }
+
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const previousStatus = order.status;
+    order.status = status;
+    
+    const statusLabels = {
+      shipped: 'Shipped',
+      out_for_delivery: 'Out for Delivery',
+      delivered: 'Delivered',
+      completed: 'Completed',
+    };
+
+    order.tracking.push({
+      status,
+      label: statusLabels[status] || status,
+      description: description || `Order status updated to ${statusLabels[status] || status} by rider`,
+      timestamp: new Date(),
+    });
+
+    if (!order.activityLogs) order.activityLogs = [];
+    order.activityLogs.push({
+      action: `Status Updated to ${status} by Rider`,
+      actor: req.user?.name || 'Rider',
+      details: description || `Status changed from ${previousStatus} to ${status}`,
+      timestamp: new Date(),
+    });
+
     await order.save();
     res.json(order);
   } catch (error) {

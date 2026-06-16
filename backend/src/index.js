@@ -93,6 +93,10 @@ async function start() {
   try {
     validateTwilioConfig();
     console.log('✅ Twilio Verify configuration validated successfully.');
+  } catch (error) {
+    console.warn('⚠️ Twilio configuration invalid (server will still start, but SMS/OTP will fail):', error.message);
+  }
+  try {
     await connectDB();
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

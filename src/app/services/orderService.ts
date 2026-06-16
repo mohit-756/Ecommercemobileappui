@@ -2,6 +2,7 @@ import api from './api';
 
 export const orderService = {
   createOrder: (data: {
+    items: any[];
     shippingAddress: any;
     paymentMethod: 'razorpay' | 'cod';
     notes?: string;
@@ -21,6 +22,12 @@ export const orderService = {
 
   rateOrder: (id: string, rating: number) =>
     api.put(`/orders/${id}/rate`, { rating }),
+
+  cancelOrder: (id: string, reason?: string) =>
+    api.put(`/orders/${id}/cancel`, { reason }),
+
+  updateRiderStatus: (id: string, status: string, description?: string) =>
+    api.put(`/orders/${id}/rider-status`, { status, description }),
 
   getAllOrders: (params?: {
     page?: number;

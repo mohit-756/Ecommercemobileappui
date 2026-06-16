@@ -39,3 +39,7 @@ export function saveRecentSearch(query: string) {
     console.error('Failed to save recent search:', e);
   }
 }
+
+export function handleImageError(e: React.SyntheticEvent<HTMLImageElement, Event>) {
+  e.currentTarget.src = '/images/products/cashews.webp';
+}

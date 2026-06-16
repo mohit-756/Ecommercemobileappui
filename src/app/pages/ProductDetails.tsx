@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { ChevronLeft, Heart, Share2, Star, Minus, Plus, ShoppingBag, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart, Share2, Star, Minus, Plus, ShoppingBag, Check } from 'lucide-react';
 import { products as mockProducts } from '../data/mock';
 import useEmblaCarousel from 'embla-carousel-react';
 import { recentlyViewedService } from '../services/recentlyViewedService';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { cn, normalizeProduct, formatPrice } from '../lib/utils';
+import { cn, normalizeProduct, formatPrice, handleImageError } from '../lib/utils';
 import { motion } from 'motion/react';
 import { hapticService } from '../services/hapticService';
 import { Share } from '@capacitor/share';
@@ -25,7 +25,24 @@ export function ProductDetails() {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const { showAddToCartPopup } = useAddToCartPopup();
-  const [emblaRef] = useEmblaCarousel();
+  const [emblaRef, emblaApi] = useEmblaCarousel();
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi, onSelect]);
   const [quantity, setQuantity] = useState(1);
   const [isWishlist, setIsWishlist] = useState(false);
   const [product, setProduct] = useState<any>(null);
@@ -82,6 +99,17 @@ export function ProductDetails() {
         }
         if (prod.colors?.length > 0) setSelectedColor(prod.colors[0]);
         checkWishlistStatus(prod);
+
+        if (user) {
+          reviewService.checkUserReview(id)
+            .then(res => {
+              setHasReviewed(res.data.hasReviewed);
+            })
+            .catch(() => {});
+        } else {
+          setHasReviewed(false);
+        }
+
         recentlyViewedService.add(prod);
         setReviews(Array.isArray(reviewsRes.data) ? reviewsRes.data : (reviewsRes.data.reviews || []));
 
@@ -280,7 +308,7 @@ export function ProductDetails() {
       <div className="lg:max-w-[1536px] lg:mx-auto lg:px-6 lg:py-6 w-full flex-1">
         <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start mb-8">
           {/* Left Column: Image gallery */}
-          <div className="h-[400px] lg:h-[600px] bg-gray-100 dark:bg-surface-tertiary relative overflow-hidden lg:rounded-3xl" ref={emblaRef}>
+          <div className="h-[400px] lg:h-[600px] bg-gray-100 dark:bg-surface-tertiary relative overflow-hidden lg:rounded-3xl group" ref={emblaRef}>
             <div className="flex h-full">
               {product.images.length > 0 ? (
                 product.images.map((img: string, idx: number) => (
@@ -290,6 +318,7 @@ export function ProductDetails() {
                       alt={`${product.name} - View ${idx + 1}`}
                       loading="lazy"
                       className="w-full h-full object-cover"
+                      onError={handleImageError}
                     />
                   </div>
                 ))
@@ -299,9 +328,38 @@ export function ProductDetails() {
                 </div>
               )}
             </div>
-            <div className="absolute bottom-6 w-full flex justify-center gap-2">
+
+            {/* Left/Right less visible scroll buttons */}
+            {product.images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    emblaApi?.scrollPrev();
+                  }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-black/15 hover:bg-black/35 text-white/70 hover:text-white flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 shadow-sm cursor-pointer backdrop-blur-[2px]"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    emblaApi?.scrollNext();
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-black/15 hover:bg-black/35 text-white/70 hover:text-white flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 shadow-sm cursor-pointer backdrop-blur-[2px]"
+                  aria-label="Next image"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </>
+            )}
+
+            <div className="absolute bottom-6 w-full flex justify-center gap-2 z-30">
               {product.images.map((_: any, idx: number) => (
-                <div key={idx} className={cn("w-1.5 h-1.5 rounded-full", idx === 0 ? "w-6 bg-blue-600" : "bg-white/60")} />
+                <div key={idx} className={cn("w-1.5 h-1.5 rounded-full transition-all duration-300", idx === selectedIndex ? "w-6 bg-blue-600" : "bg-white/60")} />
               ))}
             </div>
           </div>

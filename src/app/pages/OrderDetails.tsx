@@ -14,7 +14,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { orderService } from '../services/orderService';
-import { cn, formatPrice } from '../lib/utils';
+import { cn, formatPrice, handleImageError } from '../lib/utils';
 import { hapticService } from '../services/hapticService';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
@@ -100,6 +100,23 @@ export function OrderDetails() {
     }
   };
 
+  const handleCancelOrder = async () => {
+    if (!order) return;
+    hapticService.impact();
+    const reason = prompt('Please enter a reason for cancellation (optional):');
+    if (reason === null) return;
+
+    const toastId = toast.loading('Cancelling your order...');
+    try {
+      const res = await orderService.cancelOrder(order._id, reason.trim());
+      setOrder(res.data);
+      toast.success('Order cancelled successfully!', { id: toastId });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to cancel order', { id: toastId });
+    }
+  };
+
   const handleRateOrder = async (starValue: number) => {
     if (!order) return;
     hapticService.impact();
@@ -126,30 +143,134 @@ export function OrderDetails() {
   const handleDownloadInvoice = () => {
     hapticService.impact();
     const toastId = toast.loading('Generating invoice...');
+    
     setTimeout(() => {
-      const element = document.createElement("a");
-      const file = new Blob([
-        `DRYFRUIT HUB INVOICE\n`,
-        `====================\n`,
-        `Order ID: ${order._id}\n`,
-        `Date: ${formatDate(order.createdAt)}\n`,
-        `Customer: ${order.shippingAddress?.fullName || 'N/A'}\n`,
-        `Phone: ${order.shippingAddress?.phone || 'N/A'}\n`,
-        `Address: ${order.shippingAddress?.addressLine1}, ${order.shippingAddress?.city}, ${order.shippingAddress?.state} - ${order.shippingAddress?.pincode}\n`,
-        `--------------------\n`,
-        order.items?.map((item: any) => `${item.name} x ${item.quantity} - ${formatPrice(item.price * item.quantity)}`).join('\n'),
-        `\n--------------------\n`,
-        `Subtotal: ${formatPrice(order.subtotal || 0)}\n`,
-        `Delivery Cost: ${formatPrice(order.shippingCost || 0)}\n`,
-        `Total: ${formatPrice(order.total || 0)}\n`,
-        `Thank you for shopping with us!\n`
-      ], { type: 'text/plain' });
-      element.href = URL.createObjectURL(file);
-      element.download = `Invoice_${order._id.slice(-6).toUpperCase()}.txt`;
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-      toast.success('Invoice downloaded successfully!', { id: toastId });
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast.error('Popup blocked! Please allow popups to print/download invoice.', { id: toastId });
+        return;
+      }
+      
+      const invoiceHtml = `
+        <html>
+        <head>
+          <title>Invoice - ORD-${displayId}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; margin: 40px; }
+            .invoice-card { max-width: 800px; margin: auto; border: 1px solid #eee; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); }
+            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; margin-bottom: 30px; }
+            .logo { font-size: 24px; font-weight: bold; color: #1e3a8a; }
+            .title { font-size: 24px; font-weight: bold; color: #3b82f6; text-align: right; }
+            .details { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 14px; }
+            .details h3 { margin-top: 0; color: #1e3a8a; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+            th { background-color: #f3f4f6; text-align: left; padding: 12px; font-weight: bold; border-bottom: 2px solid #e5e7eb; }
+            td { padding: 12px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+            .total-section { display: flex; justify-content: flex-end; }
+            .total-table { width: 300px; }
+            .total-table td { border-bottom: none; padding: 6px 12px; }
+            .total-table tr.grand-total td { font-weight: bold; font-size: 16px; color: #1e3a8a; border-top: 1px solid #e5e7eb; }
+            .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+            @media print {
+              body { margin: 0; }
+              .invoice-card { border: none; box-shadow: none; padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-card">
+            <div class="header">
+              <div class="logo">DRYFRUIT HUB</div>
+              <div class="title">TAX INVOICE</div>
+            </div>
+            
+            <div class="details">
+              <div>
+                <h3>Billed To:</h3>
+                <p><strong>${order.shippingAddress?.fullName || 'Customer'}</strong></p>
+                <p>${order.shippingAddress?.addressLine1 || ''}</p>
+                <p>${order.shippingAddress?.addressLine2 || ''}</p>
+                <p>${order.shippingAddress?.city || ''}, ${order.shippingAddress?.state || ''} - ${order.shippingAddress?.pincode || ''}</p>
+                <p>Phone: ${order.shippingAddress?.phone || ''}</p>
+              </div>
+              <div style="text-align: right;">
+                <h3>Invoice Details:</h3>
+                <p><strong>Order ID:</strong> ORD-${displayId}</p>
+                <p><strong>Date:</strong> ${formatDate(order.createdAt)}</p>
+                <p><strong>Payment Status:</strong> ${order.paymentDetails?.status?.toUpperCase() || 'COD'}</p>
+                <p><strong>Payment Method:</strong> ${order.paymentMethod?.toUpperCase() || 'COD'}</p>
+              </div>
+            </div>
+            
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Weight</th>
+                  <th style="text-align: center;">Qty</th>
+                  <th style="text-align: right;">Unit Price</th>
+                  <th style="text-align: right;">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${order.items?.map((item: any) => `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td>${item.weight || 'N/A'}</td>
+                    <td style="text-align: center;">${item.quantity}</td>
+                    <td style="text-align: right;">${formatPrice(item.price)}</td>
+                    <td style="text-align: right;">${formatPrice(item.price * item.quantity)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            
+            <div class="total-section">
+              <table class="total-table">
+                <tr>
+                  <td>Subtotal</td>
+                  <td style="text-align: right;">${formatPrice(order.subtotal || 0)}</td>
+                </tr>
+                <tr>
+                  <td>Delivery Fee</td>
+                  <td style="text-align: right;">${order.shippingCost === 0 ? 'Free' : formatPrice(order.shippingCost)}</td>
+                </tr>
+                ${order.fees > 0 ? `
+                  <tr>
+                    <td>Handling Fee</td>
+                    <td style="text-align: right;">${formatPrice(order.fees)}</td>
+                  </tr>
+                ` : ''}
+                ${order.tax > 0 ? `
+                  <tr>
+                    <td>Taxes & charges</td>
+                    <td style="text-align: right;">${formatPrice(order.tax)}</td>
+                  </tr>
+                ` : ''}
+                <tr class="grand-total">
+                  <td>Total</td>
+                  <td style="text-align: right;">${formatPrice(order.total || 0)}</td>
+                </tr>
+              </table>
+            </div>
+            
+            <div class="footer">
+              <p>Thank you for shopping with DryFruit Hub!</p>
+              <p>This is a computer generated invoice and does not require signature.</p>
+            </div>
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+            }
+          </script>
+        </body>
+        </html>
+      `;
+      
+      printWindow.document.write(invoiceHtml);
+      printWindow.document.close();
+      toast.success('Invoice print window opened!', { id: toastId });
     }, 800);
   };
 
@@ -258,7 +379,7 @@ export function OrderDetails() {
                   >
                     <div className="w-16 h-16 bg-white dark:bg-surface-secondary border border-gray-100 dark:border-border-light rounded-xl p-1.5 flex items-center justify-center flex-shrink-0">
                       {item.image ? (
-                        <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                        <img src={item.image} alt={item.name} className="w-full h-full object-contain" onError={handleImageError} />
                       ) : (
                         <Package size={24} className="text-gray-300" />
                       )}
@@ -321,6 +442,13 @@ export function OrderDetails() {
                     )}
                   </div>
                 </div>
+
+                {order.fees > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span>Handling Fee</span>
+                    <span className="text-gray-900 dark:text-text-primary font-extrabold">{formatPrice(order.fees)}</span>
+                  </div>
+                )}
 
                 {order.tax > 0 && (
                   <div className="flex justify-between items-center">
@@ -470,7 +598,7 @@ export function OrderDetails() {
               </div>
             ) : (
               /* Actions buttons row */
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
                 {isDelivered ? (
                   <button
                     type="button"
@@ -478,27 +606,38 @@ export function OrderDetails() {
                       hapticService.impact();
                       setRatingActive(true);
                     }}
-                    className="flex-1 bg-white hover:bg-gray-50 border border-blue-600 text-blue-600 font-extrabold text-sm py-3.5 rounded-xl transition-all active:scale-98 cursor-pointer flex justify-center items-center"
+                    className="flex-1 bg-white hover:bg-gray-50 border border-blue-600 text-blue-600 font-extrabold text-sm py-3.5 rounded-xl transition-all active:scale-98 cursor-pointer flex justify-center items-center min-h-[46px]"
                   >
                     Rate Order
                   </button>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      hapticService.impact();
-                      navigate(`/tracking?orderId=${order._id}`);
-                    }}
-                    className="flex-1 bg-white hover:bg-gray-55 border border-blue-600 text-blue-600 font-extrabold text-sm py-3.5 rounded-xl transition-all active:scale-98 cursor-pointer flex justify-center items-center"
-                  >
-                    Track Shipment
-                  </button>
+                  <>
+                    {(order.status === 'pending' || order.status === 'confirmed') && (
+                      <button
+                        type="button"
+                        onClick={handleCancelOrder}
+                        className="flex-1 bg-white hover:bg-red-50/30 border border-red-500 text-red-600 font-extrabold text-sm py-3.5 rounded-xl transition-all active:scale-98 cursor-pointer flex justify-center items-center min-h-[46px]"
+                      >
+                        Cancel Order
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        hapticService.impact();
+                        navigate(`/tracking?orderId=${order._id}`);
+                      }}
+                      className="flex-1 bg-white hover:bg-gray-55 border border-blue-600 text-blue-600 font-extrabold text-sm py-3.5 rounded-xl transition-all active:scale-98 cursor-pointer flex justify-center items-center min-h-[46px]"
+                    >
+                      Track Shipment
+                    </button>
+                  </>
                 )}
                 
                 <button
                   type="button"
                   onClick={handleOrderAgain}
-                  className="flex-grow-[1.5] bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm py-3.5 rounded-xl transition-all active:scale-98 cursor-pointer shadow-sm shadow-blue-200 dark:shadow-none flex justify-center items-center"
+                  className="flex-grow-[1.2] bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm py-3.5 rounded-xl transition-all active:scale-98 cursor-pointer shadow-sm shadow-blue-200 dark:shadow-none flex justify-center items-center min-h-[46px]"
                 >
                   Order Again
                 </button>

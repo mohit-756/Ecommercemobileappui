@@ -83,7 +83,7 @@ async function seedOrders() {
     }
 
     const tax = Math.round(subtotal * 0.08 * 100) / 100;
-    const shippingCost = fulfillmentType === 'pickup' ? 0 : (subtotal > 500 ? 0 : 40);
+    const shippingCost = fulfillmentType === 'pickup' ? 0 : (subtotal >= 500 ? 0 : 40);
     const fees = i % 3 === 0 ? 5 : 0;
     const tips = i % 4 === 0 ? 20 : (i % 7 === 0 ? 50 : 0);
     const total = subtotal + tax + shippingCost + fees + tips;

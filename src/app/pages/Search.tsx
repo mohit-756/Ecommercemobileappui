@@ -42,6 +42,26 @@ export function Search() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [varietyFilter, setVarietyFilter] = useState('');
 
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await productService.getSearchSuggestions(query);
+        setSuggestions(res.data || []);
+      } catch (err) {
+        console.error('Failed to fetch search suggestions:', err);
+        setSuggestions([]);
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [query]);
+
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   const handleClearRecent = () => {
@@ -157,45 +177,69 @@ export function Search() {
 
   return (
     <div className="min-h-full flex flex-col bg-white dark:bg-surface transition-colors duration-300">
-      <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white dark:bg-surface lg:pt-4 lg:pb-4 border-b border-gray-100 dark:border-border-light flex items-center gap-3 transition-colors duration-300">
+      <div className="pt-12 pb-4 px-6 sticky top-0 z-30 bg-white dark:bg-surface sm:pt-4 sm:pb-4 border-b border-gray-100 dark:border-border-light flex items-center gap-3 transition-colors duration-300">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary flex-shrink-0 lg:hidden"
+          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary flex-shrink-0 sm:hidden"
         >
           <ChevronLeft size={24} />
         </button>
-        <div className="flex-1 relative lg:hidden">
+        <div className="flex-1 relative sm:hidden">
           <SearchIcon size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary" />
           <input
             type="text"
             autoFocus
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSuggestionsOpen(true);
+            }}
+            onFocus={() => setSuggestionsOpen(true)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && query.trim()) {
                 saveRecentSearch(query);
+                setSuggestionsOpen(false);
               }
             }}
             onBlur={() => {
               if (query.trim()) {
                 saveRecentSearch(query);
               }
+              setTimeout(() => setSuggestionsOpen(false), 200);
             }}
             placeholder="Search products..."
             className="w-full bg-gray-100 dark:bg-surface-tertiary border-transparent text-gray-900 dark:text-text-primary rounded-xl py-2.5 pl-10 pr-10 focus:ring-2 focus:ring-blue-600 focus:bg-white dark:focus:bg-surface outline-none transition-all"
           />
           {query && (
             <button
-              onClick={() => setQuery('')}
+              onClick={() => { setQuery(''); setSuggestions([]); }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary hover:text-gray-600 dark:hover:text-text-secondary"
             >
               <X size={16} />
             </button>
           )}
+
+          {suggestionsOpen && suggestions.length > 0 && (
+            <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-surface border border-gray-150 dark:border-border-light rounded-2xl shadow-xl z-50 overflow-hidden divide-y divide-gray-100 dark:divide-border-light">
+              {suggestions.map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setQuery(item);
+                    saveRecentSearch(item);
+                    setSuggestionsOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm text-gray-800 dark:text-text-primary hover:bg-gray-50 dark:hover:bg-surface-secondary transition-colors cursor-pointer"
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         
         {/* Desktop Header Title */}
-        <h1 className="hidden lg:block text-2xl font-black text-gray-900 dark:text-text-primary flex-1">Search Results</h1>
+        <h1 className="hidden sm:block text-2xl font-black text-gray-900 dark:text-text-primary flex-1">Search Results</h1>
 
         <button
           type="button"
@@ -205,12 +249,12 @@ export function Search() {
             setShowFilters(true);
           }}
           className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative transition-colors lg:w-auto lg:px-4 lg:gap-2 cursor-pointer",
+            "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative transition-colors sm:w-auto sm:px-4 sm:gap-2 cursor-pointer",
             activeFilterCount > 0 ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-surface-tertiary text-gray-700 dark:text-text-primary"
           )}
         >
           <SlidersHorizontal size={20} />
-          <span className="hidden lg:inline font-semibold text-sm">Filters</span>
+          <span className="hidden sm:inline font-semibold text-sm">Filters</span>
           {activeFilterCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-surface">
               {activeFilterCount}

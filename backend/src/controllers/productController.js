@@ -206,3 +206,35 @@ export async function bulkUploadProducts(req, res, next) {
     next(error);
   }
 }
+
+export async function getSearchSuggestions(req, res, next) {
+  try {
+    const { q } = req.query;
+    if (!q || !q.trim()) {
+      return res.json([]);
+    }
+    const keywords = q.trim().split(/\s+/).filter(Boolean);
+    if (keywords.length === 0) {
+      return res.json([]);
+    }
+    
+    // Find up to 5 matching products (name, tags)
+    const filter = {
+      isActive: true,
+      $and: keywords.map(kw => ({
+        $or: [
+          { name: { $regex: kw, $options: 'i' } },
+          { tags: { $regex: kw, $options: 'i' } },
+        ]
+      }))
+    };
+    
+    const products = await Product.find(filter)
+      .select('name')
+      .limit(5);
+      
+    res.json(products.map(p => p.name));
+  } catch (error) {
+    next(error);
+  }
+}

@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router';
 import { Trash2, Minus, Plus, ArrowRight, Tag, ShoppingCart, BellOff, DoorOpen, UserCheck, PhoneOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../lib/utils';
+import { formatPrice, handleImageError } from '../lib/utils';
 import { useTranslation } from '../hooks/useTranslation';
 
 export function Cart() {
@@ -60,7 +60,7 @@ export function Cart() {
                       className="bg-white dark:bg-surface transition-colors duration-300 p-3 rounded-2xl flex gap-4 shadow-sm border border-gray-100 dark:border-border-light"
                     >
                       <div className="w-24 h-24 bg-gray-100 dark:bg-surface-tertiary rounded-xl overflow-hidden flex-shrink-0">
-                        <img src={item.product.image || item.product.images?.[0] || ''} alt={item.product.name} className="w-full h-full object-cover" />
+                        <img src={item.product.image || item.product.images?.[0] || ''} alt={item.product.name} className="w-full h-full object-cover" onError={handleImageError} />
                       </div>
 
                       <div className="flex-1 flex flex-col py-1">
@@ -89,7 +89,13 @@ export function Cart() {
                         <div className="mt-auto flex items-center justify-between">
                           <div className="flex items-center bg-gray-100 dark:bg-surface-tertiary rounded-full px-1">
                             <button
-                              onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                              onClick={() => {
+                                if (item.quantity === 1) {
+                                  removeItem(item._id);
+                                } else {
+                                  updateQuantity(item._id, item.quantity - 1);
+                                }
+                              }}
                               className="w-7 h-7 flex items-center justify-center text-gray-600 dark:text-text-secondary"
                             >
                               <Minus size={14} />

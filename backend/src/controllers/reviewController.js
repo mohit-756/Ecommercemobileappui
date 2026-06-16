@@ -25,15 +25,17 @@ export async function getProductReviews(req, res, next) {
     ]);
 
     const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    aggregation.forEach((r) => { ratingDistribution[r._id] = r.count; });
+    let totalRatingSum = 0;
+    aggregation.forEach((r) => { 
+      ratingDistribution[r._id] = r.count; 
+      totalRatingSum += r._id * r.count;
+    });
 
     res.json({
       reviews,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
       ratingDistribution,
-      averageRating: total > 0
-        ? reviews.reduce((sum, r) => sum + r.rating, 0) / total
-        : 0,
+      averageRating: total > 0 ? totalRatingSum / total : 0,
       totalReviews: total,
     });
   } catch (error) {

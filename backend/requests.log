@@ -761,3 +761,227 @@
 [2026-06-16T05:56:34.108Z] GET /promo/mixed_nuts.png finished in 6ms with status 304
 [2026-06-16T05:56:34.109Z] GET /promo/healthy_lifestyle.png finished in 5ms with status 304
 [2026-06-16T05:56:34.110Z] GET /promo/gift_box.png finished in 4ms with status 304
+[2026-06-16T14:51:11.272Z] GET /api/cart started
+[2026-06-16T14:51:11.295Z] GET / finished in 23ms with status 401
+[2026-06-16T14:51:11.311Z] GET /api/auth/me started
+[2026-06-16T14:51:11.318Z] GET /me finished in 7ms with status 401
+[2026-06-16T14:51:11.327Z] GET /api/auth/me started
+[2026-06-16T14:51:11.332Z] GET /me finished in 5ms with status 401
+[2026-06-16T14:51:11.334Z] GET /api/cart started
+[2026-06-16T14:51:11.338Z] GET / finished in 4ms with status 401
+[2026-06-16T14:51:11.397Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T14:51:11.406Z] GET /promo/mixed_nuts.png finished in 9ms with status 304
+[2026-06-16T14:51:14.095Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T14:51:14.121Z] GET /promo/mixed_nuts.png finished in 25ms with status 304
+[2026-06-16T14:51:28.375Z] POST /api/auth/login started
+[2026-06-16T14:51:41.717Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T14:51:41.738Z] GET /promo/mixed_nuts.png finished in 21ms with status 304
+[2026-06-16T14:51:45.896Z] POST /api/auth/login started
+[2026-06-16T14:51:46.738Z] POST /login finished in 842ms with status 200
+[2026-06-16T14:51:46.766Z] GET /api/wishlist started
+[2026-06-16T14:51:46.814Z] GET /api/admin/stats started
+[2026-06-16T14:51:46.819Z] GET /api/cart started
+[2026-06-16T14:51:47.119Z] GET / finished in 353ms with status 304
+[2026-06-16T14:51:47.168Z] GET /api/wishlist started
+[2026-06-16T14:51:47.266Z] GET / finished in 447ms with status 200
+[2026-06-16T14:51:47.378Z] GET / finished in 210ms with status 304
+[2026-06-16T14:51:47.482Z] GET /stats finished in 668ms with status 200
+[2026-06-16T14:51:50.332Z] GET /api/products?limit=100 started
+[2026-06-16T14:51:50.353Z] GET /api/categories started
+[2026-06-16T14:51:50.476Z] GET /?limit=100 finished in 144ms with status 200
+[2026-06-16T14:51:50.485Z] GET / finished in 132ms with status 304
+[2026-06-16T14:51:50.614Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T14:51:50.617Z] GET /images/promo/gift_box.png started
+[2026-06-16T14:51:50.619Z] GET /promo/healthy_lifestyle.png finished in 5ms with status 304
+[2026-06-16T14:51:50.625Z] GET /promo/gift_box.png finished in 8ms with status 304
+[2026-06-16T14:51:52.561Z] GET /api/orders?limit=1 started
+[2026-06-16T14:51:52.682Z] GET /?limit=1 finished in 121ms with status 304
+[2026-06-16T14:51:55.916Z] GET /api/orders?limit=50 started
+[2026-06-16T14:51:55.981Z] GET /?limit=50 finished in 65ms with status 200
+[2026-06-16T14:52:07.964Z] GET /api/orders?limit=1 started
+[2026-06-16T14:52:08.099Z] GET /?limit=1 finished in 136ms with status 304
+[2026-06-16T14:52:18.534Z] POST /api/auth/login started
+[2026-06-16T14:52:20.196Z] POST /login finished in 1662ms with status 200
+[2026-06-16T14:52:20.303Z] GET /api/categories started
+[2026-06-16T14:52:20.324Z] GET /api/wishlist started
+[2026-06-16T14:52:20.347Z] GET /api/cart started
+[2026-06-16T14:52:20.381Z] GET /api/products?limit=100 started
+[2026-06-16T14:52:21.085Z] GET / finished in 782ms with status 304
+[2026-06-16T14:52:21.095Z] GET / finished in 748ms with status 200
+[2026-06-16T14:52:21.109Z] GET /?limit=100 finished in 728ms with status 304
+[2026-06-16T14:52:21.129Z] GET / finished in 805ms with status 304
+[2026-06-16T14:52:21.212Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T14:52:21.214Z] GET /images/promo/gift_box.png started
+[2026-06-16T14:52:21.216Z] GET /promo/healthy_lifestyle.png finished in 4ms with status 304
+[2026-06-16T14:52:21.218Z] GET /promo/gift_box.png finished in 4ms with status 304
+[2026-06-16T14:52:21.280Z] GET /api/wishlist started
+[2026-06-16T14:52:21.374Z] GET / finished in 94ms with status 304
+[2026-06-16T14:52:39.274Z] GET /api/orders?limit=1 started
+[2026-06-16T14:52:39.330Z] GET /?limit=1 finished in 56ms with status 200
+[2026-06-16T14:52:44.226Z] GET /api/orders?limit=50 started
+[2026-06-16T14:52:44.809Z] GET /?limit=50 finished in 584ms with status 200
+[2026-06-16T14:53:00.015Z] GET /api/orders/6a2fa5cb23b087e7109dc986 started
+[2026-06-16T14:53:00.362Z] GET /6a2fa5cb23b087e7109dc986 finished in 347ms with status 200
+[2026-06-16T14:53:03.932Z] PUT /api/orders/6a2fa5cb23b087e7109dc986/rider-status started
+[2026-06-16T14:53:04.201Z] PUT /6a2fa5cb23b087e7109dc986/rider-status finished in 269ms with status 200
+[2026-06-16T14:53:07.747Z] PUT /api/orders/6a2fa5cb23b087e7109dc986/rider-status started
+[2026-06-16T14:53:08.799Z] PUT /6a2fa5cb23b087e7109dc986/rider-status finished in 1052ms with status 200
+[2026-06-16T14:53:08.844Z] GET /api/orders?limit=50 started
+[2026-06-16T14:53:09.079Z] GET /?limit=50 finished in 235ms with status 200
+[2026-06-16T14:53:14.057Z] GET /api/orders?limit=1 started
+[2026-06-16T14:53:14.172Z] GET /?limit=1 finished in 115ms with status 200
+[2026-06-16T14:53:17.011Z] GET /api/products?limit=100 started
+[2026-06-16T14:53:17.016Z] GET /api/categories started
+[2026-06-16T14:53:17.141Z] GET / finished in 125ms with status 304
+[2026-06-16T14:53:17.151Z] GET /?limit=100 finished in 140ms with status 304
+[2026-06-16T14:53:17.283Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T14:53:17.290Z] GET /promo/healthy_lifestyle.png finished in 7ms with status 304
+[2026-06-16T14:53:17.308Z] GET /images/promo/gift_box.png started
+[2026-06-16T14:53:17.312Z] GET /promo/gift_box.png finished in 4ms with status 304
+[2026-06-16T15:14:05.937Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T15:14:05.949Z] GET /promo/mixed_nuts.png finished in 12ms with status 304
+[2026-06-16T15:14:06.658Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T15:14:06.660Z] GET /promo/mixed_nuts.png finished in 2ms with status 304
+[2026-06-16T15:18:38.209Z] POST /api/auth/login started
+[2026-06-16T15:18:39.462Z] POST /login finished in 1253ms with status 200
+[2026-06-16T15:18:39.475Z] GET /api/wishlist started
+[2026-06-16T15:18:39.529Z] GET /api/cart started
+[2026-06-16T15:18:39.564Z] GET /api/products?limit=100 started
+[2026-06-16T15:18:39.583Z] GET /api/categories started
+[2026-06-16T15:18:39.620Z] GET / finished in 91ms with status 304
+[2026-06-16T15:18:39.665Z] GET / finished in 190ms with status 304
+[2026-06-16T15:18:39.680Z] GET /?limit=100 finished in 116ms with status 304
+[2026-06-16T15:18:39.685Z] GET /api/wishlist started
+[2026-06-16T15:18:39.696Z] GET / finished in 113ms with status 304
+[2026-06-16T15:18:39.763Z] GET / finished in 78ms with status 304
+[2026-06-16T15:18:39.829Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T15:18:39.835Z] GET /images/promo/gift_box.png started
+[2026-06-16T15:18:39.845Z] GET /promo/healthy_lifestyle.png finished in 17ms with status 304
+[2026-06-16T15:18:39.850Z] GET /promo/gift_box.png finished in 15ms with status 304
+[2026-06-16T15:18:44.759Z] POST /api/cart/add started
+[2026-06-16T15:18:45.231Z] POST /add finished in 472ms with status 200
+[2026-06-16T15:18:47.502Z] GET /api/products/6a2a3cf4fc273594b72c93e0 started
+[2026-06-16T15:18:47.512Z] GET /api/reviews/product/6a2a3cf4fc273594b72c93e0 started
+[2026-06-16T15:18:47.567Z] GET /6a2a3cf4fc273594b72c93e0 finished in 65ms with status 304
+[2026-06-16T15:18:47.579Z] GET /product/6a2a3cf4fc273594b72c93e0 finished in 67ms with status 304
+[2026-06-16T15:18:47.598Z] GET /api/wishlist started
+[2026-06-16T15:18:47.609Z] GET /api/reviews/product/6a2a3cf4fc273594b72c93e0/check started
+[2026-06-16T15:18:47.618Z] GET /api/products?category=6a2a3cf4fc273594b72c93d8&limit=5 started
+[2026-06-16T15:18:47.676Z] GET /product/6a2a3cf4fc273594b72c93e0/check finished in 67ms with status 200
+[2026-06-16T15:18:47.692Z] GET /?category=6a2a3cf4fc273594b72c93d8&limit=5 finished in 74ms with status 304
+[2026-06-16T15:18:47.702Z] GET / finished in 104ms with status 304
+[2026-06-16T15:18:50.168Z] POST /api/cart/add started
+[2026-06-16T15:18:50.315Z] POST /add finished in 147ms with status 200
+[2026-06-16T15:18:54.916Z] PUT /api/cart/6a31695aa86517fb4d0cafd1 started
+[2026-06-16T15:18:55.039Z] PUT /6a31695aa86517fb4d0cafd1 finished in 124ms with status 200
+[2026-06-16T15:18:55.124Z] PUT /api/cart/6a31695aa86517fb4d0cafd1 started
+[2026-06-16T15:18:55.498Z] PUT /api/cart/6a31695aa86517fb4d0cafd1 started
+[2026-06-16T15:18:55.509Z] PUT /6a31695aa86517fb4d0cafd1 finished in 385ms with status 200
+[2026-06-16T15:18:55.607Z] PUT /6a31695aa86517fb4d0cafd1 finished in 109ms with status 200
+[2026-06-16T15:18:57.157Z] PUT /api/cart/6a31695aa86517fb4d0cafd1 started
+[2026-06-16T15:18:57.286Z] PUT /6a31695aa86517fb4d0cafd1 finished in 130ms with status 200
+[2026-06-16T15:18:57.701Z] PUT /api/cart/6a31695aa86517fb4d0cafd1 started
+[2026-06-16T15:18:57.829Z] PUT /6a31695aa86517fb4d0cafd1 finished in 128ms with status 200
+[2026-06-16T15:18:58.293Z] DELETE /api/cart/6a31695aa86517fb4d0cafd1 started
+[2026-06-16T15:18:58.399Z] DELETE /6a31695aa86517fb4d0cafd1 finished in 106ms with status 200
+[2026-06-16T15:19:01.013Z] PUT /api/cart/6a316955a86517fb4d0cafbd started
+[2026-06-16T15:19:01.118Z] PUT /6a316955a86517fb4d0cafbd finished in 105ms with status 200
+[2026-06-16T15:19:04.180Z] GET /api/addresses started
+[2026-06-16T15:19:04.279Z] GET / finished in 99ms with status 200
+[2026-06-16T15:19:04.315Z] GET /api/shipping/pincode/600001 started
+[2026-06-16T15:19:04.348Z] GET /pincode/600001 finished in 33ms with status 200
+[2026-06-16T15:19:14.318Z] GET /api/orders?limit=50 started
+[2026-06-16T15:19:14.399Z] GET /?limit=50 finished in 81ms with status 304
+[2026-06-16T15:19:22.029Z] GET /api/orders?limit=1 started
+[2026-06-16T15:19:23.408Z] GET /?limit=1 finished in 1379ms with status 304
+[2026-06-16T15:21:56.050Z] GET /api/addresses started
+[2026-06-16T15:21:56.327Z] GET / finished in 280ms with status 304
+[2026-06-16T15:21:56.344Z] GET /api/shipping/pincode/600001 started
+[2026-06-16T15:21:56.456Z] GET /pincode/600001 finished in 112ms with status 304
+[2026-06-16T15:22:01.435Z] POST /api/orders started
+[2026-06-16T15:23:59.278Z] GET /api/orders?limit=1 started
+[2026-06-16T15:23:59.432Z] GET /?limit=1 finished in 155ms with status 304
+[2026-06-16T15:25:16.617Z] GET /api/health started
+[2026-06-16T15:25:16.631Z] GET /api/health finished in 14ms with status 200
+[2026-06-16T15:38:04.706Z] POST /api/auth/login started
+[2026-06-16T15:38:05.640Z] POST /login finished in 934ms with status 200
+[2026-06-16T15:38:05.653Z] GET /api/wishlist started
+[2026-06-16T15:38:05.690Z] GET /api/cart started
+[2026-06-16T15:38:05.696Z] GET /api/admin/stats started
+[2026-06-16T15:38:05.807Z] GET / finished in 154ms with status 304
+[2026-06-16T15:38:05.816Z] GET / finished in 126ms with status 200
+[2026-06-16T15:38:05.818Z] GET /api/wishlist started
+[2026-06-16T15:38:05.894Z] GET / finished in 76ms with status 304
+[2026-06-16T15:38:05.967Z] GET /stats finished in 271ms with status 200
+[2026-06-16T15:38:09.930Z] GET /api/products?limit=100&search= started
+[2026-06-16T15:38:09.963Z] GET /api/categories started
+[2026-06-16T15:38:10.020Z] GET /?limit=100&search= finished in 90ms with status 200
+[2026-06-16T15:38:10.031Z] GET / finished in 68ms with status 304
+[2026-06-16T15:39:35.213Z] GET /api/products?limit=100&search= started
+[2026-06-16T15:39:35.226Z] GET /api/categories started
+[2026-06-16T15:39:35.374Z] GET /?limit=100&search= finished in 161ms with status 304
+[2026-06-16T15:39:35.398Z] GET / finished in 172ms with status 304
+[2026-06-16T15:40:49.409Z] POST /api/products started
+[2026-06-16T15:40:49.860Z] POST / finished in 452ms with status 201
+[2026-06-16T15:40:49.929Z] GET /api/products?limit=100&search= started
+[2026-06-16T15:40:50.093Z] GET /?limit=100&search= finished in 164ms with status 200
+[2026-06-16T15:40:54.265Z] GET /api/products?limit=100 started
+[2026-06-16T15:40:54.276Z] GET /api/categories started
+[2026-06-16T15:40:54.344Z] GET / finished in 68ms with status 200
+[2026-06-16T15:40:54.372Z] GET /?limit=100 finished in 107ms with status 200
+[2026-06-16T15:40:54.479Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T15:40:54.488Z] GET /images/promo/gift_box.png started
+[2026-06-16T15:40:54.503Z] GET /promo/healthy_lifestyle.png finished in 24ms with status 304
+[2026-06-16T15:40:54.595Z] GET /promo/gift_box.png finished in 107ms with status 304
+[2026-06-16T15:40:57.591Z] GET /api/products/6a316e810d5737261df02a60 started
+[2026-06-16T15:40:57.612Z] GET /api/reviews/product/6a316e810d5737261df02a60 started
+[2026-06-16T15:40:58.979Z] GET /6a316e810d5737261df02a60 finished in 1388ms with status 200
+[2026-06-16T15:40:59.349Z] GET /product/6a316e810d5737261df02a60 finished in 1737ms with status 200
+[2026-06-16T15:40:59.510Z] GET /api/reviews/product/6a316e810d5737261df02a60/check started
+[2026-06-16T15:40:59.739Z] GET /api/wishlist started
+[2026-06-16T15:40:59.940Z] GET /api/products?category=6a2f7b5f33f71a7c5334140e&limit=5 started
+[2026-06-16T15:41:00.103Z] GET /product/6a316e810d5737261df02a60/check finished in 593ms with status 200
+[2026-06-16T15:41:00.241Z] GET /?category=6a2f7b5f33f71a7c5334140e&limit=5 finished in 301ms with status 200
+[2026-06-16T15:41:00.279Z] GET / finished in 540ms with status 304
+[2026-06-16T15:41:36.941Z] GET /api/orders?limit=1 started
+[2026-06-16T15:41:37.247Z] GET /?limit=1 finished in 306ms with status 200
+[2026-06-16T15:41:38.538Z] GET /api/admin/stats started
+[2026-06-16T15:41:38.823Z] GET /stats finished in 285ms with status 200
+[2026-06-16T15:41:40.197Z] GET /api/products?limit=100&search= started
+[2026-06-16T15:41:40.209Z] GET /api/categories started
+[2026-06-16T15:41:40.262Z] GET /?limit=100&search= finished in 65ms with status 304
+[2026-06-16T15:41:40.271Z] GET / finished in 62ms with status 304
+[2026-06-16T15:41:43.625Z] DELETE /api/products/6a316e810d5737261df02a60 started
+[2026-06-16T15:41:43.688Z] DELETE /6a316e810d5737261df02a60 finished in 63ms with status 200
+[2026-06-16T15:41:43.695Z] GET /api/products?limit=100&search= started
+[2026-06-16T15:41:43.755Z] GET /?limit=100&search= finished in 60ms with status 200
+[2026-06-16T15:41:47.371Z] DELETE /api/products/6a30e2ff661b3106e3714b44 started
+[2026-06-16T15:41:47.428Z] DELETE /6a30e2ff661b3106e3714b44 finished in 57ms with status 200
+[2026-06-16T15:41:47.457Z] GET /api/products?limit=100&search= started
+[2026-06-16T15:41:47.578Z] GET /?limit=100&search= finished in 121ms with status 200
+[2026-06-16T15:42:13.016Z] GET /api/products?limit=100 started
+[2026-06-16T15:42:13.054Z] GET /api/categories started
+[2026-06-16T15:42:13.363Z] GET / finished in 309ms with status 304
+[2026-06-16T15:42:13.384Z] GET /?limit=100 finished in 368ms with status 200
+[2026-06-16T15:42:13.495Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T15:42:13.499Z] GET /promo/healthy_lifestyle.png finished in 4ms with status 304
+[2026-06-16T15:42:13.508Z] GET /images/promo/gift_box.png started
+[2026-06-16T15:42:13.512Z] GET /promo/gift_box.png finished in 4ms with status 304
+[2026-06-16T15:42:16.224Z] GET /api/products/6a2f9aff1d52299d788d5b30 started
+[2026-06-16T15:42:16.246Z] GET /api/reviews/product/6a2f9aff1d52299d788d5b30 started
+[2026-06-16T15:42:16.315Z] GET /6a2f9aff1d52299d788d5b30 finished in 91ms with status 200
+[2026-06-16T15:42:16.328Z] GET /product/6a2f9aff1d52299d788d5b30 finished in 82ms with status 200
+[2026-06-16T15:42:16.343Z] GET /api/reviews/product/6a2f9aff1d52299d788d5b30/check started
+[2026-06-16T15:42:16.350Z] GET /api/wishlist started
+[2026-06-16T15:42:16.355Z] GET /api/products?category=6a2f9a3c1d52299d788d5aea&limit=5 started
+[2026-06-16T15:42:16.491Z] GET /product/6a2f9aff1d52299d788d5b30/check finished in 148ms with status 200
+[2026-06-16T15:42:16.565Z] GET /?category=6a2f9a3c1d52299d788d5aea&limit=5 finished in 210ms with status 200
+[2026-06-16T15:42:16.594Z] GET / finished in 245ms with status 304
+[2026-06-16T15:42:19.053Z] GET /api/products?limit=100 started
+[2026-06-16T15:42:19.066Z] GET /api/categories started
+[2026-06-16T15:42:19.277Z] GET /?limit=100 finished in 224ms with status 304
+[2026-06-16T15:42:19.305Z] GET / finished in 239ms with status 304
+[2026-06-16T15:42:19.434Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T15:42:19.436Z] GET /images/promo/gift_box.png started
+[2026-06-16T15:42:19.438Z] GET /promo/healthy_lifestyle.png finished in 5ms with status 304
+[2026-06-16T15:42:19.444Z] GET /promo/gift_box.png finished in 9ms with status 304

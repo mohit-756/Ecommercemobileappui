@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useSearchParams, useLocation } from 'react-router';
 import { ShoppingCart, User, Search, Heart, Leaf, Zap, X } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../contexts/AuthContext';
 import { useDeliveryLocation } from '../contexts/LocationContext';
 import { saveRecentSearch } from '../lib/utils';
+import { productService } from '../services/productService';
 
 export function WebShell() {
   const navigate = useNavigate();
@@ -15,6 +16,26 @@ export function WebShell() {
   const { itemCount } = useCart();
   const { user } = useAuth();
   const { deliveryLocation, setShowSelector } = useDeliveryLocation();
+
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await productService.getSearchSuggestions(query);
+        setSuggestions(res.data || []);
+      } catch (err) {
+        console.error('Failed to fetch search suggestions:', err);
+        setSuggestions([]);
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -48,7 +69,7 @@ export function WebShell() {
               {user && (
                 <div
                   onClick={() => setShowSelector(true)}
-                  className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 dark:hover:bg-surface-secondary cursor-pointer transition-colors text-left border border-transparent hover:border-gray-100 dark:hover:border-border-light"
+                  className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-55 dark:hover:bg-surface-secondary cursor-pointer transition-colors text-left border border-transparent hover:border-gray-100 dark:hover:border-border-light"
                 >
                   <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-500/20 flex items-center justify-center text-amber-500 flex-shrink-0">
                     <Zap size={15} className="fill-amber-500" />
@@ -65,7 +86,7 @@ export function WebShell() {
             </div>
 
             {user && (
-              <div className="flex-grow max-w-3xl mx-8 hidden sm:block">
+              <div className="flex-grow max-w-3xl mx-8 hidden sm:block relative">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary" size={22} />
                   <input
@@ -73,29 +94,33 @@ export function WebShell() {
                     value={query}
                     onChange={(e) => {
                       const val = e.target.value;
+                      setSuggestionsOpen(true);
                       if (val) {
                         navigate(`/search?q=${encodeURIComponent(val)}`, { replace: location.pathname === '/search' });
                       } else {
                         navigate('/search', { replace: location.pathname === '/search' });
                       }
                     }}
+                    onFocus={() => {
+                      setSuggestionsOpen(true);
+                      if (location.pathname !== '/search') {
+                        navigate('/search');
+                      }
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && query.trim()) {
                         saveRecentSearch(query);
+                        setSuggestionsOpen(false);
                       }
                     }}
                     onBlur={() => {
                       if (query.trim()) {
                         saveRecentSearch(query);
                       }
+                      setTimeout(() => setSuggestionsOpen(false), 200);
                     }}
                     placeholder="Search products..."
                     className="w-full bg-gray-100/80 dark:bg-surface-secondary border border-transparent hover:bg-gray-100 dark:hover:bg-surface-tertiary focus:bg-white dark:focus:bg-surface focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-full py-3 pl-12 pr-12 outline-none transition-all text-base text-gray-900 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-tertiary"
-                    onFocus={() => {
-                      if (location.pathname !== '/search') {
-                        navigate('/search');
-                      }
-                    }}
                   />
                   {query && (
                     <button
@@ -106,6 +131,24 @@ export function WebShell() {
                     </button>
                   )}
                 </div>
+
+                {suggestionsOpen && suggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 mt-2 bg-white dark:bg-surface border border-gray-150 dark:border-border-light rounded-2xl shadow-xl z-50 overflow-hidden divide-y divide-gray-100 dark:divide-border-light">
+                    {suggestions.map((item, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          navigate(`/search?q=${encodeURIComponent(item)}`, { replace: location.pathname === '/search' });
+                          saveRecentSearch(item);
+                          setSuggestionsOpen(false);
+                        }}
+                        className="w-full text-left px-5 py-3.5 text-sm text-gray-800 dark:text-text-primary hover:bg-gray-50 dark:hover:bg-surface-secondary transition-colors cursor-pointer"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
