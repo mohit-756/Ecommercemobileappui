@@ -227,3 +227,117 @@
 [2026-06-16T04:09:41.895Z] GET /?limit=1 finished in 60ms with status 304
 [2026-06-16T04:15:17.848Z] GET /images/promo/mixed_nuts.png started
 [2026-06-16T04:15:17.852Z] GET /promo/mixed_nuts.png finished in 4ms with status 304
+[2026-06-16T04:21:14.709Z] POST /api/auth/login started
+[2026-06-16T04:21:15.103Z] POST /login finished in 394ms with status 200
+[2026-06-16T04:21:15.127Z] GET /api/wishlist started
+[2026-06-16T04:21:15.131Z] GET /api/cart started
+[2026-06-16T04:21:15.134Z] GET /api/products?limit=100 started
+[2026-06-16T04:21:15.141Z] GET /api/categories started
+[2026-06-16T04:21:15.191Z] GET / finished in 64ms with status 304
+[2026-06-16T04:21:15.194Z] GET / finished in 63ms with status 304
+[2026-06-16T04:21:15.195Z] GET /api/wishlist started
+[2026-06-16T04:21:15.212Z] GET /?limit=100 finished in 78ms with status 304
+[2026-06-16T04:21:15.215Z] GET / finished in 74ms with status 304
+[2026-06-16T04:21:15.255Z] GET / finished in 60ms with status 304
+[2026-06-16T04:21:15.258Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T04:21:15.259Z] GET /images/promo/gift_box.png started
+[2026-06-16T04:21:15.260Z] GET /promo/healthy_lifestyle.png finished in 2ms with status 304
+[2026-06-16T04:21:15.261Z] GET /promo/gift_box.png finished in 2ms with status 304
+[2026-06-16T04:21:17.015Z] GET /api/orders?limit=1 started
+[2026-06-16T04:21:17.080Z] GET /?limit=1 finished in 65ms with status 304
+[2026-06-16T04:21:21.089Z] POST /api/auth/login started
+[2026-06-16T04:21:21.464Z] POST /login finished in 375ms with status 200
+[2026-06-16T04:21:21.484Z] GET /api/wishlist started
+[2026-06-16T04:21:21.486Z] GET /api/cart started
+[2026-06-16T04:21:21.498Z] GET /api/admin/stats started
+[2026-06-16T04:21:21.605Z] GET / finished in 119ms with status 200
+[2026-06-16T04:21:21.609Z] GET / finished in 125ms with status 200
+[2026-06-16T04:21:21.615Z] GET /api/wishlist started
+[2026-06-16T04:21:21.708Z] GET / finished in 93ms with status 304
+[2026-06-16T04:21:21.817Z] GET /stats finished in 319ms with status 200
+[2026-06-16T04:21:23.499Z] GET /api/products?limit=100&search= started
+[2026-06-16T04:21:23.502Z] GET /api/categories started
+[2026-06-16T04:21:23.562Z] GET /?limit=100&search= finished in 63ms with status 200
+[2026-06-16T04:21:23.565Z] GET / finished in 63ms with status 304
+[2026-06-16T04:21:39.515Z] GET /api/orders/all?limit=100&status=pending,confirmed,processing,packed started
+[2026-06-16T04:21:39.575Z] GET /all?limit=100&status=pending,confirmed,processing,packed finished in 60ms with status 200
+[2026-06-16T04:21:40.485Z] GET /api/admin/stats started
+[2026-06-16T04:21:40.748Z] GET /stats finished in 263ms with status 200
+[2026-06-16T04:21:45.684Z] POST /api/auth/login started
+[2026-06-16T04:21:46.026Z] POST /login finished in 342ms with status 200
+[2026-06-16T04:21:46.047Z] GET /api/wishlist started
+[2026-06-16T04:21:46.050Z] GET /api/cart started
+[2026-06-16T04:21:46.052Z] GET /api/admin/stats started
+[2026-06-16T04:21:46.136Z] GET / finished in 89ms with status 304
+[2026-06-16T04:21:46.139Z] GET / finished in 90ms with status 304
+[2026-06-16T04:21:46.141Z] GET /api/wishlist started
+[2026-06-16T04:21:46.229Z] GET / finished in 88ms with status 304
+[2026-06-16T04:21:46.352Z] GET /stats finished in 300ms with status 200
+[2026-06-16T04:23:31.243Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:23:31.244Z] GET /promo/mixed_nuts.png finished in 1ms with status 304
+[2026-06-16T04:24:54.129Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:24:54.130Z] GET /promo/mixed_nuts.png finished in 1ms with status 304
+[2026-06-16T04:24:57.175Z] GET /images/promo/gift_box.png started
+[2026-06-16T04:24:57.177Z] GET /promo/gift_box.png finished in 2ms with status 304
+[2026-06-16T04:24:57.725Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T04:24:57.728Z] GET /promo/healthy_lifestyle.png finished in 3ms with status 304
+[2026-06-16T04:25:12.341Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:25:12.342Z] GET /promo/mixed_nuts.png finished in 1ms with status 304
+[2026-06-16T04:25:29.470Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:25:29.472Z] GET /promo/mixed_nuts.png finished in 2ms with status 304
+[2026-06-16T04:25:29.779Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:25:29.781Z] GET /promo/mixed_nuts.png finished in 2ms with status 304
+[2026-06-16T04:25:29.941Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:25:29.942Z] GET /promo/mixed_nuts.png finished in 1ms with status 304
+[2026-06-16T04:25:30.095Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:25:30.096Z] GET /promo/mixed_nuts.png finished in 1ms with status 304
+[2026-06-16T04:25:30.265Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:25:30.266Z] GET /promo/mixed_nuts.png finished in 1ms with status 304
+[2026-06-16T04:25:30.460Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:25:30.461Z] GET /promo/mixed_nuts.png finished in 1ms with status 304
+[2026-06-16T04:25:30.629Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:25:30.630Z] GET /promo/mixed_nuts.png finished in 1ms with status 304
+[2026-06-16T04:27:47.846Z] POST /api/auth/login started
+[2026-06-16T04:27:48.172Z] POST /login finished in 326ms with status 200
+[2026-06-16T04:27:48.193Z] GET /api/wishlist started
+[2026-06-16T04:27:48.196Z] GET /api/cart started
+[2026-06-16T04:27:48.207Z] GET /api/admin/stats started
+[2026-06-16T04:27:48.280Z] GET / finished in 87ms with status 304
+[2026-06-16T04:27:48.283Z] GET / finished in 87ms with status 304
+[2026-06-16T04:27:48.284Z] GET /api/wishlist started
+[2026-06-16T04:27:48.301Z] GET /stats finished in 94ms with status 200
+[2026-06-16T04:27:48.371Z] GET / finished in 87ms with status 304
+[2026-06-16T04:31:21.863Z] GET /api/admin/stats started
+[2026-06-16T04:31:21.866Z] GET /api/cart started
+[2026-06-16T04:31:21.961Z] GET /stats finished in 98ms with status 200
+[2026-06-16T04:31:21.965Z] GET / finished in 99ms with status 304
+[2026-06-16T04:32:15.996Z] POST /api/auth/google started
+[2026-06-16T04:32:16.191Z] POST /google finished in 195ms with status 200
+[2026-06-16T04:32:16.211Z] GET /api/wishlist started
+[2026-06-16T04:32:16.214Z] GET /api/cart started
+[2026-06-16T04:32:16.217Z] GET /api/products?limit=100 started
+[2026-06-16T04:32:16.219Z] GET /api/categories started
+[2026-06-16T04:32:24.127Z] GET /api/cart started
+[2026-06-16T04:32:24.139Z] GET /api/auth/me started
+[2026-06-16T04:32:24.214Z] GET /me finished in 75ms with status 200
+[2026-06-16T04:32:24.219Z] GET /api/wishlist started
+[2026-06-16T04:32:24.238Z] GET / finished in 112ms with status 200
+[2026-06-16T04:32:24.243Z] GET /api/products?limit=100 started
+[2026-06-16T04:32:24.249Z] GET /api/categories started
+[2026-06-16T04:32:24.285Z] GET / finished in 66ms with status 200
+[2026-06-16T04:32:24.309Z] POST /api/wishlist/add started
+[2026-06-16T04:32:24.317Z] GET /?limit=100 finished in 74ms with status 304
+[2026-06-16T04:32:24.320Z] GET / finished in 71ms with status 304
+[2026-06-16T04:32:24.329Z] GET /images/promo/mixed_nuts.png started
+[2026-06-16T04:32:24.332Z] GET /promo/mixed_nuts.png finished in 3ms with status 304
+[2026-06-16T04:32:24.395Z] GET /images/promo/gift_box.png started
+[2026-06-16T04:32:24.396Z] GET /images/promo/healthy_lifestyle.png started
+[2026-06-16T04:32:24.397Z] GET /promo/gift_box.png finished in 2ms with status 304
+[2026-06-16T04:32:24.398Z] GET /promo/healthy_lifestyle.png finished in 2ms with status 304
+[2026-06-16T04:32:24.410Z] POST /add finished in 101ms with status 200
+[2026-06-16T04:32:24.424Z] POST /api/wishlist/add started
+[2026-06-16T04:32:24.522Z] POST /add finished in 98ms with status 200
+[2026-06-16T04:32:24.525Z] GET /api/wishlist started
+[2026-06-16T04:32:24.615Z] GET / finished in 90ms with status 200
+[2026-06-16T04:32:26.602Z] GET /api/orders?limit=1 started
+[2026-06-16T04:32:26.668Z] GET /?limit=1 finished in 66ms with status 200

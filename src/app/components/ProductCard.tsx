@@ -182,9 +182,9 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
               </span>
             )}
           </div>
-          <div className="mt-auto flex items-end justify-between gap-2 pt-1">
+          <div className="mt-auto flex items-end justify-between gap-1.5 pt-1">
             <div className="flex min-w-0 flex-col justify-end h-10">
-              <span className="font-bold text-gray-900 dark:text-text-primary leading-none truncate">{formatPrice(displayPrice)}</span>
+              <span className="text-sm font-extrabold text-gray-900 dark:text-text-primary leading-none truncate">{formatPrice(displayPrice)}</span>
               {displayOriginalPrice && displayOriginalPrice !== displayPrice && (
                 <span className="text-[10px] text-gray-400 dark:text-text-tertiary line-through mt-1 truncate">{formatPrice(displayOriginalPrice)}</span>
               )}
@@ -192,7 +192,7 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
             {hasVariants ? (
               <button
                 onClick={toggleSelector}
-                className="px-3 py-1.5 shrink-0 bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl flex flex-col items-center justify-center hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all text-xs font-bold min-w-[56px] border border-blue-100 dark:border-blue-500/10 cursor-pointer"
+                className="px-2.5 py-1.5 shrink-0 bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl flex flex-col items-center justify-center hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all text-[11px] font-extrabold min-w-[48px] border border-blue-100 dark:border-blue-500/10 cursor-pointer"
               >
                 <span className="leading-none">ADD</span>
                 <span className="text-[7px] font-semibold leading-none mt-0.5">options</span>

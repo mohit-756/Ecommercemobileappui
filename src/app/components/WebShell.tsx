@@ -23,8 +23,8 @@ export function WebShell() {
     return null;
   }
 
-  // No shell (navbar/footer) on splash, login, or OTP pages
-  const noShellRoutes = ['/', '/login', '/verify-otp'];
+  // No shell (navbar/footer) on splash, login, OTP, or onboarding pages
+  const noShellRoutes = ['/', '/login', '/verify-otp', '/onboarding'];
   if (noShellRoutes.includes(location.pathname)) {
     return <Outlet />;
   }

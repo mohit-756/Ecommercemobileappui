@@ -208,34 +208,34 @@ export function Login() {
   };
 
   return (
-    <div className="w-full min-h-screen lg:min-h-[75vh] flex items-stretch lg:items-center justify-center bg-white dark:bg-background lg:bg-transparent transition-colors duration-300">
+    <div className="w-full min-h-screen flex items-stretch lg:items-center justify-center bg-white dark:bg-background lg:bg-gray-50 dark:lg:bg-background transition-colors duration-300">
       <div className="w-full max-w-5xl mx-auto bg-white dark:bg-surface-secondary lg:rounded-3xl lg:shadow-2xl lg:border lg:border-border-medium/60 overflow-hidden transition-all duration-300 flex flex-col">
-        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 min-h-full lg:min-h-[600px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 min-h-full lg:min-h-[500px]">
           
           {/* Left panel - Visual Showcase (desktop only) */}
-          <div className="hidden lg:flex lg:col-span-5 bg-gradient-to-br from-amber-600 via-amber-800 to-amber-950 p-12 flex-col justify-between relative overflow-hidden text-white">
+          <div className="hidden lg:flex lg:col-span-5 bg-gradient-to-br from-amber-600 via-amber-800 to-amber-950 p-8 flex-col justify-between relative overflow-hidden text-white">
             {/* Background decorative patterns */}
             <div className="absolute inset-0 bg-black/10 z-0"></div>
             <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-amber-500/20 rounded-full blur-3xl"></div>
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-yellow-500/10 rounded-full blur-2xl"></div>
             
             <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-8">
+              <div className="flex items-center gap-3 mb-6">
                 <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain drop-shadow-md" />
                 <span className="font-black tracking-tight text-xl">DryFruit Hub</span>
               </div>
               
-              <h2 className="text-3xl font-black mb-4 leading-tight">Taste Nature's Finest Goodness</h2>
-              <p className="text-white/80 text-sm leading-relaxed font-medium">
+              <h2 className="text-2xl font-black mb-3 leading-tight">Taste Nature's Finest Goodness</h2>
+              <p className="text-white/80 text-xs leading-relaxed font-medium">
                 Sourced from the best organic orchards. Handpicked, sorted, and packed to preserve natural crunch and nutrition.
               </p>
             </div>
             
-            <div className="relative z-10 flex justify-center py-6">
+            <div className="relative z-10 flex justify-center py-4">
               <img 
                 src={`${IMAGE_BASE_URL}/images/promo/mixed_nuts.png`} 
                 alt="Dry Fruits Showcase" 
-                className="w-56 h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-float"
+                className="w-40 h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-float"
               />
             </div>
             
@@ -250,27 +250,27 @@ export function Login() {
           </div>
 
           {/* Right panel - Form (always visible) */}
-          <div className="col-span-1 lg:col-span-7 flex flex-col justify-center px-6 py-10 pt-safe pb-safe lg:p-12 bg-white dark:bg-surface-secondary">
+          <div className="col-span-1 lg:col-span-7 flex flex-col justify-center px-6 py-8 pt-safe pb-safe lg:px-10 lg:py-8 bg-white dark:bg-surface-secondary">
             <div className="w-full max-w-md mx-auto">
-              <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-text-primary mb-2">
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-text-primary mb-1.5">
                   {isLogin ? 'Welcome Back!' : 'Create Account'}
                 </h1>
-                <p className="text-gray-500 dark:text-text-secondary">
+                <p className="text-gray-500 dark:text-text-secondary text-sm">
                   {isLogin ? 'Sign in to continue shopping.' : 'Sign up to get started.'}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
                 {!isLogin && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1.5">Full Name</label>
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-text-primary mb-1.5">Full Name</label>
                     <div className="relative">
                       <input
                         name="name"
                         type="text"
                         placeholder="John Doe"
-                        className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3.5 px-4 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+                        className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-2.5 px-4 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm"
                         required
                       />
                     </div>
@@ -278,32 +278,32 @@ export function Login() {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1.5">Email Address</label>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-text-primary mb-1.5">Email Address</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-text-tertiary">
-                      <Mail size={20} />
+                      <Mail size={16} />
                     </div>
                     <input
                       name="email"
                       type="email"
                       placeholder="you@example.com"
-                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3.5 pl-11 pr-4 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-text-primary mb-1.5">Password</label>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-text-primary mb-1.5">Password</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-text-tertiary">
-                      <Lock size={20} />
+                      <Lock size={16} />
                     </div>
                     <input
                       name="password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
-                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-3.5 pl-11 pr-12 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all"
+                      className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium text-gray-900 dark:text-text-primary rounded-xl py-2.5 pl-10 pr-10 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-sm"
                       required
                       minLength={6}
                     />
@@ -312,14 +312,14 @@ export function Login() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-text-tertiary hover:text-gray-600 cursor-pointer"
                     >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>
 
                 {isLogin && (
                   <div className="flex justify-end">
-                    <button type="button" className="text-sm font-medium text-blue-600 hover:text-blue-700 cursor-pointer">
+                    <button type="button" className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer">
                       Forgot Password?
                     </button>
                   </div>
@@ -328,11 +328,11 @@ export function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 text-white font-semibold rounded-xl py-4 mt-4 shadow-lg shadow-blue-200 dark:shadow-blue-900/30 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full bg-blue-600 text-white font-semibold rounded-xl py-3 mt-2 shadow-lg shadow-blue-200 dark:shadow-blue-900/30 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-sm"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       {isLogin ? 'Signing in...' : 'Creating account...'}
                     </span>
                   ) : (
@@ -340,12 +340,12 @@ export function Login() {
                   )}
                 </button>
 
-                <div className="relative my-4">
+                <div className="relative my-3">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-200 dark:border-border-light"></div>
                   </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white dark:bg-surface-secondary text-gray-500 dark:text-text-secondary transition-colors">Or continue with</span>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="px-3 bg-white dark:bg-surface-secondary text-gray-500 dark:text-text-secondary transition-colors">Or continue with</span>
                   </div>
                 </div>
 
