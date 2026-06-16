@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../contexts/AuthContext';
 import { useDeliveryLocation } from '../contexts/LocationContext';
+import { saveRecentSearch } from '../lib/utils';
 
 export function WebShell() {
   const navigate = useNavigate();
@@ -76,6 +77,16 @@ export function WebShell() {
                         navigate(`/search?q=${encodeURIComponent(val)}`, { replace: location.pathname === '/search' });
                       } else {
                         navigate('/search', { replace: location.pathname === '/search' });
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && query.trim()) {
+                        saveRecentSearch(query);
+                      }
+                    }}
+                    onBlur={() => {
+                      if (query.trim()) {
+                        saveRecentSearch(query);
                       }
                     }}
                     placeholder="Search products..."

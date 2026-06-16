@@ -116,7 +116,7 @@ export function Orders() {
               <div
                 key={order._id}
                 className="bg-white dark:bg-surface p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-border-light cursor-pointer hover:border-blue-600 transition-colors"
-                onClick={() => navigate(`/tracking?orderId=${order._id}`)}
+                onClick={() => navigate(`/order-details?orderId=${order._id}`)}
               >
                 <div className="flex justify-between items-start mb-3 border-b border-gray-50 dark:border-border-light pb-3">
                   <div>
@@ -140,7 +140,14 @@ export function Orders() {
                       <p className="text-xs font-bold text-gray-900 dark:text-text-primary mt-0.5">{formatPrice(order.total || 0)}</p>
                     </div>
                   </div>
-                  <button className="flex items-center gap-1 text-sm font-semibold text-blue-600 cursor-pointer">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      hapticService.impact();
+                      navigate(`/tracking?orderId=${order._id}`);
+                    }}
+                    className="flex items-center gap-1 text-sm font-semibold text-blue-600 cursor-pointer"
+                  >
                     Track <ChevronRight size={16} />
                   </button>
                 </div>

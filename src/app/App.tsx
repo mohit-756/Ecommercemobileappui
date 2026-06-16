@@ -19,11 +19,13 @@ import { Home } from './pages/Home';
 import { Search } from './pages/Search';
 import { Cart } from './pages/Cart';
 import { Profile } from './pages/Profile';
+import { EditProfile } from './pages/EditProfile';
 import { ProductDetails } from './pages/ProductDetails';
 import { Checkout } from './pages/Checkout';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { OrderTracking } from './pages/OrderTracking';
 import { Orders } from './pages/Orders';
+import { OrderDetails } from './pages/OrderDetails';
 import { Wishlist } from './pages/Wishlist';
 import { Addresses } from './pages/Addresses';
 import { Payments } from './pages/Payments';
@@ -75,10 +77,12 @@ export default function App() {
                       <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
                       <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
                       <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                      <Route path="profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
                       <Route path="product/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
                       <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
                       <Route path="success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
                       <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
+                      <Route path="order-details" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
                       <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
                       <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
                       <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />

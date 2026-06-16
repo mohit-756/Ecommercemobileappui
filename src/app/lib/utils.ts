@@ -24,3 +24,18 @@ export function normalizeProduct(p: any) {
     originalPrice: p.originalPrice ?? p.price,
   };
 }
+
+export function saveRecentSearch(query: string) {
+  if (!query || !query.trim()) return;
+  const term = query.trim();
+  try {
+    const saved = localStorage.getItem('recent_searches');
+    const prev = saved ? JSON.parse(saved) : ['Almonds', 'Cashews', 'Dates', 'Walnuts', 'Raisins'];
+    const filtered = prev.filter((x: string) => x.toLowerCase() !== term.toLowerCase());
+    const updated = [term, ...filtered].slice(0, 8);
+    localStorage.setItem('recent_searches', JSON.stringify(updated));
+    window.dispatchEvent(new Event('recent-searches-updated'));
+  } catch (e) {
+    console.error('Failed to save recent search:', e);
+  }
+}

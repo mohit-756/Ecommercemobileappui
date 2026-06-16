@@ -14,11 +14,16 @@ export async function getProducts(req, res, next) {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
     if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { tags: { $regex: search, $options: 'i' } },
-      ];
+      const keywords = search.trim().split(/\s+/).filter(Boolean);
+      if (keywords.length > 0) {
+        filter.$and = keywords.map(kw => ({
+          $or: [
+            { name: { $regex: kw, $options: 'i' } },
+            { description: { $regex: kw, $options: 'i' } },
+            { tags: { $regex: kw, $options: 'i' } },
+          ]
+        }));
+      }
     }
 
     let sortOption = { createdAt: -1 };

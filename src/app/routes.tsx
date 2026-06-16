@@ -8,12 +8,14 @@ import { Home } from "./pages/Home";
 import { Search } from "./pages/Search";
 import { Cart } from "./pages/Cart";
 import { Profile } from "./pages/Profile";
+import { EditProfile } from "./pages/EditProfile";
 import { ProductDetails } from "./pages/ProductDetails";
 import { Checkout } from "./pages/Checkout";
 import { OrderSuccess } from "./pages/OrderSuccess";
 import { OrderTracking } from "./pages/OrderTracking";
-import { Addresses } from "./pages/Addresses";
 import { Orders } from "./pages/Orders";
+import { OrderDetails } from "./pages/OrderDetails";
+import { Addresses } from "./pages/Addresses";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminProducts } from "./pages/AdminProducts";
 import { AdminOrders } from "./pages/AdminOrders";
@@ -31,10 +33,12 @@ export const router = createBrowserRouter([
       { path: "search", element: <ProtectedRoute><Search /></ProtectedRoute> },
       { path: "cart", element: <ProtectedRoute><Cart /></ProtectedRoute> },
       { path: "profile", element: <ProtectedRoute><Profile /></ProtectedRoute> },
+      { path: "profile/edit", element: <ProtectedRoute><EditProfile /></ProtectedRoute> },
       { path: "product/:id", element: <ProtectedRoute><ProductDetails /></ProtectedRoute> },
       { path: "checkout", element: <ProtectedRoute><Checkout /></ProtectedRoute> },
       { path: "success", element: <ProtectedRoute><OrderSuccess /></ProtectedRoute> },
       { path: "tracking", element: <ProtectedRoute><OrderTracking /></ProtectedRoute> },
+      { path: "order-details", element: <ProtectedRoute><OrderDetails /></ProtectedRoute> },
       { path: "orders", element: <ProtectedRoute><Orders /></ProtectedRoute> },
       { path: "addresses", element: <ProtectedRoute><Addresses /></ProtectedRoute> },
       { path: "admin", element: <ProtectedRoute><AdminDashboard /></ProtectedRoute> },

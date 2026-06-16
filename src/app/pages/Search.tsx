@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { ChevronLeft, Search as SearchIcon, X, SlidersHorizontal, ChevronDown, Star, RotateCcw, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ProductCard } from '../components/ProductCard';
-import { cn } from '../lib/utils';
+import { cn, saveRecentSearch } from '../lib/utils';
 import { products as mockProducts, categories as mockCategories } from '../data/mock';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
@@ -42,7 +42,29 @@ export function Search() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [varietyFilter, setVarietyFilter] = useState('');
 
-  const recentSearches = ['Almonds', 'Cashews', 'Dates', 'Walnuts', 'Raisins'];
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  const handleClearRecent = () => {
+    setRecentSearches([]);
+    localStorage.removeItem('recent_searches');
+    hapticService.impact();
+  };
+
+  useEffect(() => {
+    const loadRecent = () => {
+      const saved = localStorage.getItem('recent_searches');
+      if (saved) {
+        setRecentSearches(JSON.parse(saved));
+      } else {
+        const defaults = ['Almonds', 'Cashews', 'Dates', 'Walnuts', 'Raisins'];
+        setRecentSearches(defaults);
+        localStorage.setItem('recent_searches', JSON.stringify(defaults));
+      }
+    };
+    loadRecent();
+    window.addEventListener('recent-searches-updated', loadRecent);
+    return () => window.removeEventListener('recent-searches-updated', loadRecent);
+  }, []);
 
   useEffect(() => {
     categoryService.getCategories()
@@ -88,14 +110,25 @@ export function Search() {
           searchStr = searchStr ? `${searchStr} ${varietyFilter}` : varietyFilter;
         }
         if (searchStr) {
-          filtered = filtered.filter((p: any) =>
-            p.name.toLowerCase().includes(searchStr.toLowerCase())
-          );
+          const keywords = searchStr.toLowerCase().split(/\s+/).filter(Boolean);
+          filtered = filtered.filter((p: any) => {
+            const name = p.name?.toLowerCase() || '';
+            const desc = p.description?.toLowerCase() || '';
+            const tags = (p.tags || []).map((t: string) => t.toLowerCase());
+            return keywords.every(kw => 
+              name.includes(kw) || 
+              desc.includes(kw) || 
+              tags.some((t: string) => t.includes(kw))
+            );
+          });
         }
         if (categoryFilter) {
-          filtered = filtered.filter((p: any) =>
-            (p.category?._id || p.category?.id || p.category) === categoryFilter
-          );
+          const categoryObj = mockCategories.find(c => c.id === categoryFilter);
+          const categoryName = categoryObj ? categoryObj.name : categoryFilter;
+          filtered = filtered.filter((p: any) => {
+            const pCat = p.category?._id || p.category?.id || p.category;
+            return pCat === categoryFilter || pCat === categoryName;
+          });
         }
         if (minPrice) {
           filtered = filtered.filter((p: any) => p.price >= Number(minPrice));
@@ -138,6 +171,16 @@ export function Search() {
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && query.trim()) {
+                saveRecentSearch(query);
+              }
+            }}
+            onBlur={() => {
+              if (query.trim()) {
+                saveRecentSearch(query);
+              }
+            }}
             placeholder="Search products..."
             className="w-full bg-gray-100 dark:bg-surface-tertiary border-transparent text-gray-900 dark:text-text-primary rounded-xl py-2.5 pl-10 pr-10 focus:ring-2 focus:ring-blue-600 focus:bg-white dark:focus:bg-surface outline-none transition-all"
           />
@@ -155,9 +198,14 @@ export function Search() {
         <h1 className="hidden lg:block text-2xl font-black text-gray-900 dark:text-text-primary flex-1">Search Results</h1>
 
         <button
-          onClick={() => setShowFilters(true)}
+          type="button"
+          onClick={() => {
+            console.log('Filters button clicked!');
+            hapticService.impact();
+            setShowFilters(true);
+          }}
           className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative transition-colors lg:w-auto lg:px-4 lg:gap-2",
+            "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 relative transition-colors lg:w-auto lg:px-4 lg:gap-2 cursor-pointer",
             activeFilterCount > 0 ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-surface-tertiary text-gray-700 dark:text-text-primary"
           )}
         >
@@ -177,7 +225,7 @@ export function Search() {
             <div>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-gray-900 dark:text-text-primary">Recent Searches</h3>
-                <button className="text-gray-400 dark:text-text-tertiary text-sm">Clear All</button>
+                <button onClick={handleClearRecent} className="text-gray-400 dark:text-text-tertiary text-sm cursor-pointer hover:text-red-500 transition-colors">Clear All</button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {recentSearches.map((search, idx) => (
@@ -227,24 +275,27 @@ export function Search() {
         )}
       </div>
 
-      <AnimatePresence>
-        {showFilters && createPortal(
-          <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-4 sm:p-0">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-              onClick={() => setShowFilters(false)}
-            />
-            <motion.div
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.9 }}
-              className="relative bg-white dark:bg-surface w-full sm:max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh] transition-colors duration-300"
-            >
+      {createPortal(
+        <AnimatePresence>
+          {showFilters && (
+            <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-4 sm:p-0">
+              <motion.div
+                key="filters-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                onClick={() => setShowFilters(false)}
+              />
+              <motion.div
+                key="filters-card"
+                initial={{ y: '100%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: '100%', opacity: 0 }}
+                transition={{ type: 'spring', damping: 28, stiffness: 300, mass: 0.9 }}
+                className="relative bg-white dark:bg-surface w-full sm:max-w-md rounded-3xl shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[80vh] transition-colors duration-300"
+              >
               <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 dark:border-border-light">
                 <h3 className="text-xl font-extrabold text-gray-900 dark:text-text-primary tracking-tight">Filters</h3>
                 <button
@@ -447,10 +498,11 @@ export function Search() {
                 </div>
               </div>
             </motion.div>
-          </div>,
-          document.body
+          </div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+    )}
     </div>
   );
 }
