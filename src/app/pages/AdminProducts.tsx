@@ -15,7 +15,7 @@ export function AdminProducts() {
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({ name: '', description: '', price: '', originalPrice: '', stock: '', category: '', image: '', variants: [] as any[] });
+  const [form, setForm] = useState({ name: '', description: '', price: '', offerPercentage: '', originalPrice: '', stock: '', category: '', image: '', variants: [] as any[] });
   const [uploading, setUploading] = useState(false);
   const [bulkUploading, setBulkUploading] = useState(false);
   const [showBulkHelp, setShowBulkHelp] = useState(false);
@@ -117,15 +117,35 @@ export function AdminProducts() {
 
   const openEdit = (product: any) => {
     setActiveFormTab('general');
+    let mainOfferPct = '';
+    if (product.originalPrice && product.originalPrice > product.price) {
+      mainOfferPct = String(Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100));
+    }
+    
+    const loadedVariants = (product.variants || []).map((v: any) => {
+      let varOfferPct = '';
+      if (v.originalPrice && v.originalPrice > v.price) {
+        varOfferPct = String(Math.round(((v.originalPrice - v.price) / v.originalPrice) * 100));
+      }
+      return {
+        ...v,
+        price: String(v.price),
+        originalPrice: v.originalPrice ? String(v.originalPrice) : '',
+        offerPercentage: varOfferPct,
+        stock: String(v.stock),
+      };
+    });
+
     setForm({
       name: product.name,
       description: product.description,
       price: String(product.price),
+      offerPercentage: mainOfferPct,
       originalPrice: product.originalPrice ? String(product.originalPrice) : '',
       stock: String(product.stock),
       category: product.category?._id || product.category || '',
       image: product.images?.[0] || '',
-      variants: product.variants || [],
+      variants: loadedVariants,
     });
     setEditing(product);
     setShowForm(true);
@@ -133,7 +153,7 @@ export function AdminProducts() {
 
   const openCreate = () => {
     setActiveFormTab('general');
-    setForm({ name: '', description: '', price: '', originalPrice: '', stock: '0', category: '', image: '', variants: [] });
+    setForm({ name: '', description: '', price: '', offerPercentage: '', originalPrice: '', stock: '0', category: '', image: '', variants: [] });
     setEditing(null);
     setShowForm(true);
   };
@@ -158,16 +178,31 @@ export function AdminProducts() {
   };
 
   const handleAddVariant = () => {
-    setForm(f => ({
-      ...f,
-      variants: [...(f.variants || []), { weight: '', price: '', originalPrice: '', stock: '0' }]
-    }));
+    setForm(f => {
+      const mainPct = f.offerPercentage;
+      return {
+        ...f,
+        variants: [...(f.variants || []), { weight: '', price: '', offerPercentage: mainPct, originalPrice: '', stock: '0' }]
+      };
+    });
   };
 
   const handleUpdateVariant = (index: number, key: string, value: string) => {
     setForm(f => {
       const updated = [...(f.variants || [])];
-      updated[index] = { ...updated[index], [key]: value };
+      const currentVar = { ...updated[index], [key]: value };
+      
+      if (key === 'price' || key === 'offerPercentage') {
+        const vPrice = Number(currentVar.price);
+        const vPct = Number(currentVar.offerPercentage);
+        if (vPrice && vPct) {
+          currentVar.originalPrice = String(Math.round(vPrice / (1 - vPct / 100)));
+        } else {
+          currentVar.originalPrice = '';
+        }
+      }
+      
+      updated[index] = currentVar;
       return { ...f, variants: updated };
     });
   };
@@ -432,26 +467,75 @@ export function AdminProducts() {
 
                 {/* Right Column (Price & Media) */}
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Price *</label>
                       <input 
                         type="number" 
                         value={form.price} 
-                        onChange={e => setForm(f => ({ ...f, price: e.target.value }))} 
+                        onChange={e => {
+                          const price = e.target.value;
+                          setForm(f => {
+                            const priceVal = Number(price);
+                            const pctVal = Number(f.offerPercentage);
+                            let origPrice = '';
+                            if (priceVal && pctVal) {
+                              origPrice = String(Math.round(priceVal / (1 - pctVal / 100)));
+                            }
+                            return { ...f, price: price, originalPrice: origPrice };
+                          });
+                        }} 
                         placeholder="₹"
                         className="w-full bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary" 
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Original Price</label>
+                      <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Offer %</label>
                       <input 
                         type="number" 
-                        value={form.originalPrice} 
-                        onChange={e => setForm(f => ({ ...f, originalPrice: e.target.value }))} 
-                        placeholder="₹"
+                        min="0"
+                        max="99"
+                        value={form.offerPercentage} 
+                        onChange={e => {
+                          const pct = e.target.value;
+                          setForm(f => {
+                            const priceVal = Number(f.price);
+                            const pctVal = Number(pct);
+                            let origPrice = '';
+                            if (priceVal && pctVal) {
+                              origPrice = String(Math.round(priceVal / (1 - pctVal / 100)));
+                            }
+                            
+                            const updatedVariants = (f.variants || []).map((v: any) => {
+                              const varPriceVal = Number(v.price);
+                              let varOrigPrice = v.originalPrice;
+                              if (varPriceVal && pctVal) {
+                                varOrigPrice = String(Math.round(varPriceVal / (1 - pctVal / 100)));
+                              }
+                              return {
+                                ...v,
+                                offerPercentage: pct,
+                                originalPrice: varOrigPrice
+                              };
+                            });
+
+                            return { 
+                              ...f, 
+                              offerPercentage: pct, 
+                              originalPrice: origPrice,
+                              variants: updatedVariants
+                            };
+                          });
+                        }} 
+                        placeholder="%"
                         className="w-full bg-gray-50 dark:bg-background border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 text-gray-900 dark:text-text-primary" 
                       />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-500 dark:text-text-secondary block mb-1">Original Price</label>
+                      <div className="w-full bg-gray-100 dark:bg-surface border border-gray-150 dark:border-border-medium rounded-xl px-4 py-2.5 text-sm text-gray-500 dark:text-text-secondary font-medium min-h-[42px] flex items-center">
+                        {form.originalPrice ? `₹${form.originalPrice}` : '—'}
+                      </div>
                     </div>
                   </div>
                   <div>
@@ -534,10 +618,11 @@ export function AdminProducts() {
                       <thead>
                         <tr className="bg-gray-50 dark:bg-background/60 text-gray-500 dark:text-text-secondary text-[10px] font-extrabold uppercase tracking-wider border-b border-gray-150 dark:border-border-medium">
                           <th className="px-4 py-3">Weight (e.g. 500g) *</th>
-                          <th className="px-4 py-3 w-[120px]">Price (₹) *</th>
+                          <th className="px-4 py-3 w-[110px]">Price (₹) *</th>
+                          <th className="px-4 py-3 w-[90px]">Offer %</th>
                           <th className="px-4 py-3 w-[130px]">Original Price (₹)</th>
-                          <th className="px-4 py-3 w-[110px]">Stock</th>
-                          <th className="px-4 py-3 w-[60px] text-center">Delete</th>
+                          <th className="px-4 py-3 w-[90px]">Stock</th>
+                          <th className="px-4 py-3 w-[50px] text-center">Delete</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-border-light">
@@ -566,11 +651,18 @@ export function AdminProducts() {
                             <td className="px-4 py-3">
                               <input
                                 type="number"
-                                placeholder="₹"
-                                value={v.originalPrice}
-                                onChange={(e) => handleUpdateVariant(index, 'originalPrice', e.target.value)}
+                                placeholder="%"
+                                min="0"
+                                max="99"
+                                value={v.offerPercentage || ''}
+                                onChange={(e) => handleUpdateVariant(index, 'offerPercentage', e.target.value)}
                                 className="w-full bg-gray-50 dark:bg-background border border-gray-250 dark:border-border-medium rounded-xl px-3 py-2 text-xs outline-none text-gray-900 dark:text-text-primary focus:ring-2 focus:ring-blue-100"
                               />
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="w-full bg-gray-100 dark:bg-surface border border-gray-250 dark:border-border-medium rounded-xl px-3 py-2 text-xs text-gray-500 dark:text-text-secondary min-h-[34px] flex items-center">
+                                {v.originalPrice ? `₹${v.originalPrice}` : '—'}
+                              </div>
                             </td>
                             <td className="px-4 py-3">
                               <input

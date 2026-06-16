@@ -19,6 +19,9 @@ export const orderService = {
   getOrderById: (id: string) =>
     api.get(`/orders/${id}`),
 
+  rateOrder: (id: string, rating: number) =>
+    api.put(`/orders/${id}/rate`, { rating }),
+
   getAllOrders: (params?: {
     page?: number;
     limit?: number;

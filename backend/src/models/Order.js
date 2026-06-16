@@ -75,6 +75,7 @@ const orderSchema = new mongoose.Schema({
     estimatedDelivery: Date,
   },
   notes: String,
+  rating: { type: Number, min: 1, max: 5 },
 }, { timestamps: true });
 
 export default mongoose.model('Order', orderSchema);

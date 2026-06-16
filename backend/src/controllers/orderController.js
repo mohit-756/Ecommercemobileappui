@@ -735,3 +735,24 @@ export async function adminCreateOrder(req, res, next) {
     next(error);
   }
 }
+
+export async function rateOrder(req, res, next) {
+  try {
+    const { rating } = req.body;
+    if (rating === undefined || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    order.rating = rating;
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    next(error);
+  }
+}

@@ -12,6 +12,7 @@ import {
   addOrderRefund,
   updateOrderNotes,
   adminCreateOrder,
+  rateOrder,
 } from '../controllers/orderController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 
@@ -29,6 +30,7 @@ router.post('/admin/create', protect, adminOnly, adminCreateOrder);
 
 // Parametric routes
 router.get('/:id', protect, getOrderById);
+router.put('/:id/rate', protect, rateOrder);
 router.put('/:id/status', protect, adminOnly, updateOrderStatus);
 router.put('/:id/items/:itemId/packing', protect, adminOnly, updateItemPackingStatus);
 router.put('/:id/refund', protect, adminOnly, addOrderRefund);
