@@ -18,6 +18,7 @@ import geocodingRoutes from './routes/geocoding.js';
 import wishlistRoutes from './routes/wishlist.js';
 import reviewRoutes from './routes/reviews.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { validateTwilioConfig } from './services/smsService.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -83,8 +84,14 @@ async function start() {
   console.log('JWT_SECRET set:', !!process.env.JWT_SECRET);
   console.log('GMAIL_USER set:', !!process.env.GMAIL_USER);
   console.log('GMAIL_APP_PASSWORD set:', !!process.env.GMAIL_APP_PASSWORD);
+  console.log('TWILIO_ACCOUNT_SID set:', !!process.env.TWILIO_ACCOUNT_SID);
+  console.log('TWILIO_API_KEY set:', !!process.env.TWILIO_API_KEY);
+  console.log('TWILIO_API_SECRET set:', !!process.env.TWILIO_API_SECRET);
+  console.log('TWILIO_VERIFY_SERVICE_SID set:', !!process.env.TWILIO_VERIFY_SERVICE_SID);
   console.log('PORT:', process.env.PORT || PORT);
   try {
+    validateTwilioConfig();
+    console.log('✅ Twilio Verify configuration validated successfully.');
     await connectDB();
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
