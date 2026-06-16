@@ -23,9 +23,12 @@ export function WebShell() {
     return null;
   }
 
-  if (location.pathname === '/') {
+  // No shell (navbar/footer) on splash, login, or OTP pages
+  const noShellRoutes = ['/', '/login', '/verify-otp'];
+  if (noShellRoutes.includes(location.pathname)) {
     return <Outlet />;
   }
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background flex flex-col transition-colors duration-300">
