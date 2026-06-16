@@ -30,8 +30,8 @@ export function MobileShell() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-background font-sans text-gray-900 dark:text-text-primary overflow-hidden transition-colors duration-300">
-      <div className="w-full h-screen bg-white dark:bg-background overflow-hidden relative flex flex-col transition-colors duration-300">
+    <div className="min-h-dvh bg-white dark:bg-background font-sans text-gray-900 dark:text-text-primary overflow-hidden transition-colors duration-300">
+      <div className="w-full h-dvh bg-white dark:bg-background overflow-hidden relative flex flex-col transition-colors duration-300">
         
         <div
           ref={scrollRef}
