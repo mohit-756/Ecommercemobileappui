@@ -1,17 +1,49 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
-import { ChevronLeft, Bell, Lock, Eye, Globe, Trash2, ChevronRight } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ChevronLeft, Bell, Lock, Eye, Globe, Trash2, ChevronRight, User, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Switch } from '../components/ui/switch';
 import { toast } from 'sonner';
 import { useTranslation } from '../hooks/useTranslation';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { authService } from '../services/authService';
+import { hapticService } from '../services/hapticService';
 
 export function Settings() {
   const navigate = useNavigate();
   const { t, currentLanguage, setLanguage } = useTranslation();
   const { isDark, setTheme } = useTheme();
+  const { user, updateUser } = useAuth();
   const [notifications, setNotifications] = useState(true);
+
+  // Edit Profile States
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editName.trim()) {
+      toast.error('Name cannot be empty');
+      return;
+    }
+    setSavingProfile(true);
+    try {
+      await authService.updateProfile({ name: editName, phone: editPhone });
+      updateUser({ name: editName, phone: editPhone });
+      setShowEditDialog(false);
+      hapticService.notificationSuccess();
+      toast.success('Profile updated successfully!');
+    } catch (err: any) {
+      hapticService.impact();
+      toast.error(err.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   useEffect(() => {
     const savedNotifs = localStorage.getItem('settings_notifs');
@@ -96,6 +128,30 @@ export function Settings() {
         </div>
 
         <div>
+          <h3 className="text-xs font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-3 px-1">{t('account')}</h3>
+          <div className="bg-white dark:bg-surface rounded-3xl shadow-sm border border-gray-100 dark:border-border-light overflow-hidden transition-colors duration-300">
+            <motion.button
+              onClick={() => {
+                hapticService.impact();
+                setEditName(user?.name || '');
+                setEditPhone(user?.phone || '');
+                setShowEditDialog(true);
+              }}
+              whileTap={{ backgroundColor: '#f9fafb' }}
+              className="w-full flex items-center justify-between p-4 cursor-pointer dark:hover:bg-surface-secondary text-left"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/20 text-blue-600 flex items-center justify-center">
+                  <User size={20} />
+                </div>
+                <span className="font-semibold text-gray-900 dark:text-text-primary">{t('editProfile')}</span>
+              </div>
+              <ChevronRight size={18} className="text-gray-300 dark:text-text-tertiary" />
+            </motion.button>
+          </div>
+        </div>
+
+        <div>
           <h3 className="text-xs font-bold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-3 px-1">{t('security')}</h3>
           <div className="bg-white dark:bg-surface rounded-3xl shadow-sm border border-gray-100 dark:border-border-light overflow-hidden transition-colors duration-300">
             <motion.button
@@ -138,6 +194,79 @@ export function Settings() {
           <p className="text-[10px] text-gray-300 dark:text-text-tertiary mt-1">{t('version')} 1.0.0 ({t('build')} 2024.06)</p>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showEditDialog && createPortal(
+          <div className="fixed inset-0 z-[100] flex items-end justify-center md:items-center p-4 md:p-0">
+            <div className="fixed inset-0 bg-black/40" onClick={() => setShowEditDialog(false)} />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="relative bg-white dark:bg-surface w-full md:max-w-[393px] rounded-3xl max-h-[85vh] overflow-y-auto p-6 pb-10 z-10 shadow-2xl transition-colors duration-300"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-text-primary">Edit Profile</h2>
+                <button onClick={() => setShowEditDialog(false)} className="w-8 h-8 rounded-full bg-gray-100 dark:bg-surface-tertiary flex items-center justify-center text-gray-500 dark:text-text-secondary">
+                  <span className="text-lg leading-none">✕</span>
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveProfile} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-2">Email Address (Read-only)</label>
+                  <input
+                    type="email"
+                    value={user?.email || ''}
+                    disabled
+                    className="w-full bg-gray-100 dark:bg-surface-tertiary border border-gray-200 dark:border-border-light/50 rounded-xl py-3 px-4 text-sm text-gray-400 dark:text-text-tertiary outline-none cursor-not-allowed opacity-80"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-100 dark:border-border-light rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-blue-600 focus:bg-white dark:focus:bg-surface outline-none transition-all text-gray-900 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-tertiary"
+                    placeholder="Enter your name"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 dark:text-text-tertiary uppercase tracking-wider mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-100 dark:border-border-light rounded-xl py-3 px-4 text-sm focus:ring-2 focus:ring-blue-600 focus:bg-white dark:focus:bg-surface outline-none transition-all text-gray-900 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-tertiary"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 dark:shadow-blue-900/30 hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                  {savingProfile ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 size={16} className="animate-spin" />
+                      Saving...
+                    </span>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </div>,
+          document.body
+        )}
+      </AnimatePresence>
     </div>
   );
 }

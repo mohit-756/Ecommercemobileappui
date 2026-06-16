@@ -190,11 +190,16 @@ export async function getProfile(req, res, next) {
 export async function updateProfile(req, res, next) {
   try {
     const { name, phone, avatar } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { ...(name && { name }), ...(phone && { phone }), ...(avatar && { avatar }) },
-      { new: true, runValidators: true }
-    );
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (name !== undefined) user.name = name;
+    if (phone !== undefined) user.phone = phone;
+    if (avatar !== undefined) user.avatar = avatar;
+
+    await user.save();
     res.json(user);
   } catch (error) {
     next(error);

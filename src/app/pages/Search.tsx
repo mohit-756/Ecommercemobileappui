@@ -8,6 +8,7 @@ import { cn } from '../lib/utils';
 import { products as mockProducts, categories as mockCategories } from '../data/mock';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
+import { hapticService } from '../services/hapticService';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Relevance' },
@@ -39,6 +40,7 @@ export function Search() {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [varietyFilter, setVarietyFilter] = useState('');
 
   const recentSearches = ['Almonds', 'Cashews', 'Dates', 'Walnuts', 'Raisins'];
 
@@ -57,7 +59,7 @@ export function Search() {
   }, []);
 
   useEffect(() => {
-    if (!query.trim()) {
+    if (!query.trim() && !categoryFilter && !minPrice && !maxPrice && !varietyFilter) {
       setResults([]);
       return;
     }
@@ -65,9 +67,12 @@ export function Search() {
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const params: any = {
-          search: query,
-        };
+        const params: any = {};
+        let searchStr = query.trim();
+        if (varietyFilter) {
+          searchStr = searchStr ? `${searchStr} ${varietyFilter}` : varietyFilter;
+        }
+        if (searchStr) params.search = searchStr;
         if (sort) params.sort = sort;
         if (minPrice) params.minPrice = Number(minPrice);
         if (maxPrice) params.maxPrice = Number(maxPrice);
@@ -77,9 +82,27 @@ export function Search() {
         setResults(res.data.products || []);
       } catch (err) {
         console.error('Failed to search products in backend:', err);
-        const filtered = mockProducts.filter((p: any) =>
-          p.name.toLowerCase().includes(query.toLowerCase())
-        );
+        let filtered = [...mockProducts];
+        let searchStr = query.trim();
+        if (varietyFilter) {
+          searchStr = searchStr ? `${searchStr} ${varietyFilter}` : varietyFilter;
+        }
+        if (searchStr) {
+          filtered = filtered.filter((p: any) =>
+            p.name.toLowerCase().includes(searchStr.toLowerCase())
+          );
+        }
+        if (categoryFilter) {
+          filtered = filtered.filter((p: any) =>
+            (p.category?._id || p.category?.id || p.category) === categoryFilter
+          );
+        }
+        if (minPrice) {
+          filtered = filtered.filter((p: any) => p.price >= Number(minPrice));
+        }
+        if (maxPrice) {
+          filtered = filtered.filter((p: any) => p.price <= Number(maxPrice));
+        }
         setResults(filtered);
       } finally {
         setLoading(false);
@@ -87,15 +110,16 @@ export function Search() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [query, sort, minPrice, maxPrice, categoryFilter]);
+  }, [query, sort, minPrice, maxPrice, categoryFilter, varietyFilter]);
 
-  const activeFilterCount = [sort, minPrice, maxPrice, categoryFilter].filter(Boolean).length;
+  const activeFilterCount = [sort, minPrice, maxPrice, categoryFilter, varietyFilter].filter(Boolean).length;
 
   const clearFilters = () => {
     setSort('');
     setMinPrice('');
     setMaxPrice('');
     setCategoryFilter('');
+    setVarietyFilter('');
   };
 
   return (
@@ -148,7 +172,7 @@ export function Search() {
       </div>
 
       <div className="flex-1 px-6 py-4 overflow-y-auto bg-gray-50 dark:bg-surface-secondary transition-colors duration-300">
-        {!query ? (
+        {!query && !categoryFilter && !minPrice && !maxPrice && !varietyFilter ? (
           <div className="space-y-8">
             <div>
               <div className="flex justify-between items-center mb-4">
@@ -159,25 +183,10 @@ export function Search() {
                 {recentSearches.map((search, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setQuery(search)}
-                    className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium text-gray-600 dark:text-text-secondary text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
+                    onClick={() => { setQuery(search); hapticService.impact(); }}
+                    className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium text-gray-600 dark:text-text-secondary text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors cursor-pointer"
                   >
                     {search}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-gray-900 dark:text-text-primary mb-4">Browse Categories</h3>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((cat: any) => (
-                  <button
-                    key={cat._id || cat.id}
-                    onClick={() => { setCategoryFilter(cat._id || cat.id); setQuery(cat.name); }}
-                    className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium text-gray-600 dark:text-text-secondary text-sm px-4 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition-colors"
-                  >
-                    {cat.name}
                   </button>
                 ))}
               </div>
@@ -187,10 +196,14 @@ export function Search() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-gray-900 dark:text-text-primary">
-                {loading ? 'Searching...' : `${results.length} Result${results.length !== 1 ? 's' : ''} for "${query}"`}
+                {loading 
+                  ? 'Searching...' 
+                  : query 
+                    ? `${results.length} Result${results.length !== 1 ? 's' : ''} for "${query}"`
+                    : `${results.length} Result${results.length !== 1 ? 's' : ''} found`}
               </h3>
               {activeFilterCount > 0 && (
-                <button onClick={clearFilters} className="text-xs text-blue-600 font-medium">Clear filters</button>
+                <button onClick={clearFilters} className="text-xs text-blue-600 font-medium cursor-pointer">Clear filters</button>
               )}
             </div>
             {loading ? (
@@ -275,6 +288,34 @@ export function Search() {
                     <span className="w-1 h-4 bg-blue-600 rounded-full" />
                     Price Range
                   </label>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {[
+                      { label: 'Under ₹300', min: '0', max: '300' },
+                      { label: '₹300 - ₹600', min: '300', max: '600' },
+                      { label: '₹600 - ₹1200', min: '600', max: '1200' },
+                      { label: 'Above ₹1200', min: '1200', max: '5000' },
+                    ].map((p, idx) => {
+                      const isActive = minPrice === p.min && maxPrice === p.max;
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            setMinPrice(p.min);
+                            setMaxPrice(p.max);
+                            hapticService.selection();
+                          }}
+                          className={cn(
+                            "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border",
+                            isActive
+                              ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                              : "bg-white dark:bg-surface border-gray-200 dark:border-border-medium text-gray-600 dark:text-text-secondary hover:border-blue-300"
+                          )}
+                        >
+                          {p.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <div className="flex items-center gap-3">
                     <div className="relative flex-1">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-tertiary text-sm font-medium">₹</span>
@@ -344,6 +385,45 @@ export function Search() {
                         )}
                       >
                         {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-gray-50/80 dark:bg-surface-secondary rounded-2xl p-5 border border-gray-100 dark:border-border-light">
+                  <label className="text-sm font-bold text-gray-900 dark:text-text-primary block mb-4 flex items-center gap-2">
+                    <span className="w-1 h-4 bg-blue-600 rounded-full" />
+                    Specialty / Variety
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setVarietyFilter('')}
+                      className={cn(
+                        "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                        !varietyFilter
+                          ? "bg-blue-600 text-white shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
+                          : "bg-white dark:bg-surface text-gray-600 dark:text-text-secondary border border-gray-200 dark:border-border-medium hover:border-blue-300 hover:text-blue-600"
+                      )}
+                    >
+                      All
+                    </button>
+                    {[
+                      { label: 'Roasted & Salted', value: 'salted' },
+                      { label: 'Raw & Natural', value: 'raw' },
+                      { label: 'Premium Grade', value: 'premium' },
+                      { label: 'Organic Nuts', value: 'organic' },
+                    ].map((t) => (
+                      <button
+                        key={t.value}
+                        onClick={() => setVarietyFilter(t.value)}
+                        className={cn(
+                          "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                          varietyFilter === t.value
+                            ? "bg-blue-600 text-white shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
+                            : "bg-white dark:bg-surface text-gray-600 dark:text-text-secondary border border-gray-200 dark:border-border-medium hover:border-blue-300 hover:text-blue-600"
+                        )}
+                      >
+                        {t.label}
                       </button>
                     ))}
                   </div>

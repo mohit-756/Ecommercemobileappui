@@ -31,6 +31,8 @@ import { Settings } from './pages/Settings';
 import { Support } from './pages/Support';
 import { Privacy } from './pages/Privacy';
 import { Terms } from './pages/Terms';
+import { RefundPolicy } from './pages/RefundPolicy';
+import { ShippingInfo } from './pages/ShippingInfo';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminProducts } from './pages/AdminProducts';
 import { AdminOrders } from './pages/AdminOrders';
@@ -85,6 +87,8 @@ export default function App() {
                       <Route path="support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
                       <Route path="privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
                       <Route path="terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
+                      <Route path="refund" element={<ProtectedRoute><RefundPolicy /></ProtectedRoute>} />
+                      <Route path="shipping" element={<ProtectedRoute><ShippingInfo /></ProtectedRoute>} />
                       <Route path="*" element={<Navigate to="/home" replace />} />
                     </Route>
 

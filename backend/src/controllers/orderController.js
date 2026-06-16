@@ -57,11 +57,19 @@ export async function createOrder(req, res, next) {
           status: 'created',
         };
       } else if (rzp) {
-        razorpayOrder = await rzp.orders.create({
-          amount: Math.round(total * 100),
-          currency: 'INR',
-          receipt: `receipt_${Date.now()}`,
-        });
+        try {
+          razorpayOrder = await rzp.orders.create({
+            amount: Math.round(total * 100),
+            currency: 'INR',
+            receipt: `receipt_${Date.now()}`,
+          });
+        } catch (rzpError) {
+          console.error('Razorpay Order Creation Failed:', rzpError);
+          return res.status(502).json({
+            message: 'Payment gateway error: Razorpay configuration is invalid or has expired.',
+            details: rzpError.message
+          });
+        }
       } else {
         return res.status(400).json({ message: 'Razorpay not configured' });
       }

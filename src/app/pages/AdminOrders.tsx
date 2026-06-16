@@ -11,6 +11,7 @@ import { categoryService } from '../services/categoryService';
 import { adminService } from '../services/adminService';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
+import { hapticService } from '../services/hapticService';
 
 const STATUS_OPTIONS = [
   { value: 'received', label: 'Received', color: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400' },
@@ -630,34 +631,45 @@ export function AdminOrders() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            <div className="flex bg-gray-100 dark:bg-surface-tertiary p-1 rounded-2xl border border-gray-200/20 dark:border-border-light/20 flex-grow sm:flex-initial">
+              <button
+                onClick={() => {
+                  setActiveView('dashboard');
+                  hapticService.selection();
+                }}
+                className={cn(
+                  "flex-grow sm:flex-initial text-center py-2 px-3 sm:px-4 text-xs font-bold rounded-xl transition-all cursor-pointer",
+                  activeView === 'dashboard'
+                    ? "bg-white dark:bg-surface text-blue-600 dark:text-blue-400 shadow-sm"
+                    : "text-gray-500 dark:text-text-secondary hover:text-gray-900 dark:hover:text-text-primary"
+                )}
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => {
+                  setActiveView('history');
+                  hapticService.selection();
+                }}
+                className={cn(
+                  "flex-grow sm:flex-initial text-center py-2 px-3 sm:px-4 text-xs font-bold rounded-xl transition-all cursor-pointer",
+                  activeView === 'history'
+                    ? "bg-white dark:bg-surface text-blue-600 dark:text-blue-400 shadow-sm"
+                    : "text-gray-500 dark:text-text-secondary hover:text-gray-900 dark:hover:text-text-primary"
+                )}
+              >
+                Order List
+              </button>
+            </div>
             <button
-              onClick={() => setActiveView('dashboard')}
-              className={cn(
-                "px-4 py-2 text-xs font-bold rounded-xl transition-all border",
-                activeView === 'dashboard'
-                  ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100 dark:shadow-blue-900/30"
-                  : "bg-white dark:bg-surface border-gray-200 dark:border-border-medium text-gray-600 dark:text-text-secondary hover:bg-gray-50"
-              )}
+              onClick={() => {
+                setIsCreateOpen(true);
+                hapticService.impact();
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2.5 sm:px-4 sm:py-2.5 rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-100 dark:shadow-emerald-900/30 cursor-pointer flex-shrink-0"
             >
-              Dashboard Stats
-            </button>
-            <button
-              onClick={() => setActiveView('history')}
-              className={cn(
-                "px-4 py-2 text-xs font-bold rounded-xl transition-all border",
-                activeView === 'history'
-                  ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100 dark:shadow-blue-900/30"
-                  : "bg-white dark:bg-surface border-gray-200 dark:border-border-medium text-gray-600 dark:text-text-secondary hover:bg-gray-50"
-              )}
-            >
-              Order List & History
-            </button>
-            <button
-              onClick={() => setIsCreateOpen(true)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-100 dark:shadow-emerald-900/30"
-            >
-              <Plus size={16} /> Create Order
+              <Plus size={15} /> <span>Create</span>
             </button>
           </div>
         </div>
@@ -848,54 +860,54 @@ export function AdminOrders() {
           <div className="bg-white dark:bg-surface p-5 rounded-2xl border border-gray-100 dark:border-border-light shadow-sm">
             <h3 className="font-bold text-gray-900 dark:text-text-primary text-sm uppercase tracking-wide mb-4">Financial & Operations Metrics</h3>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className="p-3 bg-blue-50/40 dark:bg-blue-950/20 rounded-xl border border-blue-100/50">
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth md:grid md:grid-cols-5 md:gap-4 md:pb-0">
+              <div className="flex-shrink-0 w-[150px] md:w-auto p-3 bg-blue-50/40 dark:bg-blue-950/20 rounded-xl border border-blue-100/50">
                 <span className="text-[10px] font-bold uppercase text-blue-600">Total Orders</span>
                 <p className="text-xl font-black text-blue-900 dark:text-text-primary mt-1">{analytics.totalOrders}</p>
-                <span className="text-[9px] text-gray-400 font-medium">{analytics.pickupOrders} Pickups | {analytics.deliveryOrders} Deliveries</span>
+                <span className="text-[9px] text-gray-400 font-medium block mt-1 leading-tight">{analytics.pickupOrders} Pickups · {analytics.deliveryOrders} Deliveries</span>
               </div>
-              <div className="p-3 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-xl border border-emerald-100/50">
+              <div className="flex-shrink-0 w-[150px] md:w-auto p-3 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-xl border border-emerald-100/50">
                 <span className="text-[10px] font-bold uppercase text-emerald-600">Net Sales</span>
-                <p className="text-xl font-black text-emerald-900 dark:text-text-primary mt-1">₹{analytics.netSales?.toFixed(2)}</p>
-                <span className="text-[9px] text-gray-400 font-medium">Exc. Taxes & Fees</span>
+                <p className="text-xl font-black text-emerald-900 dark:text-text-primary mt-1">₹{analytics.netSales?.toFixed(0)}</p>
+                <span className="text-[9px] text-gray-400 font-medium block mt-1 leading-tight">Exc. Taxes & Fees</span>
               </div>
-              <div className="p-3 bg-amber-50/40 dark:bg-amber-950/20 rounded-xl border border-amber-100/50">
+              <div className="flex-shrink-0 w-[150px] md:w-auto p-3 bg-amber-50/40 dark:bg-amber-950/20 rounded-xl border border-amber-100/50">
                 <span className="text-[10px] font-bold uppercase text-amber-600">Taxes & Tips</span>
-                <p className="text-xl font-black text-amber-900 dark:text-text-primary mt-1">₹{(analytics.taxes + analytics.tips)?.toFixed(2)}</p>
-                <span className="text-[9px] text-gray-400 font-medium">Tips: ₹{analytics.tips?.toFixed(2)}</span>
+                <p className="text-xl font-black text-amber-900 dark:text-text-primary mt-1">₹{(analytics.taxes + analytics.tips)?.toFixed(0)}</p>
+                <span className="text-[9px] text-gray-400 font-medium block mt-1 leading-tight">Tips: ₹{analytics.tips?.toFixed(0)}</span>
               </div>
-              <div className="p-3 bg-purple-50/40 dark:bg-purple-950/20 rounded-xl border border-purple-100/50">
+              <div className="flex-shrink-0 w-[150px] md:w-auto p-3 bg-purple-50/40 dark:bg-purple-950/20 rounded-xl border border-purple-100/50">
                 <span className="text-[10px] font-bold uppercase text-purple-600">Avg. Order Value</span>
-                <p className="text-xl font-black text-purple-900 dark:text-text-primary mt-1">₹{analytics.averageOrderValue?.toFixed(2)}</p>
-                <span className="text-[9px] text-gray-400 font-medium">Total sales / Orders</span>
+                <p className="text-xl font-black text-purple-900 dark:text-text-primary mt-1">₹{analytics.averageOrderValue?.toFixed(0)}</p>
+                <span className="text-[9px] text-gray-400 font-medium block mt-1 leading-tight">Total sales / Orders</span>
               </div>
-              <div className="p-3 bg-orange-50/40 dark:bg-orange-950/20 rounded-xl border border-orange-100/50">
+              <div className="flex-shrink-0 w-[150px] md:w-auto p-3 bg-orange-50/40 dark:bg-orange-950/20 rounded-xl border border-orange-100/50">
                 <span className="text-[10px] font-bold uppercase text-orange-600">Avg. Items/Order</span>
                 <p className="text-xl font-black text-orange-900 dark:text-text-primary mt-1">{analytics.averageItemsPerOrder?.toFixed(1)}</p>
-                <span className="text-[9px] text-gray-400 font-medium">Items count / Orders</span>
+                <span className="text-[9px] text-gray-400 font-medium block mt-1 leading-tight">Items count / Orders</span>
               </div>
             </div>
           </div>
 
           {/* Action toolbar for exports/prints */}
-          <div className="flex justify-between items-center">
-            <h3 className="font-bold text-gray-900 dark:text-text-primary text-sm uppercase tracking-wide">Order Operations List</h3>
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
+            <h3 className="font-bold text-gray-900 dark:text-text-primary text-xs md:text-sm uppercase tracking-wide">Order Operations List</h3>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth">
               <button
                 onClick={exportOrdersCSV}
-                className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium hover:bg-gray-50 text-gray-700 dark:text-text-secondary text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
+                className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium hover:bg-gray-50 text-gray-700 dark:text-text-secondary text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm flex-shrink-0"
               >
                 <Download size={14} /> Export Orders CSV
               </button>
               <button
                 onClick={exportItemsCSV}
-                className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium hover:bg-gray-50 text-gray-700 dark:text-text-secondary text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
+                className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium hover:bg-gray-50 text-gray-700 dark:text-text-secondary text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm flex-shrink-0"
               >
                 <Download size={14} /> Export Items CSV
               </button>
               <button
                 onClick={printPicklists}
-                className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium hover:bg-gray-50 text-gray-700 dark:text-text-secondary text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm"
+                className="bg-white dark:bg-surface border border-gray-200 dark:border-border-medium hover:bg-gray-50 text-gray-700 dark:text-text-secondary text-xs font-bold px-3 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-sm flex-shrink-0"
               >
                 <Printer size={14} /> Print Pick Sheets
               </button>
@@ -908,20 +920,18 @@ export function AdminOrders() {
               <table className="w-full text-left text-xs">
                 <thead className="bg-gray-50 dark:bg-surface-tertiary text-gray-500 uppercase font-bold tracking-wider select-none border-b border-gray-100 dark:border-border-medium">
                   <tr>
-                    <th className="p-4 w-12"></th>
-                    <th className="p-4 cursor-pointer hover:bg-gray-100" onClick={() => handleSort('createdAt')}>
+                    <th className="p-3 w-10"></th>
+                    <th className="p-3 cursor-pointer hover:bg-gray-100" onClick={() => handleSort('createdAt')}>
                       Date {sortField === 'createdAt' && (sortOrder === 'desc' ? '▼' : '▲')}
                     </th>
-                    <th className="p-4">Customer</th>
-                    <th className="p-4">Fulfillment</th>
-                    <th className="p-4">Time Slot</th>
-                    <th className="p-4 cursor-pointer hover:bg-gray-100" onClick={() => handleSort('status')}>
-                      Status {sortField === 'status' && (sortOrder === 'desc' ? '▼' : '▲')}
-                    </th>
-                    <th className="p-4 cursor-pointer hover:bg-gray-100 text-right" onClick={() => handleSort('total')}>
+                    <th className="p-3">Customer</th>
+                    <th className="p-3 hidden md:table-cell">Fulfillment</th>
+                    <th className="p-3 hidden lg:table-cell">Time Slot</th>
+                    <th className="p-3">Status</th>
+                    <th className="p-3 cursor-pointer hover:bg-gray-100 text-right" onClick={() => handleSort('total')}>
                       Total {sortField === 'total' && (sortOrder === 'desc' ? '▼' : '▲')}
                     </th>
-                    <th className="p-4 text-center">Actions</th>
+                    <th className="p-3 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-border-light">
@@ -941,41 +951,45 @@ export function AdminOrders() {
                       return (
                         <>
                           <tr key={order._id} className="hover:bg-gray-50/50 dark:hover:bg-surface-secondary/40 transition-colors">
-                            <td className="p-4 text-center">
-                              <button onClick={() => toggleRowExpanded(order._id)} className="text-gray-400 hover:text-gray-600">
-                                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            <td className="p-3 text-center">
+                              <button onClick={() => toggleRowExpanded(order._id)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+                                {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                               </button>
                             </td>
-                            <td className="p-4 font-medium text-gray-500 font-mono">
-                              {new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            <td className="p-3 font-medium text-gray-500 font-mono text-[10px] sm:text-xs">
+                              <span className="block sm:inline">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>
+                              <span className="block sm:ml-1 text-[9px] sm:text-[10px] text-gray-400 sm:inline">
+                                {new Date(order.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                              </span>
                             </td>
-                            <td className="p-4">
-                              <p className="font-bold text-gray-900 dark:text-text-primary">{order.user?.name || 'Guest User'}</p>
-                              <p className="text-[10px] text-gray-400">{order.user?.email || 'N/A'}</p>
+                            <td className="p-3">
+                              <p className="font-bold text-gray-900 dark:text-text-primary text-[11px] sm:text-xs">{order.user?.name || 'Guest User'}</p>
+                              <p className="text-[9px] text-gray-400 hidden sm:block">{order.user?.email || 'N/A'}</p>
                             </td>
-                            <td className="p-4 capitalize font-semibold">{order.fulfillmentType}</td>
-                            <td className="p-4 text-gray-500">{order.timeSlot || 'Anytime'}</td>
-                            <td className="p-4">
-                              <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider", getStatusBadge(order.status))}>
+                            <td className="p-3 capitalize font-semibold hidden md:table-cell">{order.fulfillmentType}</td>
+                            <td className="p-3 text-gray-500 hidden lg:table-cell">{order.timeSlot || 'Anytime'}</td>
+                            <td className="p-3">
+                              <span className={cn("text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-wider", getStatusBadge(order.status))}>
                                 {order.status.replace(/_/g, ' ')}
                               </span>
                             </td>
-                            <td className="p-4 text-right font-black text-gray-900 dark:text-text-primary">
+                            <td className="p-3 text-right font-black text-gray-900 dark:text-text-primary text-[11px] sm:text-xs">
                               ₹{order.total?.toFixed(2)}
                             </td>
-                            <td className="p-4 text-center flex justify-center gap-2">
+                            <td className="p-3 text-center flex items-center justify-center gap-1 sm:gap-2">
                               <button
                                 onClick={() => handleOpenDetails(order)}
-                                className="bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold px-2.5 py-1.5 rounded-lg cursor-pointer"
+                                className="bg-blue-50 text-blue-600 hover:bg-blue-100 text-[9px] sm:text-[10px] font-bold px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg cursor-pointer flex-shrink-0"
                               >
-                                View Details
+                                <span className="sm:hidden">View</span>
+                                <span className="hidden sm:inline">View Details</span>
                               </button>
                               <button
                                 onClick={() => printSingleOrder(order)}
-                                className="bg-gray-50 text-gray-600 hover:bg-gray-100 text-[10px] font-bold p-1.5 rounded-lg cursor-pointer"
+                                className="bg-gray-50 text-gray-600 hover:bg-gray-100 text-[9px] sm:text-[10px] font-bold p-1 sm:p-1.5 rounded-lg cursor-pointer flex-shrink-0"
                                 title="Print Invoice"
                               >
-                                <Printer size={14} />
+                                <Printer size={12} className="sm:w-3.5 sm:h-3.5" />
                               </button>
                             </td>
                           </tr>

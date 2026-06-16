@@ -14,6 +14,8 @@ export const translations = {
     clearCache: 'Clear Cache',
     version: 'Version',
     build: 'Build',
+    account: 'Account',
+    editProfile: 'Edit Profile',
     
     // Support Page
     helpSupport: 'Help & Support',
@@ -79,6 +81,8 @@ export const translations = {
     clearCache: 'कैश साफ करें',
     version: 'संस्करण',
     build: 'बिल्ड',
+    account: 'खाता',
+    editProfile: 'प्रोफ़ाइल संपादित करें',
 
     // Support Page
     helpSupport: 'मदद और सहायता',

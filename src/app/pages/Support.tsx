@@ -15,8 +15,8 @@ export function Support() {
   ];
 
   const commonTopics = [
-    { label: t('refundPolicy'), onClick: () => toast.info("Refund Policy: Orders can be cancelled before shipping for a full refund. Delivered items can be returned within 7 days.") },
-    { label: t('shippingInfo'), onClick: () => toast.info("Shipping Information: Free delivery for orders above ₹500. Standard shipping takes 1-3 business days.") },
+    { label: t('refundPolicy'), onClick: () => navigate('/refund') },
+    { label: t('shippingInfo'), onClick: () => navigate('/shipping') },
     { label: t('termsOfService'), onClick: () => navigate('/terms') },
     { label: t('privacyPolicy'), onClick: () => navigate('/privacy') }
   ];
