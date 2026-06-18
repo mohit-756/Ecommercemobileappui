@@ -279,7 +279,7 @@ export function Home() {
                             else if (banner.id === 3) navigate('/search?q=Mixed');
                             else navigate('/search');
                           }}
-                          className="bg-white text-gray-900 shadow-lg shadow-black/10 text-xs md:text-sm font-bold px-5 py-2.5 md:px-7 md:py-3 rounded-full hover:bg-gray-50 active:scale-95 transition-all w-fit cursor-pointer"
+                          className="bg-white text-gray-900 shadow-lg shadow-black/10 text-xs md:text-sm font-bold px-5 py-2.5 md:px-7 md:py-3 rounded-full hover:bg-gray-50 active:scale-90 transition-all w-fit cursor-pointer"
                         >
                           Shop Now
                         </button>
@@ -392,13 +392,22 @@ export function Home() {
                 <p className="text-sm text-gray-500 dark:text-text-secondary">No products found in this category.</p>
               </div>
             ) : (
-              <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar lg:mx-0 lg:px-0 -mx-6 px-6">
-                {filteredProducts.slice(0, 10).map((product: any) => (
-                  <div key={product.id || product._id} className="flex-none w-[140px] sm:w-[150px] md:w-[160px] lg:w-[180px]">
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
+              <>
+                {/* Mobile: horizontal scroll */}
+                <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar -mx-6 px-6 lg:hidden">
+                  {filteredProducts.slice(0, 10).map((product: any) => (
+                    <div key={product.id || product._id} className="flex-none w-[140px] sm:w-[150px] md:w-[160px]">
+                      <ProductCard product={product} />
+                    </div>
+                  ))}
+                </div>
+                {/* Desktop: responsive grid */}
+                <div className="hidden lg:grid grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
+                  {filteredProducts.slice(0, 12).map((product: any) => (
+                    <ProductCard key={product.id || product._id} product={product} />
+                  ))}
+                </div>
+              </>
             )}
           </div>
 
@@ -439,7 +448,7 @@ export function Home() {
                     key={filter.id}
                     onClick={() => { hapticService.selection(); setActiveFilter(filter.id); }}
                     className={cn(
-                      "px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-200 active:scale-95",
+                      "px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-200 active:scale-90",
                       activeFilter === filter.id
                         ? "bg-blue-600 border-blue-600 text-white shadow-sm shadow-blue-200 dark:shadow-blue-900/30"
                         : "bg-white dark:bg-surface border-gray-100 dark:border-border-light text-gray-600 dark:text-text-secondary hover:border-gray-200 dark:hover:border-border-medium"

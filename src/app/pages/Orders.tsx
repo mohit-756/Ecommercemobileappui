@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { 
   ChevronLeft, 
@@ -15,6 +15,7 @@ import { motion } from 'motion/react';
 import { hapticService } from '../services/hapticService';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
+import { Skeleton } from '../components/ui/skeleton';
 
 const statusStyles: Record<string, { bg: string; text: string; icon: any; label: string }> = {
   pending: { bg: 'bg-yellow-50 dark:bg-yellow-500/10', text: 'text-yellow-600 dark:text-yellow-400', icon: Clock, label: 'Order pending' },
@@ -31,6 +32,7 @@ export function Orders() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [orders, setOrders] = useState<any[]>([]);
+  const touchStartY = useRef<number>(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [ratingOrderId, setRatingOrderId] = useState<string | null>(null);
@@ -59,15 +61,11 @@ export function Orders() {
   }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    (window as any)._startYOrders = touch.screenY;
+    touchStartY.current = e.touches[0].screenY;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    const touch = e.changedTouches[0];
-    const startY = (window as any)._startYOrders || 0;
-    const diff = touch.screenY - startY;
-
+    const diff = e.changedTouches[0].screenY - touchStartY.current;
     if (diff > 150 && window.scrollY === 0) {
       fetchOrders(true);
     }
@@ -151,7 +149,7 @@ export function Orders() {
           {/* Header section */}
           <div className="pt-6 pb-4 px-6 border-b border-gray-100 dark:border-border-light flex items-center">
             <button 
-              onClick={() => navigate('/profile')} 
+              onClick={() => navigate(-1)} 
               className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-gray-900 dark:text-text-primary hover:bg-gray-55"
             >
               <ChevronLeft size={24} />
@@ -162,8 +160,28 @@ export function Orders() {
           {/* List section */}
           <div className="p-6">
             {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <div className="flex flex-col gap-5">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="bg-white dark:bg-surface rounded-2xl border border-gray-100 dark:border-border-light shadow-sm overflow-hidden">
+                    <div className="p-5 flex justify-between items-start">
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-48" />
+                      </div>
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                    <div className="px-5 pb-4 border-b border-gray-50 dark:border-border-light">
+                      <div className="flex gap-3">
+                        {[1, 2, 3].map(j => (
+                          <Skeleton key={j} className="w-14 h-14 rounded-xl flex-shrink-0" />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="bg-gray-50/50 dark:bg-surface-secondary/40 py-3.5 px-5">
+                      <Skeleton className="h-4 w-40 mx-auto" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : orders.length === 0 ? (
               <div className="text-center py-16">

@@ -63,7 +63,7 @@ export function EditProfile() {
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image size must be less than 2MB');
+      toast.error('Image must be under 2 MB. Compress it first or use a smaller photo.');
       return;
     }
 
@@ -157,6 +157,9 @@ export function EditProfile() {
           
           <p className="text-xs text-gray-400 dark:text-text-tertiary mt-3">
             Tap the camera icon to upload or capture a profile photo
+          </p>
+          <p className="text-[10px] text-amber-500 dark:text-amber-400 mt-1 font-medium">
+            Max 2 MB · JPG, PNG, or WebP
           </p>
 
           {/* Web Hidden File Input */}

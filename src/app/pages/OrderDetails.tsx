@@ -41,6 +41,9 @@ export function OrderDetails() {
   const [ratingActive, setRatingActive] = useState<boolean>(false);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [submittingRating, setSubmittingRating] = useState<boolean>(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     if (!orderId) {
@@ -102,18 +105,25 @@ export function OrderDetails() {
 
   const handleCancelOrder = async () => {
     if (!order) return;
-    hapticService.impact();
-    const reason = prompt('Please enter a reason for cancellation (optional):');
-    if (reason === null) return;
+    setShowCancelModal(true);
+  };
 
+  const confirmCancelOrder = async () => {
+    if (!order) return;
+    hapticService.impact();
+    setCancelling(true);
     const toastId = toast.loading('Cancelling your order...');
     try {
-      const res = await orderService.cancelOrder(order._id, reason.trim());
+      const res = await orderService.cancelOrder(order._id, cancelReason.trim() || undefined);
       setOrder(res.data);
       toast.success('Order cancelled successfully!', { id: toastId });
+      setShowCancelModal(false);
+      setCancelReason('');
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.message || 'Failed to cancel order', { id: toastId });
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -612,7 +622,7 @@ export function OrderDetails() {
                   </button>
                 ) : (
                   <>
-                    {(order.status === 'pending' || order.status === 'confirmed') && (
+                    {(order.status === 'pending' || order.status === 'confirmed' || order.status === 'received') && (
                       <button
                         type="button"
                         onClick={handleCancelOrder}
@@ -647,6 +657,47 @@ export function OrderDetails() {
 
         </div>
       </div>
+
+      {/* Cancel Order Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="w-full sm:max-w-md bg-white dark:bg-surface rounded-3xl shadow-2xl p-6 border border-gray-100 dark:border-border-light">
+            <div className="text-center mb-5">
+              <div className="w-14 h-14 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                <AlertCircle size={28} className="text-red-500" />
+              </div>
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-text-primary">Cancel Order?</h3>
+              <p className="text-sm text-gray-500 dark:text-text-secondary mt-1">This action cannot be undone. Please provide a reason (optional).</p>
+            </div>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Reason for cancellation (optional)"
+              rows={3}
+              className="w-full bg-gray-50 dark:bg-surface-secondary border border-gray-200 dark:border-border-medium rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-text-primary outline-none focus:ring-2 focus:ring-red-500 resize-none mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setShowCancelModal(false); setCancelReason(''); }}
+                className="flex-1 bg-gray-100 dark:bg-surface-tertiary text-gray-700 dark:text-text-primary font-semibold rounded-xl py-3 transition-all cursor-pointer"
+              >
+                Keep Order
+              </button>
+              <button
+                type="button"
+                onClick={confirmCancelOrder}
+                disabled={cancelling}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-xl py-3 transition-all disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
+              >
+                {cancelling ? (
+                  <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Cancelling...</>
+                ) : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

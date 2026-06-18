@@ -207,16 +207,15 @@ export function Checkout() {
         weight: item.selectedWeight || null,
       }));
 
-      const backendPaymentMethod = paymentMethod === 'cod' ? 'cod' : 'razorpay';
       const res = await orderService.createOrder({
         items: cartItems,
         shippingAddress,
-        paymentMethod: backendPaymentMethod,
+        paymentMethod: paymentMethod as 'razorpay' | 'cod',
       });
 
       const { order, razorpayOrder, razorpayKeyId } = res.data;
 
-      if (backendPaymentMethod === 'cod') {
+      if (paymentMethod === 'cod') {
         await hapticService.notificationSuccess();
         await clearCart();
         navigate(`/success?orderId=${order._id}`);
@@ -292,9 +291,13 @@ export function Checkout() {
   }
 
   const paymentMethods = [
-    { id: 'upi', name: 'UPI (GPay / PhonePe / Paytm)', icon: ShieldCheck, popular: true },
-    { id: 'card', name: 'Credit / Debit Card', icon: CreditCard },
-    { id: 'wallet', name: 'Wallet / Net Banking', icon: Wallet },
+    { 
+      id: 'razorpay', 
+      name: 'Pay Online', 
+      subtitle: 'UPI, Credit/Debit Card, Wallet & Net Banking',
+      icon: ShieldCheck, 
+      popular: true 
+    },
     { id: 'cod', name: 'Cash on Delivery', icon: Banknote },
   ];
 
@@ -429,6 +432,9 @@ export function Checkout() {
                         <method.icon size={24} className={cn("mr-4", paymentMethod === method.id ? "text-blue-600" : "text-gray-400 dark:text-text-tertiary")} />
                         <div className="flex-1">
                           <span className={cn("font-bold block text-sm", paymentMethod === method.id ? "text-blue-900 dark:text-blue-300" : "text-gray-700 dark:text-text-primary")}>{method.name}</span>
+                          {(method as any).subtitle && (
+                            <span className="text-[10px] text-gray-400 dark:text-text-tertiary">{(method as any).subtitle}</span>
+                          )}
                           {(method as any).popular && <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-tight">Popular</span>}
                         </div>
                         <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === method.id ? "border-blue-600" : "border-gray-300 dark:border-border-medium")}>

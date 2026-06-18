@@ -48,10 +48,8 @@ export function VerifyOtp() {
     }
   };
 
-  const handleVerify = async () => {
-    const code = otp.join('');
+  const handleVerifyWithCode = async (code: string) => {
     if (code.length !== 6) return;
-
     setLoading(true);
     try {
       const res = await authService.verifyOtp(
@@ -77,6 +75,29 @@ export function VerifyOtp() {
       inputs.current[0]?.focus();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerify = () => handleVerifyWithCode(otp.join(''));
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').trim().replace(/\D/g, '');
+    if (!pasted) return;
+    const digits = pasted.slice(0, 6).split('');
+    const newOtp = ['', '', '', '', '', ''];
+    digits.forEach((d, i) => { newOtp[i] = d; });
+    setOtp(newOtp);
+    // Focus the next empty input or the last one
+    const nextEmpty = newOtp.findIndex(d => d === '');
+    const focusIdx = nextEmpty === -1 ? 5 : nextEmpty;
+    inputs.current[focusIdx]?.focus();
+    // Auto-submit if all 6 digits were pasted
+    if (digits.length === 6) {
+      setTimeout(() => {
+        const code = digits.join('');
+        if (code.length === 6) handleVerifyWithCode(code);
+      }, 100);
     }
   };
 
@@ -189,6 +210,7 @@ export function VerifyOtp() {
                     value={digit}
                     onChange={e => handleChange(index, e.target.value)}
                     onKeyDown={e => handleKeyDown(index, e)}
+                    onPaste={index === 0 ? handlePaste : undefined}
                     className="w-10 h-12 lg:w-12 lg:h-14 rounded-xl border border-gray-200 dark:border-border-medium bg-gray-50 dark:bg-surface-secondary text-center text-lg font-bold text-gray-900 dark:text-text-primary focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none transition-all"
                   />
                 ))}

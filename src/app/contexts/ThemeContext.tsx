@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { Capacitor } from '@capacitor/core';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -82,6 +83,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     syncDocumentTheme(dark);
     localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(dark));
     setIsDark(dark);
+    // Sync native StatusBar style (dynamic import — package may not be installed)
+    if (Capacitor.isNativePlatform()) {
+      import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
+        StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light }).catch(() => {});
+      }).catch(() => {});
+    }
   };
 
   // Sync theme when the auth token state changes (login / logout)

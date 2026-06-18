@@ -1,7 +1,7 @@
 import { Star, Heart } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { cn, normalizeProduct, formatPrice } from '../lib/utils';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -144,12 +144,12 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
         onClick={() => navigate(`/product/${product.id}`)}
         className="bg-white dark:bg-surface rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-border-light flex flex-col relative group w-full transition-colors duration-300"
       >
-        <div className="relative w-full h-[140px] sm:h-[150px] md:h-[160px] lg:h-[180px] aspect-square bg-gray-100 dark:bg-surface-tertiary overflow-hidden flex-shrink-0">
+        <div className="relative w-full h-[140px] sm:h-[150px] md:h-[160px] lg:h-[180px] aspect-square bg-white dark:bg-surface-secondary overflow-hidden flex-shrink-0 border-b border-gray-50 dark:border-border-light">
           <img
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
             onError={(e) => { e.currentTarget.src = '/images/products/cashews.webp'; }}
           />
           {discountText && (
@@ -212,15 +212,17 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
       </motion.div>
 
       {/* Responsive Variant Selector Drawer/Modal */}
-      {isSelectorOpen && createPortal(
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsSelectorOpen(false);
-          }}
-          className="fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm z-[999] flex items-end justify-center sm:items-center p-4 sm:p-4"
-        >
-          <motion.div
+      {createPortal(
+        <AnimatePresence>
+          {isSelectorOpen && (
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsSelectorOpen(false);
+              }}
+              className="fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm z-[999] flex items-end justify-center sm:items-center p-4 sm:p-4"
+            >
+              <motion.div
             initial={{ y: "100%", opacity: 0.5 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
@@ -330,7 +332,9 @@ export function ProductCard({ product: raw, layout = 'grid' }: ProductCardProps)
               })}
             </div>
           </motion.div>
-        </div>,
+            </div>
+          )}
+        </AnimatePresence>,
         document.body
       )}
     </>

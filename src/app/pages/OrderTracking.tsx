@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { ChevronLeft, Package, Truck, CheckCircle2, Clock } from 'lucide-react';
 import { orderService } from '../services/orderService';
@@ -114,17 +115,35 @@ export function OrderTracking() {
         <div className="bg-white dark:bg-surface p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-border-light">
           <div className="relative">
             <div className="absolute left-[15px] top-4 bottom-4 w-[2px] bg-gray-100 dark:bg-surface-tertiary" />
+            {/* Progress fill — covers completed steps */}
+            {currentStatusIndex >= 0 && (
+              <div
+                className="absolute left-[15px] top-4 w-[2px] bg-blue-500 transition-all duration-700 ease-in-out"
+                style={{
+                  height: `${Math.min(
+                    ((currentStatusIndex) / Math.max(steps.length - 1, 1)) * 100,
+                    100
+                  )}%`,
+                }}
+              />
+            )}
 
             {steps.map((step, idx) => (
               <div key={step.status} className="flex gap-4 mb-8 last:mb-0 relative">
                 <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center z-10 relative transition-all",
-                  step.completed ? "bg-blue-600 text-white" : step.current ? "bg-blue-100 dark:bg-blue-500/20 border-2 border-blue-600 text-blue-600" : "bg-gray-100 dark:bg-surface-tertiary text-gray-400 dark:text-text-tertiary"
+                  "w-8 h-8 rounded-full flex items-center justify-center z-10 relative transition-all duration-300 shadow-sm",
+                  step.completed && !step.current ? "bg-blue-600 text-white ring-2 ring-blue-100 dark:ring-blue-500/20" :
+                  step.current ? "bg-white dark:bg-surface border-2 border-blue-600 text-blue-600 ring-4 ring-blue-100/60 dark:ring-blue-500/20" :
+                  "bg-gray-100 dark:bg-surface-tertiary text-gray-400 dark:text-text-tertiary"
                 )}>
-                  {step.completed ? (
-                    <CheckCircle2 size={16} />
+                  {step.completed && !step.current ? (
+                    <CheckCircle2 size={16} className="text-white" />
                   ) : step.current ? (
-                    <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse" />
+                    <motion.div
+                      className="w-3 h-3 bg-blue-600 rounded-full"
+                      animate={{ scale: [1, 1.3, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                    />
                   ) : (
                     <Clock size={14} />
                   )}

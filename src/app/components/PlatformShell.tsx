@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { MobileShell } from './MobileShell';
 import { WebShell } from './WebShell';
@@ -10,13 +10,20 @@ export function PlatformShell() {
     }
     return false;
   });
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileScreen(window.innerWidth < 1024);
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      debounceTimer.current = setTimeout(() => {
+        setIsMobileScreen(window.innerWidth < 1024);
+      }, 150);
     };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
   }, []);
 
   if (Capacitor.isNativePlatform() || isMobileScreen) {

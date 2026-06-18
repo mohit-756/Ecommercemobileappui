@@ -27,7 +27,6 @@ export function OrderSuccess() {
               const productName = item.product?.name || 'Dry Fruits';
               localNotificationService.scheduleRestockReminder(productName, 30);
             });
-            toast.info('Restock reminders scheduled! A test notification will fire in 10 seconds.');
           }
         })
         .catch((err) => {

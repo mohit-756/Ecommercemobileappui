@@ -9,9 +9,27 @@ export function Support() {
   const { t } = useTranslation();
 
   const contactMethods = [
-    { icon: MessageCircle, label: t('liveChat'), description: t('liveChatDesc'), color: 'bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' },
-    { icon: Phone, label: t('callSupport'), description: t('callSupportDesc'), color: 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
-    { icon: Mail, label: t('emailUs'), description: t('emailUsDesc'), color: 'bg-purple-50 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' },
+    {
+      icon: MessageCircle,
+      label: t('liveChat'),
+      description: t('liveChatDesc'),
+      color: 'bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
+      action: () => window.open('https://wa.me/919999999999?text=Hi%2C%20I%20need%20help%20with%20my%20DryFruit%20Hub%20order', '_blank', 'noopener,noreferrer'),
+    },
+    {
+      icon: Phone,
+      label: t('callSupport'),
+      description: t('callSupportDesc'),
+      color: 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
+      action: () => window.location.href = 'tel:+919999999999',
+    },
+    {
+      icon: Mail,
+      label: t('emailUs'),
+      description: t('emailUsDesc'),
+      color: 'bg-purple-50 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400',
+      action: () => window.location.href = 'mailto:support@dryfruithub.com?subject=Support%20Request',
+    },
   ];
 
   const commonTopics = [
@@ -43,7 +61,8 @@ export function Support() {
                 <motion.button
                   key={idx}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-white dark:bg-surface p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-gray-100 dark:border-border-light cursor-pointer"
+                  onClick={method.action}
+                  className="w-full bg-white dark:bg-surface p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-gray-100 dark:border-border-light cursor-pointer hover:shadow-md transition-shadow"
                 >
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${method.color}`}>
                     <method.icon size={24} />

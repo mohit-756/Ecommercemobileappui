@@ -19,6 +19,8 @@ import wishlistRoutes from './routes/wishlist.js';
 import reviewRoutes from './routes/reviews.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { validateTwilioConfig } from './services/smsService.js';
+import helmet from 'helmet';
+import { apiRateLimiter } from './middleware/rateLimiter.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -27,26 +29,30 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
   credentials: true,
 }));
+
+// Security headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow image serving
+  contentSecurityPolicy: false, // managed by frontend/Vercel
+}));
+
+// General API rate limiting
+app.use('/api', apiRateLimiter);
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Request logging middleware to diagnose performance/endpoints
-import fs from 'fs';
+// Lightweight request logger — console only, no disk writes
 app.use((req, res, next) => {
-  const start = Date.now();
-  const logFile = path.join(__dirname, '../requests.log');
-  const logMsg = `[${new Date().toISOString()}] ${req.method} ${req.url} started\n`;
-  try {
-    fs.appendFileSync(logFile, logMsg);
-  } catch (e) {}
-  
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    const finishMsg = `[${new Date().toISOString()}] ${req.method} ${req.url} finished in ${duration}ms with status ${res.statusCode}\n`;
-    try {
-      fs.appendFileSync(logFile, finishMsg);
-    } catch (e) {}
-  });
+  if (process.env.NODE_ENV === 'development') {
+    const start = Date.now();
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      const status = res.statusCode;
+      const color = status >= 500 ? '\x1b[31m' : status >= 400 ? '\x1b[33m' : '\x1b[32m';
+      console.log(`${color}${req.method}\x1b[0m ${req.url} ${status} ${duration}ms`);
+    });
+  }
   next();
 });
 

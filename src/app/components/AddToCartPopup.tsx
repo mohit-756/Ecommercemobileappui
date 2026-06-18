@@ -79,7 +79,7 @@ export function AddToCartPopup({ product, isOpen, onClose, cartSubtotal, cartIte
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 100, opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed bottom-24 left-3 right-3 z-[1001] sm:left-auto sm:right-4 sm:w-[360px]"
+            className="fixed bottom-[calc(env(safe-area-inset-bottom,0px)+88px)] left-3 right-3 z-[1001] sm:left-auto sm:right-4 sm:w-[360px] lg:bottom-6"
           >
             <div className="bg-white/90 dark:bg-surface/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 dark:border-white/10 overflow-hidden">
               {/* Progress bar */}

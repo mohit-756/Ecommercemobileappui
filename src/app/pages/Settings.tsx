@@ -41,11 +41,28 @@ export function Settings() {
   };
 
   const handleClearCache = () => {
-    toast.promise(new Promise(res => setTimeout(res, 1500)), {
-      loading: 'Clearing cache...',
-      success: 'Cache cleared successfully!',
-      error: 'Failed to clear cache'
-    });
+    toast.promise(
+      new Promise<void>((resolve) => {
+        setTimeout(() => {
+          // Clear all non-critical cached data
+          const keysToRemove = [
+            'recent_searches',
+            'recently_viewed',
+            'guest_cart',
+            'delivery_location',
+            'location-popup-dismissed',
+          ];
+          keysToRemove.forEach(key => localStorage.removeItem(key));
+          sessionStorage.clear();
+          resolve();
+        }, 600);
+      }),
+      {
+        loading: 'Clearing cache...',
+        success: 'Cache cleared! Some data like login session is preserved.',
+        error: 'Failed to clear cache',
+      }
+    );
   };
 
   return (
@@ -155,7 +172,6 @@ export function Settings() {
                 </div>
                 <span className="font-semibold text-red-500">{t('clearCache')}</span>
               </div>
-              <span className="text-sm text-gray-400 dark:text-text-tertiary">24 MB</span>
             </motion.button>
           </div>
         </div>

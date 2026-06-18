@@ -17,6 +17,7 @@ export function Profile() {
   const { t } = useTranslation();
   const [ordersCount, setOrdersCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [reviewsCount, setReviewsCount] = useState(0);
 
 
 
@@ -24,6 +25,14 @@ export function Profile() {
     orderService.getUserOrders({ limit: 1 })
       .then(res => {
         setOrdersCount(res.data.total || res.data.orders?.length || 0);
+      })
+      .catch(() => {});
+
+    // Count orders that have been rated (as a proxy for reviews given)
+    orderService.getUserOrders({ limit: 100 })
+      .then(res => {
+        const ratedOrders = (res.data.orders || []).filter((o: any) => o.rating);
+        setReviewsCount(ratedOrders.length);
       })
       .catch(() => {});
 
@@ -115,7 +124,7 @@ export function Profile() {
             <span className="text-xs text-gray-500 dark:text-text-secondary font-medium">{t('orders')}</span>
           </div>
           <div className="bg-gray-50 dark:bg-surface-tertiary rounded-2xl p-3 text-center">
-            <span className="block text-xl font-bold text-gray-900 dark:text-text-primary">0</span>
+            <span className="block text-xl font-bold text-gray-900 dark:text-text-primary">{reviewsCount}</span>
             <span className="text-xs text-gray-500 dark:text-text-secondary font-medium">{t('reviews')}</span>
           </div>
           <div onClick={() => navigate('/wishlist')} className="bg-gray-50 dark:bg-surface-tertiary rounded-2xl p-3 text-center cursor-pointer active:bg-gray-100 dark:active:bg-surface-tertiary transition-colors">

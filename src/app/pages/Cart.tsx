@@ -1,16 +1,29 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Trash2, Minus, Plus, ArrowRight, Tag, ShoppingCart, BellOff, DoorOpen, UserCheck, PhoneOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../contexts/CartContext';
 import { formatPrice, handleImageError } from '../lib/utils';
 import { useTranslation } from '../hooks/useTranslation';
+import { toast } from 'sonner';
+import { productService } from '../services/productService';
+import { ProductCard } from '../components/ProductCard';
 
 export function Cart() {
   const navigate = useNavigate();
   const { items, itemCount, loading, updateQuantity, removeItem, subtotal } = useCart();
   const { t } = useTranslation();
+  const [recommended, setRecommended] = useState<any[]>([]);
+
+  useEffect(() => {
+    productService.getProducts({ limit: 6 })
+      .then(res => setRecommended(res.data?.products || []))
+      .catch(() => {});
+  }, []);
+
   const shipping = items.length > 0 ? (subtotal >= 500 ? 0 : 40) : 0;
-  const total = subtotal + shipping;
+  const tax = Math.round(subtotal * 0.08 * 100) / 100;
+  const total = subtotal + shipping + tax;
 
   if (loading) {
     return (
@@ -31,18 +44,41 @@ export function Cart() {
 
       <div className="flex-1 px-6 py-6 pb-32 lg:pb-6 overflow-y-auto">
         {items.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 bg-gray-100 dark:bg-surface-tertiary rounded-full flex items-center justify-center mx-auto mb-4">
-              <ShoppingCart size={40} className="text-gray-400 dark:text-text-tertiary" />
+          <div>
+            {/* Empty state header */}
+            <div className="text-center py-10">
+              <div className="w-24 h-24 bg-gray-100 dark:bg-surface-tertiary rounded-full flex items-center justify-center mx-auto mb-4">
+                <ShoppingCart size={40} className="text-gray-400 dark:text-text-tertiary" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-text-primary mb-2">{t('cartEmpty')}</h2>
+              <p className="text-gray-500 dark:text-text-secondary">{t('cartEmptyDesc')}</p>
+              <button
+                onClick={() => navigate('/home')}
+                className="mt-5 bg-blue-600 text-white font-semibold rounded-xl py-3 px-8 hover:bg-blue-700 transition-colors active:scale-95"
+              >
+                {t('shopNow')}
+              </button>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-text-primary mb-2">{t('cartEmpty')}</h2>
-            <p className="text-gray-500 dark:text-text-secondary">{t('cartEmptyDesc')}</p>
-            <button
-              onClick={() => navigate('/home')}
-              className="mt-6 bg-blue-600 text-white font-semibold rounded-xl py-3 px-8 hover:bg-blue-700 transition-colors"
-            >
-              {t('shopNow')}
-            </button>
+
+            {/* Recommendations */}
+            {recommended.length > 0 && (
+              <div className="mt-2">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-gray-900 dark:text-text-primary">You might like</h3>
+                  <button
+                    onClick={() => navigate('/home')}
+                    className="text-blue-600 text-sm font-semibold hover:underline cursor-pointer"
+                  >
+                    See all
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {recommended.map((p: any) => (
+                    <ProductCard key={p._id || p.id} product={p} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="lg:grid lg:grid-cols-3 lg:gap-8 items-start">
@@ -102,7 +138,14 @@ export function Cart() {
                             </button>
                             <span className="w-6 text-center text-sm font-semibold text-gray-900 dark:text-text-primary">{item.quantity}</span>
                             <button
-                              onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                              onClick={() => {
+                                const stock = item.product.stock ?? 999;
+                                if (item.quantity >= stock) {
+                                  toast.error(`Only ${stock} item${stock !== 1 ? 's' : ''} available`);
+                                  return;
+                                }
+                                updateQuantity(item._id, item.quantity + 1);
+                              }}
                               className="w-7 h-7 bg-white dark:bg-surface transition-colors duration-300 rounded-full shadow-sm flex items-center justify-center text-gray-900 dark:text-text-primary my-0.5 mr-0.5"
                             >
                               <Plus size={14} />
@@ -160,7 +203,7 @@ export function Cart() {
                 </div>
                 <div className="flex justify-between text-gray-500 dark:text-text-secondary text-sm">
                   <span>{t('tax')}</span>
-                  <span className="text-gray-900 dark:text-text-primary font-medium">₹0.00</span>
+                  <span className="text-gray-900 dark:text-text-primary font-medium">{formatPrice(tax)}</span>
                 </div>
                 <div className="h-px bg-gray-100 dark:bg-surface-tertiary my-2" />
                 <div className="flex justify-between items-end mb-4">

@@ -38,7 +38,6 @@ export function Onboarding() {
     }
   };
 
-  const SlideIcon = slides[currentSlide].icon;
 
   return (
     <div className="w-full min-h-screen flex items-stretch lg:items-center justify-center bg-white dark:bg-background lg:bg-gray-50 dark:lg:bg-background transition-colors duration-300">
@@ -129,10 +128,22 @@ export function Onboarding() {
                   transition={{ duration: 0.3 }}
                   className="flex flex-col items-center text-center w-full"
                 >
-                  <div className={cn("w-48 h-48 sm:w-56 sm:h-56 rounded-full flex items-center justify-center mb-8", slides[currentSlide].color)}>
-                    <SlideIcon size={80} strokeWidth={1} />
+                  {/* Real product image instead of icon */}
+                  <div className={cn(
+                    "w-52 h-52 sm:w-60 sm:h-60 rounded-3xl flex items-center justify-center mb-8 overflow-hidden relative shadow-xl",
+                    slides[currentSlide].color
+                  )}>
+                    <motion.img
+                      src={
+                        currentSlide === 0 ? '/images/promo/mixed_nuts.png' :
+                        currentSlide === 1 ? '/images/promo/gift_box.png' :
+                        '/images/promo/healthy_lifestyle.png'
+                      }
+                      alt={slides[currentSlide].title}
+                      className="w-44 h-44 sm:w-52 sm:h-52 object-contain drop-shadow-lg animate-float"
+                    />
                   </div>
-                  
+
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-text-primary mb-3 tracking-tight">
                     {slides[currentSlide].title}
                   </h2>

@@ -7,6 +7,7 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import { createShipment } from '../services/shippingPartner.js';
+import { sendOrderConfirmationEmail, sendOrderShippedEmail, sendOrderDeliveredEmail, sendOrderCancelledEmail } from '../services/emailService.js';
 
 function isDevMode() {
   return process.env.RAZORPAY_KEY_ID === 'your_razorpay_key_id'
@@ -155,6 +156,18 @@ export async function createOrder(req, res, next) {
       }
     }
 
+    // Send confirmation email (non-blocking)
+    try {
+      const user = await User.findById(req.user._id).select('name email');
+      if (user?.email) {
+        sendOrderConfirmationEmail(user.email, user.name, order).catch(err =>
+          console.error('Order confirmation email failed:', err.message)
+        );
+      }
+    } catch (emailErr) {
+      console.error('Failed to fetch user for order email:', emailErr.message);
+    }
+
     res.status(201).json({
       order,
       razorpayOrder,
@@ -200,6 +213,18 @@ export async function verifyPayment(req, res, next) {
     });
 
     await order.save();
+
+    // Payment verified — re-send confirmation now that payment is complete (non-blocking)
+    try {
+      const userDoc = await User.findById(order.user).select('name email');
+      if (userDoc?.email) {
+        sendOrderConfirmationEmail(userDoc.email, userDoc.name, order).catch(err =>
+          console.error('Post-payment order email failed:', err.message)
+        );
+      }
+    } catch (emailErr) {
+      console.error('Failed to send post-payment email:', emailErr.message);
+    }
 
     res.json({ message: 'Payment verified', order });
   } catch (error) {
@@ -411,6 +436,25 @@ export async function updateOrderStatus(req, res, next) {
     });
 
     await order.save();
+
+    // Send email for key status transitions (non-blocking)
+    try {
+      const userDoc = await User.findById(order.user).select('name email');
+      if (userDoc?.email) {
+        if (status === 'shipped' || status === 'out_for_delivery') {
+          sendOrderShippedEmail(userDoc.email, userDoc.name, order, status).catch(err =>
+            console.error('Shipped email failed:', err.message)
+          );
+        } else if (status === 'delivered' || status === 'completed') {
+          sendOrderDeliveredEmail(userDoc.email, userDoc.name, order).catch(err =>
+            console.error('Delivered email failed:', err.message)
+          );
+        }
+      }
+    } catch (emailErr) {
+      console.error('Failed to send status update email:', emailErr.message);
+    }
+
     res.json(order);
   } catch (error) {
     next(error);
@@ -802,6 +846,19 @@ export async function cancelOrder(req, res, next) {
     });
 
     await order.save();
+
+    // Send cancellation email (non-blocking)
+    try {
+      const userDoc = await User.findById(order.user).select('name email');
+      if (userDoc?.email) {
+        sendOrderCancelledEmail(userDoc.email, userDoc.name, order, req.body.reason || '').catch(err =>
+          console.error('Cancellation email failed:', err.message)
+        );
+      }
+    } catch (emailErr) {
+      console.error('Failed to send cancellation email:', emailErr.message);
+    }
+
     res.json(order);
   } catch (error) {
     next(error);

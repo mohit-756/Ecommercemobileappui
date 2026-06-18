@@ -63,35 +63,39 @@ export function MobileShell() {
                   <button
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    className="relative p-2 flex flex-col items-center gap-1 min-w-[64px]"
+                    className="relative flex flex-col items-center gap-1 min-w-[64px] py-1 px-1"
                   >
+                    {/* Background pill chip for active state */}
                     <div className="relative">
-                      <item.icon 
-                        size={24} 
-                        className={cn(
-                          "transition-colors duration-200",
-                          isActive ? "text-blue-600" : "text-gray-400 dark:text-text-tertiary"
-                        )}
-                        strokeWidth={isActive ? 2.5 : 2}
-                      />
-                      {(item.badge ?? 0) > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-surface">
-                          {item.badge}
-                        </span>
+                      {isActive && (
+                        <motion.div
+                          layoutId="nav-chip"
+                          className="absolute inset-0 -inset-x-3 -inset-y-1 bg-blue-50 dark:bg-blue-500/15 rounded-full"
+                          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                        />
                       )}
+                      <div className="relative z-10">
+                        <item.icon
+                          size={22}
+                          className={cn(
+                            "transition-colors duration-200",
+                            isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-text-tertiary"
+                          )}
+                          strokeWidth={isActive ? 2.5 : 2}
+                        />
+                        {(item.badge ?? 0) > 0 && (
+                          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-surface">
+                            {(item.badge ?? 0) > 9 ? '9+' : item.badge}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <span className={cn(
-                      "text-[10px] font-medium transition-colors",
-                      isActive ? "text-blue-600" : "text-gray-400 dark:text-text-tertiary"
+                      "text-[10px] font-semibold transition-colors leading-none",
+                      isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-text-tertiary"
                     )}>
                       {item.label}
                     </span>
-                    {isActive && (
-                      <motion.div 
-                        layoutId="nav-indicator"
-                        className="absolute -top-3 w-8 h-1 bg-blue-600 rounded-b-full"
-                      />
-                    )}
                   </button>
                 );
               })}

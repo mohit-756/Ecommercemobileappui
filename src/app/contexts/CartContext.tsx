@@ -125,7 +125,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           _id: `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
           product: normalizeProduct(product || { _id: productId }),
           quantity,
-          selectedWeight: selectedWeight || (product?.variants?.[0]?.weight || null),
+          selectedWeight: selectedWeight || product?.variants?.[0]?.weight || undefined,
           selectedPrice: guestPrice,
         });
       }

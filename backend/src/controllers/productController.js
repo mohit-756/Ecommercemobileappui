@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import * as XLSX from 'xlsx';
@@ -75,16 +76,25 @@ export async function createProduct(req, res, next) {
 }
 
 export async function updateProduct(req, res, next) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true, session }
+    );
     if (!product) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({ message: 'Product not found' });
     }
+    await session.commitTransaction();
+    session.endSession();
     res.json(product);
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     next(error);
   }
 }

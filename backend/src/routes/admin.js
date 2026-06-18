@@ -1,10 +1,14 @@
 import { Router } from 'express';
 import { getDashboardStats, getAllUsers } from '../controllers/adminController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
+import { adminAuditLog } from '../middleware/adminAudit.js';
 
 const router = Router();
 
-router.get('/stats', protect, adminOnly, getDashboardStats);
-router.get('/users', protect, adminOnly, getAllUsers);
+// Apply audit logging to all admin routes
+router.use(protect, adminOnly, adminAuditLog);
+
+router.get('/stats', getDashboardStats);
+router.get('/users', getAllUsers);
 
 export default router;

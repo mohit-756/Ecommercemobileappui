@@ -1,0 +1,291 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add `tax = Math.round(subtotal * 0.08 * 100) / 100` calculation in Cart.tsx": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753965993
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753983268
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754031817
+      }
+    ],
+    "1.2 Include tax in the `total` calculation (`subtotal + shipping + tax`)": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753966411
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754036601
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754041062
+      }
+    ],
+    "1.3 Replace the hardcoded `₹0.00` tax display with `formatPrice(tax)`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753966771
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754046022
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754061627
+      }
+    ],
+    "2.1 Normalize `selectedWeight` to `undefined` instead of `null` when no weight is provided in guest `addToCart`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753966988
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754070036
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754211063
+      }
+    ],
+    "2.2 Update the duplicate-detection `find` to use a loose equality or normalize both sides": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753967200
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754215650
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754219946
+      }
+    ],
+    "3.1 Extract `auth:logout` and `auth:login` event listener registration into a separate `useEffect` with `[]` dependency (runs once on mount)": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753967406
+      },
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754224694
+      }
+    ],
+    "3.2 Keep the profile-fetching logic in its own `useEffect` that depends on `token`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753967575
+      }
+    ],
+    "3.3 Ensure the listener cleanup runs on unmount only": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753967785
+      }
+    ],
+    "4.1 Update `AuthContextType` interface: change `login`, `loginWithGoogle`, `register` return types from `Promise<void>` to `Promise<User>`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753967936
+      }
+    ],
+    "4.2 Remove the implicit `return userData` calls (they already return) and ensure the types are consistent": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753968192
+      }
+    ],
+    "5.1 Consolidate the `paymentMethods` array to two options: `{ id: 'razorpay', name: 'Pay Online', ... }` and `{ id: 'cod', name: 'Cash on Delivery', ... }`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753968432
+      }
+    ],
+    "5.2 Add a descriptive subtitle to the Razorpay option mentioning UPI, Card, Wallet are supported": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753968581
+      }
+    ],
+    "5.3 Remove the silent `paymentMethod === 'cod' ? 'cod' : 'razorpay'` mapping in `handlePlaceOrder` since state is now direct": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753968712
+      }
+    ],
+    "5.4 Set default `paymentMethod` state to `'razorpay'` instead of `'cod'` (or keep `'cod'` as default — match current default)": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753968874
+      }
+    ],
+    "6.1 Add `user` to the location popup `useEffect` dependency array so it re-evaluates when auth state changes": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753969015
+      }
+    ],
+    "6.2 Add `detectLocation` to the `handleAllowLocation` callback dependency array (wrap in `useCallback` if needed)": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753969162
+      }
+    ],
+    "7.1 Add `user` to the `useEffect([id, navigate])` dependency array so wishlist status re-checks when auth resolves": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753969303
+      }
+    ],
+    "7.2 Alternatively, extract `checkWishlistStatus` into a separate `useEffect` that depends on `[product, user]`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753969513
+      }
+    ],
+    "8.1 Check if `item.weight` is set to determine variant vs top-level stock update path": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753969733
+      }
+    ],
+    "8.2 For variant items: use `Product.findOneAndUpdate` with `variants.weight` match and `variants.$.stock` decrement with `$gte` check": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753969886
+      }
+    ],
+    "8.3 For non-variant items: keep existing top-level `stock` decrement logic": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753970069
+      }
+    ],
+    "8.4 Ensure rollback works for both variant and non-variant paths": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753970347
+      }
+    ],
+    "9.1 Update the cancellation guard: `if (!['pending', 'confirmed', 'received'].includes(order.status))`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753970562
+      }
+    ],
+    "10.1 After clearing, return `{ message: 'Cart cleared', items: [] }` instead of `{ message: 'Cart cleared' }`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753970741
+      }
+    ],
+    "11.1 Before `User.create({ name, email, password })` in the `verifyOtp` handler, add `const existingUser = await User.findOne({ email })`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753970897
+      }
+    ],
+    "11.2 If `existingUser` exists, return `res.status(409).json({ message: 'Email already registered' })`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753971042
+      }
+    ],
+    "12.1 Before `User.create(...)` for phone registration, check `User.findOne({ email: dummyEmail })`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753971259
+      }
+    ],
+    "12.2 If the derived email exists (collision), append a random suffix: `${formattedPhone}_${crypto.randomBytes(4).toString('hex')}@phone.dryfruithub.local`": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753971416
+      }
+    ],
+    "13.1 Wrap `Order.create(...)` in a try/catch block": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753971579
+      }
+    ],
+    "13.2 In the catch block, iterate `decrementedItems` and call `Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity } })` for each (or variant rollback for variant items after Bug 8 fix)": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753971754
+      }
+    ],
+    "13.3 Re-throw or return 500 after rollback completes": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781753971911
+      }
+    ],
+    "1. Fix Cart.tsx tax display — calculate and show 8% tax in cart summary": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754062533
+      }
+    ],
+    "2. Fix CartContext.tsx guest cart null vs undefined selectedWeight deduplication bug": [
+      {
+        "executionId": "301dda7d-112f-4768-a076-d3b7469256ac",
+        "chatSessionId": "sess_f781805a-a292-4922-8922-d3d8e97a8d56",
+        "timestamp": 1781754220052
+      }
+    ]
+  }
+}

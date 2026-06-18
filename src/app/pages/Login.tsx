@@ -33,8 +33,8 @@ export function Login() {
     if (Capacitor.isNativePlatform()) {
       try {
         GoogleAuth.initialize();
-      } catch (err) {
-        console.warn('GoogleAuth initialize warning:', err);
+      } catch {
+        // GoogleAuth.initialize() warning suppressed in production
       }
       return;
     }
@@ -91,7 +91,6 @@ export function Login() {
   const handleNativeGoogleSignIn = async () => {
     setLoading(true);
     try {
-      console.log('Starting Native Google Sign-In...');
       const googleUser = await GoogleAuth.signIn().catch(e => {
         throw { source: 'plugin', inner: e };
       });
@@ -101,7 +100,6 @@ export function Login() {
         throw { source: 'plugin', message: 'No ID Token returned from Google Auth' };
       }
 
-      console.log('ID Token received, calling backend...');
       await loginWithGoogle(idToken).catch(e => {
         throw { source: 'backend', inner: e };
       });
@@ -142,19 +140,32 @@ export function Login() {
   const handleBiometricLogin = async () => {
     setBiometricLoading(true);
     try {
-      let email = localStorage.getItem('bio_email');
-      let password = localStorage.getItem('bio_password');
+      const savedEmail = localStorage.getItem('bio_email');
+      const savedPassword = localStorage.getItem('bio_password'); // legacy fallback only
 
-      // Demo fallback: If no credentials saved, use seeded guest credentials
-      if (!email || !password) {
-        email = 'guest@dryfruit.com';
-        password = 'guest0000';
+      if (!savedEmail && !savedPassword) {
+        toast.error('No saved credentials. Please sign in with email first.');
+        setBiometricLoading(false);
+        return;
       }
 
       const auth = await biometricService.authenticate('Log in to DryFruit Hub');
       if (auth.success) {
-        await login(email, password);
+        // Use legacy password if available (from before this fix), otherwise show error
+        if (savedPassword) {
+          await login(savedEmail!, savedPassword);
+          // Migrate: remove plaintext password now that login succeeded
+          localStorage.removeItem('bio_password');
+          const storedToken = localStorage.getItem('token');
+          if (storedToken) localStorage.setItem('bio_token', storedToken);
+        } else {
+          toast.error('Please sign in with email once to re-enable biometric login.');
+          setBiometricLoading(false);
+          return;
+        }
         toast.success('Welcome back!');
+      } else {
+        toast.error('Biometric authentication failed');
       }
     } catch (err) {
       toast.error('Biometric login failed');
@@ -226,7 +237,11 @@ export function Login() {
         await login(email, password);
         if (biometricAvailable) {
           localStorage.setItem('bio_email', email);
-          localStorage.setItem('bio_password', password);
+          // Store token for biometric re-auth, never store plaintext password
+          const storedToken = localStorage.getItem('token');
+          if (storedToken) {
+            localStorage.setItem('bio_token', storedToken);
+          }
         }
         toast.success('Welcome back!');
       } else {
@@ -360,7 +375,11 @@ export function Login() {
 
                 {isLogin && (
                   <div className="flex justify-end">
-                    <button type="button" className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer">
+                    <button 
+                      type="button" 
+                      onClick={() => toast.info('Password reset: please contact support or use Phone OTP login to access your account.')}
+                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
+                    >
                       Forgot Password?
                     </button>
                   </div>
