@@ -10,6 +10,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from './components/PublicRoute';
 import { LocationProvider } from './contexts/LocationContext';
 import { AddToCartPopupProvider } from './contexts/AddToCartPopupContext';
+import { ChatbotProvider } from './contexts/ChatbotContext';
 import { LocationSelectorModal } from './components/LocationSelectorModal';
 import { Splash } from './pages/Splash';
 import { Onboarding } from './pages/Onboarding';
@@ -69,46 +70,48 @@ export default function App() {
             <ThemeProvider>
               <CartProvider>
                 <AddToCartPopupProvider>
-                  <Routes>
-                    <Route element={<PlatformShell />}>
-                      <Route index element={<Splash />} />
-                      <Route path="onboarding" element={<PublicRoute><Onboarding /></PublicRoute>} />
-                      <Route path="login" element={<PublicRoute><Login /></PublicRoute>} />
-                      <Route path="verify-otp" element={<PublicRoute><VerifyOtp /></PublicRoute>} />
-                      <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-                      <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-                      <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-                      <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                      <Route path="profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
-                      <Route path="product/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
-                      <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-                      <Route path="success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
-                      <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
-                      <Route path="order-details" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
-                      <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-                      <Route path="rider" element={<ProtectedRoute><RiderPortal /></ProtectedRoute>} />
-                      <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-                      <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
-                      <Route path="payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
-                      <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                      <Route path="support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
-                      <Route path="privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
-                      <Route path="terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
-                      <Route path="refund" element={<ProtectedRoute><RefundPolicy /></ProtectedRoute>} />
-                      <Route path="shipping" element={<ProtectedRoute><ShippingInfo /></ProtectedRoute>} />
-                      <Route path="*" element={<Navigate to="/home" replace />} />
-                    </Route>
+                  <ChatbotProvider>
+                    <Routes>
+                      <Route element={<PlatformShell />}>
+                        <Route index element={<Splash />} />
+                        <Route path="onboarding" element={<PublicRoute><Onboarding /></PublicRoute>} />
+                        <Route path="login" element={<PublicRoute><Login /></PublicRoute>} />
+                        <Route path="verify-otp" element={<PublicRoute><VerifyOtp /></PublicRoute>} />
+                        <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                        <Route path="search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+                        <Route path="cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                        <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                        <Route path="profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+                        <Route path="product/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
+                        <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                        <Route path="success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+                        <Route path="tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>} />
+                        <Route path="order-details" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
+                        <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                        <Route path="rider" element={<ProtectedRoute><RiderPortal /></ProtectedRoute>} />
+                        <Route path="wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                        <Route path="addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>} />
+                        <Route path="payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
+                        <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                        <Route path="support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+                        <Route path="privacy" element={<ProtectedRoute><Privacy /></ProtectedRoute>} />
+                        <Route path="terms" element={<ProtectedRoute><Terms /></ProtectedRoute>} />
+                        <Route path="refund" element={<ProtectedRoute><RefundPolicy /></ProtectedRoute>} />
+                        <Route path="shipping" element={<ProtectedRoute><ShippingInfo /></ProtectedRoute>} />
+                        <Route path="*" element={<Navigate to="/home" replace />} />
+                      </Route>
 
 
-                    <Route element={<AdminShell />}>
-                      <Route path="admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
-                      <Route path="admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
-                      <Route path="admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
-                      <Route path="admin/categories" element={<ProtectedRoute adminOnly><AdminCategories /></ProtectedRoute>} />
-                    </Route>
-                  </Routes>
-                  <LocationSelectorModal />
-                  <ThemeAwareToaster />
+                      <Route element={<AdminShell />}>
+                        <Route path="admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+                        <Route path="admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
+                        <Route path="admin/orders" element={<ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>} />
+                        <Route path="admin/categories" element={<ProtectedRoute adminOnly><AdminCategories /></ProtectedRoute>} />
+                      </Route>
+                    </Routes>
+                    <LocationSelectorModal />
+                    <ThemeAwareToaster />
+                  </ChatbotProvider>
                 </AddToCartPopupProvider>
               </CartProvider>
             </ThemeProvider>

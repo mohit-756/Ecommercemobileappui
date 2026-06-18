@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router';
-import { ChevronLeft, MessageCircle, Phone, Mail, FileText, ChevronRight } from 'lucide-react';
-import { motion } from 'motion/react';
-import { toast } from 'sonner';
+import { ChevronLeft, Phone, Mail, FileText, ChevronRight } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { HelpSupportChat } from '../components/chatbot/HelpSupportChat';
 
 export function Support() {
   const navigate = useNavigate();
@@ -10,11 +9,10 @@ export function Support() {
 
   const contactMethods = [
     {
-      icon: MessageCircle,
+      icon: HelpSupportChat,
       label: t('liveChat'),
       description: t('liveChatDesc'),
       color: 'bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
-      action: () => window.open('https://wa.me/919999999999?text=Hi%2C%20I%20need%20help%20with%20my%20DryFruit%20Hub%20order', '_blank', 'noopener,noreferrer'),
     },
     {
       icon: Phone,
@@ -57,23 +55,27 @@ export function Support() {
             </div>
 
             <div className="space-y-3">
-              {contactMethods.map((method, idx) => (
-                <motion.button
-                  key={idx}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={method.action}
-                  className="w-full bg-white dark:bg-surface p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-gray-100 dark:border-border-light cursor-pointer hover:shadow-md transition-shadow"
-                >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${method.color}`}>
-                    <method.icon size={24} />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-bold text-gray-900 dark:text-text-primary">{method.label}</p>
-                    <p className="text-xs text-gray-500 dark:text-text-secondary">{method.description}</p>
-                  </div>
-                  <ChevronRight size={20} className="text-gray-400 dark:text-text-tertiary" />
-                </motion.button>
-              ))}
+              {contactMethods.map((method, idx) => {
+                if (method.label === t('liveChat')) {
+                  return <HelpSupportChat key={idx} />;
+                }
+                return (
+                  <button
+                    key={idx}
+                    onClick={method.action}
+                    className="w-full bg-white dark:bg-surface p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-gray-100 dark:border-border-light cursor-pointer hover:shadow-md transition-shadow"
+                  >
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${method.color}`}>
+                      <method.icon size={24} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="font-bold text-gray-900 dark:text-text-primary">{method.label}</p>
+                      <p className="text-xs text-gray-500 dark:text-text-secondary">{method.description}</p>
+                    </div>
+                    <ChevronRight size={20} className="text-gray-400 dark:text-text-tertiary" />
+                  </button>
+                );
+              })}
             </div>
           </div>
 
